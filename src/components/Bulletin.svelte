@@ -188,6 +188,7 @@
         border-radius: 10px;
         background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-section-bg-color) 92%, var(--tg-theme-hint-color)) 85%, transparent);
         backdrop-filter: var(--global-backdrop-filter);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
     }
 
     .bulletin.showBulletin {

@@ -27,7 +27,8 @@
         align-items: center;
         justify-content: center;
         border-radius: 25px;
-        background: color-mix(in srgb, var(--tg-theme-secondary-bg-color) 45%, transparent);
+        background: color-mix(in srgb, var(--tg-theme-secondary-bg-color) 55%, transparent);
         backdrop-filter: var(--global-backdrop-filter);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
     }
 </style>
