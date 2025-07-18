@@ -1,0 +1,65 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    cursor: default;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body > div {
+    height: 100%;
+}
+
+:root {
+    --global-backdrop-filter: saturate(180%) blur(20px);
+}
+
+* {
+    font-family: 'SFProText', serif;
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+    letter-spacing: -0.45px
+}
+
+/*
+Font files are sourced from Apple's official website.
+Source:
+https://www.apple.com/wss/fonts/SF-Pro-Text/v3/sf-pro-text_regular.woff2
+*/
+
+@font-face {
+    font-family: 'SFProText';
+    src: url('assets/fonts/SFProText-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'SFProText';
+    src: url('assets/fonts/SFProText-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'SFProText';
+    src: url('assets/fonts/SFProText-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'SFProText';
+    src: url('assets/fonts/SFProText-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
