@@ -120,7 +120,7 @@
                     <circle
                         cx="50"
                         cy="50"
-                        r="45"
+                        r="44"
                         fill="none"
                         stroke="white"
                         stroke-width="12"
