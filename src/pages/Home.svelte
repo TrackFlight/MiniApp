@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {currentUser, telegram} from "../lib/telegram";
+    import {currentUser, isiOS, telegram} from "../lib/telegram";
     import UserIcon from '../components/UserIcon.svelte'
     import Header from "../components/Header.svelte";
     import StickerContainer from "../components/StickerContainer.svelte";
@@ -7,10 +7,9 @@
     import Divider from "../components/Divider.svelte";
     import Button from "../components/Button.svelte";
     import ItemView from "../components/ItemView.svelte";
-    import { isiOS } from "../lib/telegram";
+    import {ReadableDateDifference, T} from "../lib/translator";
+    import {slide} from 'svelte/transition';
     import {removeLink, ServerErrorCode, sessionStore, trackLink, withUIProgress} from "../lib/api";
-    import { ReadableDateDifference, T } from "../lib/translator";
-    import { slide } from 'svelte/transition';
 
     let deletable = $state(!isiOS);
     let items = $state(sessionStore.linksList);
@@ -60,7 +59,15 @@
     function addLink() {
         telegram.showPrompt(T('ADD_LINK_PROMPT'), async (link: string | null) => {
             if (!link) return;
-            telegram.showLoadingProgress(true);
+            let res = await withUIProgress(trackLink(link));
+            if (res === ServerErrorCode.LinkAlreadyFollowing) {
+                telegram.showBulletin("error", T('LINK_ALREADY_FOLLOWING'));
+            } else if (res == ServerErrorCode.BadRequest) {
+                telegram.showBulletin("error", T('INVALID_LINK_FORMAT'));
+            } else {
+                telegram.showBulletin("link_added", T('LINK_ADDED'));
+                items = sessionStore.linksList;
+            }
         });
     }
 </script>
