@@ -57,4 +57,9 @@
         transition: transform 250ms ease;
         background: var(--tg-theme-section-separator-color);
     }
+
+    /*noinspection CssUnusedSymbol*/
+    .listView > div > :global(div:not(:last-child) > .itemView:not(:has(.icon)).isiOS.deletable::after) {
+        transform: translateX(var(--delete-width));
+    }
 </style>

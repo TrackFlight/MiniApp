@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { slide } from 'svelte/transition';
     import Button from "./Button.svelte";
     import {isiOS, isDesktop} from "../lib/telegram";
 
@@ -84,13 +83,6 @@
     .itemView.deletable > :global(div:active:has(div:active > div > .deleteBtn)::after),
     .itemView.deletable.isiOS > :global(div:has(:active, :hover):has(div.deleteBtn)::after) {
         opacity: 0;
-    }
-
-    /** Divider line **/
-
-
-    .itemView:not(:has(.icon)).isiOS.deletable:not(:last-child)::after {
-        transform: translateX(var(--delete-width));
     }
 
     /** Delete button **/
