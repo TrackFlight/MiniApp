@@ -122,7 +122,7 @@
                         cy="50"
                         r="44"
                         fill="none"
-                        stroke="white"
+                        stroke="var(--tg-theme-text-color)"
                         stroke-width="12"
                         stroke-dasharray="282.6, 282.6"
                         stroke-dashoffset="{-282.6 * progress.current}"

@@ -149,7 +149,7 @@
         left: calc(50% - 6px);
         top: calc(50% - 1px);
         border-radius: 1px;
-        background: var(--tg-theme-text-color);
+        background: #fff;
     }
 
     .deleteBtn.isiOS.deletable {
