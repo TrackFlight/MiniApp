@@ -8,12 +8,12 @@
     import Button from "../components/Button.svelte";
     import ItemView from "../components/ItemView.svelte";
     import { isiOS } from "../lib/telegram";
-    import { linksList, removeLink, withUIProgress } from "../lib/api";
+    import {removeLink, ServerErrorCode, sessionStore, trackLink, withUIProgress} from "../lib/api";
     import { ReadableDateDifference, T } from "../lib/translator";
     import { slide } from 'svelte/transition';
 
     let deletable = $state(!isiOS);
-    let items = $state(linksList);
+    let items = $state(sessionStore.linksList);
 
     function removeItem(id: number) {
         telegram.showPopup(
@@ -42,12 +42,12 @@
                         text: T('UNDO_BTN'),
                         isUndo: true,
                         on_click: () => {
-                            items = linksList;
+                            items = sessionStore.linksList;
                         }
                     },
                     async () => {
                         await withUIProgress(removeLink(id));
-                        if (linksList.length === 0 && isiOS) {
+                        if (sessionStore.linksList.length === 0 && isiOS) {
                             deletable = false;
                         }
                     },

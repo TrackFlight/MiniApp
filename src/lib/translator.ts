@@ -1,7 +1,7 @@
-import {langPack} from "./api";
+import {sessionStore} from "./api";
 
 export function T(id: string, values: Record<string, string> = {}): string {
-    const template = langPack[id];
+    const template = sessionStore.langPack[id];
     if (!template) return `%${id}%`;
     return template.replace(/\{\{\.(\w+)}}/g, (_, key) => {
         return values[key] != null ? values[key] : '';
