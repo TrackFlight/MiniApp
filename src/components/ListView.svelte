@@ -47,7 +47,7 @@
 
     /*noinspection CssUnusedSymbol*/
     .listView > div > :global(.itemView:not(:last-child)::after),
-    .listView > div > :global(div:not(:last-child) > .itemView::after) {
+    .listView > div > :global(div > div:not(:last-child) > .itemView::after) {
         content: "";
         position: absolute;
         bottom: 0;
@@ -59,7 +59,7 @@
     }
 
     /*noinspection CssUnusedSymbol*/
-    .listView > div > :global(div:not(:last-child) > .itemView:not(:has(.icon)).isiOS.deletable::after) {
+    .listView > div > :global(div > div:not(:last-child) > .itemView:not(:has(.icon)).isiOS.deletable::after) {
         transform: translateX(var(--delete-width));
     }
 </style>
