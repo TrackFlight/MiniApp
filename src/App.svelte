@@ -9,7 +9,8 @@
     import { bulletinState } from "./lib/stores";
 
     telegram?.ready();
-
+    telegram?.setHeaderColor("secondary_bg_color");
+    telegram?.setBackgroundColor("secondary_bg_color");
     telegram.showLoadingProgress = (show: boolean) => loading = show;
     telegram.showPrompt = (text: string, callback: (result: string | null) => void) => callback(prompt(text));
     telegram.showBulletin = (icon: string, text: string, duration?: number, title?: string, button?: BulletinButton, on_close?: () => void) => {
@@ -36,8 +37,6 @@
 
     tryLogin().then((success: boolean) => {
         if (success) {
-            telegram?.setHeaderColor("secondary_bg_color");
-            telegram?.setBackgroundColor("secondary_bg_color");
             logged = true;
             return;
         }
@@ -52,7 +51,7 @@
 </script>
 
 {#if logged}
-    <main transition:fade={{ duration: 250 }}>
+    <main transition:fade={{ duration: 450 }}>
         <div class="content">
             <div>
                 <Home/>
