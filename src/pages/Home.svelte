@@ -8,8 +8,8 @@
     import Button from "../components/Button.svelte";
     import ItemView from "../components/ItemView.svelte";
     import {ReadableDateDifference, T} from "../lib/translator";
-    import {slide} from 'svelte/transition';
-    import {removeLink, ServerErrorCode, sessionStore, trackLink, withUIProgress} from "../lib/api";
+    import {removeLink, ServerErrorCode, sessionStore, trackLink, withUIProgress, type Link} from "../lib/api";
+    import VirtualList from "../components/VirtualList.svelte";
 
     let deletable = $state(!isiOS);
     let items = $state(sessionStore.linksList);
@@ -89,8 +89,9 @@
 <Divider/>
 <ListView header={T('LINKS_HEADER')}>
     <ItemView icon="add" title="Add Link" on_click={addLink}/>
-    {#each items as item (item.id)}
-        <div in:slide={{ duration: 250 }} out:slide={{ duration: 250 }}>
+    <!--suppress JSUnusedGlobalSymbols -->
+    <VirtualList data={items}>
+        {#snippet children(item: Link)}
             <ItemView
                 title={item.app_name}
                 desc={
@@ -109,6 +110,6 @@
                 bind:deletable
                 on_delete={() => removeItem(item.id)}
             />
-        </div>
-    {/each}
+        {/snippet}
+    </VirtualList>
 </ListView>
