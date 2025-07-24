@@ -66,7 +66,7 @@
     })
 
     function getProgressAnim() {
-        return new Tween(1, {
+        return new Tween(0, {
             duration: duration,
             easing: linear
         });
@@ -78,6 +78,7 @@
     onMount(async () => setTimeout(() => {
         ready = true;
         showBulletin = true;
+        progress.set(1);
         close();
     }, 60));
 
