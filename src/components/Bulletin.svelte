@@ -6,16 +6,13 @@
     import { fly } from 'svelte/transition';
     import { bulletinState } from "../lib/stores";
     import Button from "./Button.svelte";
+    import type {TgsPlayer} from "./types";
 
     const {
         on_close,
     } : {
         on_close?: () => void,
     } = $props();
-
-    interface TgsPlayer extends HTMLElement {
-        play: () => void;
-    }
 
     let title: string | undefined = $state();
     let text: string = $state("");

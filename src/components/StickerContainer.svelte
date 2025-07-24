@@ -1,10 +1,29 @@
 <script lang="ts">
     import { isiOS } from "../lib/telegram";
-    const { title, desc, sticker } : {title: string, desc: string, sticker:string} = $props();
+    import {onMount} from "svelte";
+    import type {TgsPlayer} from "./types";
+    const { title, desc, sticker, children } : {title: string, desc: string, sticker:string, children: any} = $props();
+
+    let player: TgsPlayer | undefined = $state();
+
+    let loaded = $state(false);
+    onMount(async () => setTimeout(() => {
+        player!.addEventListener("ready", () => {
+            player!.play();
+            loaded = true;
+        });
+    }, 60));
 </script>
 
 <div class="sticker-container" class:isiOS>
-    <img alt="Sticker" src="src/assets/stickers/{sticker}.gif">
+    <div class:loaded>
+        {@render children?.()}
+        <tgs-player
+            bind:this={player}
+            src="src/assets/stickers/{sticker}.tgs"
+            loop>
+        </tgs-player>
+    </div>
     <h2>{title}</h2>
     <p>{desc}</p>
 </div>
@@ -23,9 +42,31 @@
         background: var(--tg-theme-section-bg-color);
     }
 
-    img {
+    .sticker-container > div {
+        position: relative;
+    }
+
+    .sticker-container > div > :global(svg), tgs-player {
         width: 140px;
         height: 140px;
+        transition: opacity 250ms ease-in-out;
+    }
+
+    .sticker-container > div.loaded > tgs-player {
+        opacity: 1;
+    }
+
+    .sticker-container > div.loaded > :global(svg) {
+        opacity: 0;
+    }
+
+    tgs-player {
+        opacity: 0;
+    }
+
+    .sticker-container > div > :global(svg) {
+        position: absolute;
+        opacity: 1;
     }
 
     h2 {
