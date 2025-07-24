@@ -6,7 +6,7 @@
     import { fly } from 'svelte/transition';
     import { bulletinState } from "../lib/stores";
     import Button from "./Button.svelte";
-    import type {TgsPlayer} from "./types";
+    import StickerView from "./StickerView.svelte";
 
     const {
         on_close,
@@ -24,7 +24,7 @@
     let shakeTimeout: ReturnType<typeof setTimeout>;
     let showBulletin: boolean = $state(false);
     let shakeBulletin: boolean = $state(false);
-    let player: TgsPlayer | undefined = $state();
+    let player: StickerView | undefined = $state();
     let actionButton: BulletinButton | undefined = $state();
     let onCloseEvent: (() => void) | undefined = $state();
     let closedByUndo: boolean = $state(false);
@@ -66,7 +66,7 @@
     })
 
     function getProgressAnim() {
-        return new Tween(0, {
+        return new Tween(1, {
             duration: duration,
             easing: linear
         });
@@ -77,18 +77,17 @@
 
     onMount(async () => setTimeout(() => {
         ready = true;
-        if (!player) {
-            showBulletin = true;
-            progress.set(1);
-            close();
-            return;
-        }
-        player.addEventListener("ready", () => {
-            showBulletin = true;
-            player!.play();
-            close();
-        });
+        showBulletin = true;
+        close();
     }, 60));
+
+    function on_sticker_load() {
+        if (player) {
+            showBulletin = true;
+            player.play();
+            close();
+        }
+    }
 
     function close(skipOpen: boolean = false, allowDeletion: boolean = true) {
         closeTimeout = setTimeout(() => {
@@ -109,7 +108,7 @@
     }
 </script>
 
-<div class="bulletin" class:showBulletin class:ready role="alert" aria-live="polite">
+<div class="bulletin" class:isiOS class:showBulletin class:ready role="alert" aria-live="polite">
     <div class:shakeBulletin>
         {#if icon === "timer"}
             <div class="timerContainer">
@@ -134,11 +133,8 @@
                     {/key}
                 </div>
             </div>
-        {:else}
-            <tgs-player
-                bind:this={player}
-                src="src/assets/stickers/{icon}.tgs">
-            </tgs-player>
+        {:else if icon}
+            <StickerView bind:this={player} size="40px" sticker={icon} on_load={on_sticker_load}/>
         {/if}
         <div class="container">
             <p>{title}</p>
@@ -184,6 +180,9 @@
         padding-inline: 12px;
         border-radius: 10px;
         background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-section-bg-color) 92%, var(--tg-theme-hint-color)) 85%, transparent);
+    }
+
+    .bulletin.isiOS > div {
         backdrop-filter: var(--global-backdrop-filter);
         -webkit-backdrop-filter: saturate(180%) blur(20px);
     }
@@ -194,11 +193,6 @@
 
     .bulletin > div.shakeBulletin {
         animation: shake 0.4s ease-in-out infinite;
-    }
-
-    .bulletin > div > tgs-player {
-        width: 40px;
-        height: 40px;
     }
 
     .container {
