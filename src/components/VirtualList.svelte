@@ -1,5 +1,8 @@
 <script lang="ts">
     import {onDestroy, onMount, tick} from "svelte";
+    import ItemWrapper from "./ItemWrapper.svelte";
+    import {Tween} from "svelte/motion";
+    import {cubicOut} from "svelte/easing";
 
     const { data = $bindable(), children } : {data: any, children: any} = $props();
 
@@ -9,9 +12,10 @@
     let clientHeight = $state(0);
     let parentElement: HTMLElement | null = $state(null);
     let totalHeight = $derived(data.length * averageHeight);
+    let totalHeightTween: Tween<number> | undefined = $state();
     let visibleItems = $derived(Math.ceil((clientHeight - currentTop) / averageHeight));
 
-    let indexedData = $derived(data.map((item: any, i: Number) => ({ __vid: i, ...item })));
+    let indexedData = $derived(data.map((item: any, i: number) => ({ __vid: i, ...item })));
     let start = $derived(Math.max(0, Math.floor(-currentTop / averageHeight) - 5));
     let end = $derived(isNaN(visibleItems) ? 1 : Math.min(visibleItems + 5, data.length));
     let visible = $derived(indexedData.slice(start, end));
@@ -19,6 +23,10 @@
     onMount(async () => {
         await tick();
         averageHeight = viewport.children[0].getBoundingClientRect().height;
+        totalHeightTween = new Tween(totalHeight, {
+            duration: 250,
+            easing: cubicOut
+        });
         await tick();
         parentElement = viewport.parentElement;
         while (parentElement && parentElement !== document.body) {
@@ -36,15 +44,19 @@
         if (parentElement) parentElement.removeEventListener("scroll", onScroll);
     });
 
+    $effect(() => {
+        totalHeightTween?.set(totalHeight);
+    });
+
     function onScroll() {
         currentTop = viewport.getBoundingClientRect().top;
     }
 </script>
 
-<div bind:this={viewport} style="height: {totalHeight}px; overflow-anchor: none; flex: 0 0 auto; visibility: hidden; width: 100%; position: relative;">
+<div bind:this={viewport} style="height: {totalHeightTween?.current}px; overflow-anchor: none; flex: 0 0 auto; visibility: hidden; width: 100%; position: relative;">
     {#each visible as item, index (item.id ?? item.__vid)}
-        <div style="position: absolute; top: {(averageHeight * (start + index))}px; width: 100%;visibility: visible">
+        <ItemWrapper top={averageHeight * (start + index)}>
             {@render children(item)}
-        </div>
+        </ItemWrapper>
     {/each}
 </div>
