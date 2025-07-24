@@ -20,7 +20,7 @@
 
 <div class="user-icon {colorName}">
     {#if user.photo_url}
-        <img src="{user.photo_url}" alt="User" />
+        <img src="{user.photo_url}" alt="User" loading="lazy"/>
     {:else}
         <p>{initials()}</p>
     {/if}

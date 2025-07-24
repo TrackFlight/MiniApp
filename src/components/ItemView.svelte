@@ -49,7 +49,7 @@
                     <div></div>
                 </div>
             {/if}
-            <img src="{icon}" alt="ItemIcon">
+            <img src="{icon}" alt="ItemIcon" loading="lazy">
             <div class="textContainer">
                 <div>
                     <p class="itemTitle">{title}</p>{#if tag}<p class="itemTag">[<span>#{tag}</span>]</p>{/if}
