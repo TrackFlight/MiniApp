@@ -1,18 +1,18 @@
 <script lang="ts">
-    import {onDestroy, onMount} from "svelte";
+    import {onMount} from "svelte";
     import {fade} from 'svelte/transition';
     import {DotLottie} from "@lottiefiles/dotlottie-web";
 
     const {
         size,
-        sticker,
+        sticker = $bindable(),
         loop = false,
         autoplay = false,
         on_load,
         children
     } : {
         size: string
-        sticker: string,
+        sticker?: string | ArrayBuffer,
         loop?: boolean,
         autoplay?: boolean,
         on_load?: () => void,
@@ -21,48 +21,51 @@
 
     let dotLottie: DotLottie;
     let loaded = $state(false);
-    let wrapper: HTMLDivElement;
     let lottieEl: HTMLCanvasElement;
-    let observer: IntersectionObserver;
 
-    onMount(() => {
+    onMount(async () => {
         dotLottie = new DotLottie({
             canvas:  lottieEl,
-            src: `src/assets/stickers/${sticker}.lottie`,
-            loop: loop,
-            autoplay: autoplay
         });
 
+        dotLottie.addEventListener("ready", loadSticker);
         dotLottie.addEventListener("load", () => {
             loaded = true;
             if (on_load) on_load();
         });
+    });
 
-        observer = new IntersectionObserver(([entry]) => {
-            if (!dotLottie) return;
-            if (entry.isIntersecting) {
-                dotLottie.unfreeze();
+    $effect(loadSticker);
+
+    function loadSticker() {
+        if (sticker) {
+            const options = {
+                loop: loop,
+                autoplay: autoplay,
+                renderConfig: {
+                    freezeOnOffscreen: true,
+                },
+            };
+            if (sticker instanceof ArrayBuffer) {
+                dotLottie.load({
+                    data: sticker,
+                    ...options
+                })
             } else {
-                dotLottie.freeze();
+                dotLottie.load({
+                    src: `src/assets/stickers/${sticker}.lottie`,
+                    ...options
+                })
             }
-        }, {
-            root: null,
-            threshold: 0.1
-        });
-
-        observer.observe(wrapper);
-    });
-
-    onDestroy(() => {
-        if (observer) observer.disconnect();
-    });
+        }
+    }
 
     export function play() {
         dotLottie.play();
     }
 </script>
 
-<div bind:this={wrapper} class="sticker-view" style="width: {size}; height: {size};" class:loaded>
+<div class="sticker-view" style="width: {size}; height: {size};" class:loaded>
     {#if !loaded}
     <div out:fade="{{ duration: 300 }}">
         {@render children?.()}
