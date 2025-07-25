@@ -56,7 +56,9 @@
         );
     }
 
-    function addLink() {
+    async function addLink() {
+        await telegram.closeBulletin();
+        deletable = isiOS ? false : deletable;
         telegram.showPrompt(T('ADD_LINK_PROMPT'), async (link: string | null) => {
             if (!link) return;
             let res = await withUIProgress(trackLink(link));

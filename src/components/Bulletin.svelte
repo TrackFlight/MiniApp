@@ -73,6 +73,17 @@
         showBulletin = true;
     }
 
+    telegram.closeBulletin = async () => {
+        return new Promise<void>((resolve) => {
+            if (!showBulletin) {
+                resolve();
+                return;
+            }
+            clearTimeout(closeTimeout);
+            close(true, resolve);
+        });
+    }
+
     function on_sticker_load() {
         player?.play();
     }
@@ -83,10 +94,11 @@
         showBulletin = false;
     }
 
-    function close(skipOpen: boolean = false) {
+    function close(skipOpen: boolean = false, close_event?: () => void) {
         closeTimeout = setTimeout(() => {
             showBulletin = false;
             if (current?.on_close) current.on_close();
+            if (close_event) close_event();
         }, skipOpen ? 0 : (current!.duration + 250));
     }
 
