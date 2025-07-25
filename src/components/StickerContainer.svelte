@@ -5,7 +5,7 @@
 </script>
 
 <div class="sticker-container" class:isiOS>
-    <StickerView size="140px" sticker={sticker} loop={true} autoplay={true}>
+    <StickerView size="140px" sticker={sticker} autoplay={true}>
         {@render children?.()}
     </StickerView>
     <h2>{title}</h2>
