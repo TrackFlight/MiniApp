@@ -1,10 +1,16 @@
 import {sessionStore} from "./api";
 
-export function T(id: string, values: Record<string, string> = {}): string {
-    const template = sessionStore.langPack[id];
+export function T(id: string, values: Record<string, string | number> = {}, count: number = 1): string {
+    const pr = new Intl.PluralRules(sessionStore.langCode);
+    const category = pr.select(count);
+    const template = sessionStore.langPack[`${id}_${category.toUpperCase()}`] ||
+        sessionStore.langPack[`${id}_OTHER`] ||
+        sessionStore.langPack[id];
+
     if (!template) return `%${id}%`;
     return template.replace(/\{\{\.(\w+)}}/g, (_, key) => {
-        return values[key] != null ? values[key] : '';
+        const value = values[key];
+        return value != null ? value.toString() : '';
     });
 }
 
