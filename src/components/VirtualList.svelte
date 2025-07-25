@@ -11,27 +11,28 @@
     let currentTop = $state(0);
     let clientHeight = $state(0);
     let averageHeight = $state(0);
-    let parentElement: HTMLElement | null = $state(null);
+    let parentElement: HTMLElement;
     let totalHeight = $derived(data.length * averageHeight);
     let totalHeightTween: Tween<number> | undefined = $state();
     let visibleItems = $derived(Math.ceil((clientHeight - currentTop) / averageHeight));
 
     let indexedData = $derived(data.map((item: any, i: number) => ({ __vid: i, ...item })));
-    let start = $derived(Math.max(0, Math.floor(-currentTop / averageHeight) - 5));
-    let end = $derived(Math.min(data.length, Math.max(1, isNaN(visibleItems) ? 1 : visibleItems + 5)));
+    let start = $derived(Math.max(0, Math.floor(-currentTop / averageHeight) - 3));
+    let end = $derived(Math.max(1, isNaN(visibleItems) ? 1 : visibleItems + 3));
     let visible = $derived(indexedData.slice(start, end));
 
     onMount(async () => {
         await tick();
-        parentElement = viewport.parentElement;
+        await tick();
+        parentElement = viewport.parentElement!;
         while (parentElement && parentElement !== document.body) {
             if (parentElement.scrollHeight > parentElement.clientHeight) {
                 parentElement.addEventListener('scroll', onScroll);
-                break;
+                break
             }
-            parentElement = parentElement.parentElement;
+            parentElement = parentElement.parentElement!;
         }
-        clientHeight = parentElement!.clientHeight;
+        clientHeight = parentElement!.parentElement!.clientHeight
         currentTop = viewport.getBoundingClientRect().top;
     });
 
