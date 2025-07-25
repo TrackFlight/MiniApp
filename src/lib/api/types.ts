@@ -1,9 +1,14 @@
-export interface Link {
+export interface App {
     id: number;
-    tag: string;
-    app_name: string;
+    name: string;
     icon_url: string;
     description: string;
+    links: Link[];
+}
+
+export interface Link {
+    id: number;
+    display_name: string;
     status: "available" | "full" | "closed";
     last_availability: number;
 }

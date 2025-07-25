@@ -7,8 +7,8 @@
     import Divider from "../components/Divider.svelte";
     import Button from "../components/Button.svelte";
     import ItemView from "../components/ItemView.svelte";
-    import {ReadableDateDifference, T} from "../lib/translator";
-    import {removeLink, ServerErrorCode, sessionStore, trackLink, withUIProgress, type Link} from "../lib/api";
+    import {T} from "../lib/translator";
+    import {removeApp, ServerErrorCode, sessionStore, trackLink, withUIProgress, type App} from "../lib/api";
     import VirtualList from "../components/VirtualList.svelte";
 
     let deletable = $state(!isiOS);
@@ -45,7 +45,7 @@
                         }
                     },
                     async () => {
-                        await withUIProgress(removeLink(id));
+                        await withUIProgress(removeApp(id));
                         if (sessionStore.linksList.length === 0 && isiOS) {
                             deletable = false;
                         }
@@ -93,22 +93,19 @@
     <ItemView icon="add" title={T('TRACK_LINK_BTN')} on_click={addLink}/>
     <!--suppress JSUnusedGlobalSymbols -->
     <VirtualList data={items}>
-        {#snippet children(item: Link)}
+        {#snippet children(item: App)}
             <ItemView
-                title={item.app_name}
+                title={item.name}
                 desc={
-                    item.status === 'available' ?
-                    T('STATUS_AVAILABLE'): item.last_availability === 0 ?
-                    T('STATUS_UNAVAILABLE') : T('STATUS_TIMED_AVAILABLE', {
-                        Time: ReadableDateDifference(
-                            item.last_availability,
-                            Math.floor(Date.now() / 1000),
-                        )
-                    })
+                    T(
+                        'LINK_AMOUNT',
+                        {
+                            Amount: item.links.length,
+                        },
+                        item.links.length,
+                    )
                 }
                 icon={item.icon_url}
-                tag={item.tag}
-                highlight={item.status === 'available'}
                 bind:deletable
                 on_delete={() => removeItem(item.id)}
             />
