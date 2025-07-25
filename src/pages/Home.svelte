@@ -88,7 +88,7 @@
 </StickerContainer>
 <Divider/>
 <ListView header={T('LINKS_HEADER')}>
-    <ItemView icon="add" title="Add Link" on_click={addLink}/>
+    <ItemView icon="add" title={T('TRACK_LINK_BTN')} on_click={addLink}/>
     <!--suppress JSUnusedGlobalSymbols -->
     <VirtualList data={items}>
         {#snippet children(item: Link)}
