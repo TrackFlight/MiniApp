@@ -46,8 +46,8 @@
     }
 
     /*noinspection CssUnusedSymbol*/
-    .listView > div > :global(.itemView:not(:last-child)::after),
-    .listView > div > :global(div > div:not(:last-child) > .itemView::after) {
+    .listView > div > :global(div > div:not(:last-child) > .itemView::after),
+    .listView > div:global(:has(> div:last-child > div)) > :global(.itemView::after) {
         content: "";
         position: absolute;
         bottom: 0;
