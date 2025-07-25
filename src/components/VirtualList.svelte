@@ -7,9 +7,10 @@
     const { data = $bindable(), children } : {data: any, children: any} = $props();
 
     let viewport: HTMLElement;
-    let averageHeight = $state(0);
+    let wasEmpty = data.length === 0;
     let currentTop = $state(0);
     let clientHeight = $state(0);
+    let averageHeight = $state(0);
     let parentElement: HTMLElement | null = $state(null);
     let totalHeight = $derived(data.length * averageHeight);
     let totalHeightTween: Tween<number> | undefined = $state();
@@ -17,16 +18,10 @@
 
     let indexedData = $derived(data.map((item: any, i: number) => ({ __vid: i, ...item })));
     let start = $derived(Math.max(0, Math.floor(-currentTop / averageHeight) - 5));
-    let end = $derived(isNaN(visibleItems) ? 1 : Math.min(visibleItems + 5, data.length));
+    let end = $derived(Math.min(data.length, Math.max(1, isNaN(visibleItems) ? 1 : visibleItems + 5)));
     let visible = $derived(indexedData.slice(start, end));
 
     onMount(async () => {
-        await tick();
-        averageHeight = viewport.children[0].getBoundingClientRect().height;
-        totalHeightTween = new Tween(totalHeight, {
-            duration: 250,
-            easing: cubicOut
-        });
         await tick();
         parentElement = viewport.parentElement;
         while (parentElement && parentElement !== document.body) {
@@ -45,7 +40,18 @@
     });
 
     $effect(() => {
-        totalHeightTween?.set(totalHeight);
+        if (data.length > 0 && averageHeight === 0) {
+            tick().then(() => {
+                averageHeight = viewport.children[0].getBoundingClientRect().height;
+                totalHeightTween = new Tween(wasEmpty ? 0:totalHeight, {
+                    duration: 250,
+                    easing: cubicOut
+                });
+                wasEmpty = false;
+            })
+        } else {
+            totalHeightTween?.set(totalHeight);
+        }
     });
 
     function onScroll() {
