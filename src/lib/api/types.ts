@@ -11,6 +11,7 @@ export interface Link {
     display_name: string;
     status: "available" | "full" | "closed";
     last_availability: number;
+    last_update: number;
 }
 
 export type ResponseData<T> = {

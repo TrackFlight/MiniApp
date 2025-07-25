@@ -7,7 +7,7 @@
     import Divider from "../components/Divider.svelte";
     import Button from "../components/Button.svelte";
     import ItemView from "../components/ItemView.svelte";
-    import {T} from "../lib/translator";
+    import {ReadableDateDifference, T} from "../lib/translator";
     import {removeApp, ServerErrorCode, sessionStore, trackLink, withUIProgress, type App} from "../lib/api";
     import VirtualList from "../components/VirtualList.svelte";
 
@@ -96,7 +96,7 @@
         {#snippet children(item: App)}
             <ItemView
                 title={item.name}
-                desc={
+                desc="{
                     T(
                         'LINK_AMOUNT',
                         {
@@ -104,7 +104,17 @@
                         },
                         item.links.length,
                     )
-                }
+                } • {
+                    T(
+                        'LAST_UPDATE_TIME',
+                        {
+                            Time: ReadableDateDifference(
+                                [...item.links].sort((a, b) => b.last_update - a.last_update)[0].last_update,
+                                Math.floor(Date.now() / 1000),
+                            ),
+                        }
+                    )
+                }"
                 icon={item.icon_url}
                 bind:deletable
                 on_delete={() => removeItem(item.id)}
