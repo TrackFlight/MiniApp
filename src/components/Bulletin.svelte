@@ -1,117 +1,135 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { Tween } from "svelte/motion";
-    import { linear } from "svelte/easing";
-    import { isiOS, telegram, type BulletinButton } from "../lib/telegram";
-    import { fly } from 'svelte/transition';
-    import { bulletinState } from "../lib/stores";
-    import Button from "./Button.svelte";
+    import {type BulletinButton, isiOS, telegram} from "../lib/telegram";
+    import {fly} from 'svelte/transition';
+    import {cubicOut, linear} from "svelte/easing";
+    import {Tween} from "svelte/motion";
     import StickerView from "./StickerView.svelte";
+    import Button from "./Button.svelte";
+    import {LRUCache} from "../lib/lru-cache";
 
-    const {
-        on_close,
-    } : {
-        on_close?: () => void,
-    } = $props();
+    const defaultDuration = 1800;
 
-    let title: string | undefined = $state();
-    let text: string = $state("");
-    let icon: string | undefined = $state();
-    let duration: number = $state(0);
-
-    let ready = $state(false);
+    let showBulletin = $state(false);
+    let shakeBulletin = $state(false);
+    let player = $state<StickerView>();
+    let progress = $state<Tween<number>>();
     let closeTimeout: ReturnType<typeof setTimeout>;
     let shakeTimeout: ReturnType<typeof setTimeout>;
-    let showBulletin: boolean = $state(false);
-    let shakeBulletin: boolean = $state(false);
-    let player: StickerView | undefined = $state();
-    let actionButton: BulletinButton | undefined = $state();
-    let onCloseEvent: (() => void) | undefined = $state();
-    let closedByUndo: boolean = $state(false);
+    const lruCache = new LRUCache<string, ArrayBuffer>(10);
 
-    bulletinState.subscribe((state) => {
-        title = state!.title;
-        text = state!.text;
-        icon = state!.icon;
-        duration = state!.duration || 1800;
-        actionButton = state!.button;
-        onCloseEvent = state!.on_close;
+    let current: {
+        title?: string,
+        message: string,
+        icon?: string,
+        iconData?: ArrayBuffer,
+        button?: BulletinButton,
+        duration: number,
+        on_close?: () => void,
+    } | undefined = $state();
+    let currentTextTimerStatus = $derived((current?.duration || defaultDuration) / 1000 - Math.floor((current?.duration || defaultDuration) * (progress?.current || 0) / 1000));
 
-        if (state!.reopen) {
+    telegram.showBulletin = async (icon: string, message: string, duration?: number, title?: string, button?: BulletinButton, on_close?: () => void) => {
+        let isSame = current && current.icon === icon && current.message === message && current.title === title && current?.icon !== 'timer';
+        let newData = {
+            title: title,
+            message: message,
+            duration: duration || defaultDuration,
+            button: button,
+            on_close: on_close,
+        };
+        if (showBulletin && !isSame) {
             clearTimeout(closeTimeout);
-            close(true, false);
-            closeTimeout = setTimeout(() => {
+            close(true);
+            closeTimeout = setTimeout(async () => {
+                current = newData;
+                await preloadSticker(icon);
                 progress = getProgressAnim();
                 showBulletin = true;
-                progress.set(1);
+                progress.set(1).then();
                 clearTimeout(closeTimeout);
                 close();
-            }, 150);
+            }, 250);
+            return;
         }
 
-        if (state!.shake) {
-            if (!player) {
-                return;
-            }
-            showBulletin = true;
-            shakeBulletin = state!.shake || false;
-            clearTimeout(closeTimeout);
+        clearTimeout(closeTimeout);
+        if (showBulletin && isSame) {
+            shakeBulletin = true;
             clearTimeout(shakeTimeout);
             telegram.HapticFeedback.notificationOccurred("error");
             shakeTimeout = setTimeout(() => {
                 shakeBulletin = false;
                 close();
             }, 400);
+        } else {
+            current = newData;
+            await preloadSticker(icon);
+            if (!showBulletin) {
+                progress = getProgressAnim();
+                progress.set(1).then();
+            }
+            close();
         }
-    })
+        showBulletin = true;
+    }
+
+    function on_sticker_load() {
+        player?.play();
+    }
+
+    function undoClick() {
+        current!.button!.on_click();
+        clearTimeout(closeTimeout);
+        showBulletin = false;
+    }
+
+    function close(skipOpen: boolean = false) {
+        closeTimeout = setTimeout(() => {
+            showBulletin = false;
+            if (current?.on_close) current.on_close();
+        }, skipOpen ? 0 : (current!.duration + 250));
+    }
 
     function getProgressAnim() {
         return new Tween(0, {
-            duration: duration,
+            duration: current!.duration,
             easing: linear
         });
     }
 
-    let progress = $derived(getProgressAnim());
-    let currentTextTimerStatus = $derived(duration / 1000 - Math.floor(duration * progress.current / 1000));
-
-    onMount(async () => setTimeout(() => {
-        ready = true;
-        showBulletin = true;
-        progress.set(1);
-        close();
-    }, 60));
-
-    function on_sticker_load() {
-        if (player) {
-            showBulletin = true;
-            player.play();
-            close();
+    async function preloadSticker(new_icon: string) {
+        if (!current || !new_icon) return;
+        if (new_icon == 'timer') {
+            current.icon = 'timer';
+            return;
         }
-    }
-
-    function close(skipOpen: boolean = false, allowDeletion: boolean = true) {
-        closeTimeout = setTimeout(() => {
-            showBulletin = false;
-            if (onCloseEvent && !closedByUndo) onCloseEvent();
-            if (!allowDeletion) return;
-            closeTimeout = setTimeout(() => {
-                if (on_close) on_close();
-            }, 150);
-        }, skipOpen ? 0 : ((duration || 1800) + 150));
-    }
-
-    function undoClick() {
-        closedByUndo = true;
-        actionButton!.on_click();
-        clearTimeout(closeTimeout);
-        close(true);
+        if (lruCache.has(new_icon)) {
+            current.icon = new_icon;
+            current.iconData = lruCache.get(new_icon);
+            return;
+        }
+        if (current.icon === new_icon && current.iconData) {
+            return;
+        }
+        const url = `src/assets/stickers/${new_icon}.lottie`;
+        let response = await fetch(url);
+        if (!response.ok) {
+            throw new Error("Failed to load sticker");
+        }
+        current.icon = new_icon;
+        current.iconData = await response.arrayBuffer();
+        lruCache.set(new_icon, current.iconData);
     }
 </script>
 
-<div class="bulletin" class:isiOS class:showBulletin class:ready role="alert" aria-live="polite">
-    <div class:shakeBulletin>
-        {#if icon === "timer"}
+{#if showBulletin && current}
+    <div class="bulletin"
+         class:isiOS
+         class:shakeBulletin
+         transition:fly={{ y: "100%", duration: 250, easing: cubicOut }}
+         role="alert" aria-live="polite"
+    >
+        {#if current.icon === "timer" && progress}
             <div class="timerContainer">
                 <svg viewBox="0 0 100 100">
                     <circle
@@ -134,66 +152,61 @@
                     {/key}
                 </div>
             </div>
-        {:else if icon}
-            <StickerView bind:this={player} size="40px" sticker={icon} on_load={on_sticker_load}/>
+        {:else if current.icon}
+            <StickerView bind:this={player} size="40px" sticker={current.iconData} on_load={on_sticker_load}/>
         {/if}
         <div class="container">
-            <p>{title}</p>
-            <p>{text}</p>
+            <p>{current.title}</p>
+            <p>{current.message}</p>
         </div>
-        {#if actionButton}
+        {#if current.button}
             <Button type="default accent rounded text" on_click={undoClick}>
-                <div class="buttonContent" class:isiOS>
-                    {#if !isiOS && actionButton.isUndo}
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                            <path d="M320-200q-17 0-28.5-11.5T280-240q0-17 11.5-28.5T320-280h244q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l76 76q11 11 11 28t-11 28q-11 11-28 11t-28-11L188-572q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l144-144q11-11 28-11t28 11q11 11 11 28t-11 28l-76 76h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H320Z"/>
-                        </svg>
-                    {/if}
-                    <p>{isiOS ? actionButton.text.toUpperCase() : actionButton.text}</p>
-                </div>
+                {#if !isiOS && current.button.isUndo}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                        <path d="M320-200q-17 0-28.5-11.5T280-240q0-17 11.5-28.5T320-280h244q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l76 76q11 11 11 28t-11 28q-11 11-28 11t-28-11L188-572q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l144-144q11-11 28-11t28 11q11 11 11 28t-11 28l-76 76h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H320Z"/>
+                    </svg>
+                {/if}
+                <p>{isiOS ? current.button.text.toUpperCase() : current.button.text}</p>
             </Button>
         {/if}
     </div>
-</div>
+{/if}
 
 <style>
     .bulletin {
         position: absolute;
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 100%;
-        bottom: 0;
-        padding-block-end: 15px;
-        padding-inline: 10px;
-        transform: translateY(100%);
-    }
-
-    .bulletin.ready {
-        transition: transform 150ms ease-in-out;
-    }
-
-    .bulletin > div {
-        display: flex;
-        align-items: center;
-        width: 100%;
+        width: calc(100% - 20px);
+        margin-inline: 10px;
+        border-radius: 10px;
         padding-block: 6px;
         padding-inline: 12px;
-        border-radius: 10px;
+        bottom: 15px;
         background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-section-bg-color) 92%, var(--tg-theme-hint-color)) 85%, transparent);
     }
 
-    .bulletin.isiOS > div {
+    .bulletin.isiOS {
         backdrop-filter: var(--global-backdrop-filter);
         -webkit-backdrop-filter: saturate(180%) blur(20px);
     }
 
-    .bulletin.showBulletin {
-        transform: translateY(0%);
+    .bulletin.shakeBulletin {
+        animation: shake 0.4s ease-in-out infinite;
     }
 
-    .bulletin > div.shakeBulletin {
-        animation: shake 0.4s ease-in-out infinite;
+    @keyframes shake {
+        0% { transform: translate(1px, 1px) rotate(0deg); }
+        10% { transform: translate(-1px, -2px) rotate(-1deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        30% { transform: translate(3px, 2px) rotate(0deg); }
+        40% { transform: translate(1px, -1px) rotate(1deg); }
+        50% { transform: translate(-1px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        70% { transform: translate(3px, 1px) rotate(-1deg); }
+        80% { transform: translate(-1px, -1px) rotate(1deg); }
+        90% { transform: translate(1px, 2px) rotate(0deg); }
+        100% { transform: translate(1px, -2px) rotate(-1deg); }
     }
 
     .container {
@@ -214,18 +227,39 @@
         font-size: 14px;
     }
 
-    @keyframes shake {
-        0% { transform: translate(1px, 1px) rotate(0deg); }
-        10% { transform: translate(-1px, -2px) rotate(-1deg); }
-        20% { transform: translate(-3px, 0px) rotate(1deg); }
-        30% { transform: translate(3px, 2px) rotate(0deg); }
-        40% { transform: translate(1px, -1px) rotate(1deg); }
-        50% { transform: translate(-1px, 2px) rotate(-1deg); }
-        60% { transform: translate(-3px, 1px) rotate(0deg); }
-        70% { transform: translate(3px, 1px) rotate(-1deg); }
-        80% { transform: translate(-1px, -1px) rotate(1deg); }
-        90% { transform: translate(1px, 2px) rotate(0deg); }
-        100% { transform: translate(1px, -2px) rotate(-1deg); }
+    /*noinspection CssUnusedSymbol*/
+    .bulletin > :global(.button:last-child) {
+        margin-left: auto;
+        padding-inline: 10px;
+        padding-block: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .bulletin > :global(.button:last-child > div > svg) {
+        width: 24px;
+        margin-right: 5px;
+        fill: var(--tg-theme-accent-text-color);
+        transform: rotate(0deg) translateY(-1px);
+    }
+
+    .bulletin > :global(.button:last-child > div:not(:has(svg)) > p) {
+        padding-block: 5px;
+        padding-inline: 5px;
+    }
+
+    .bulletin > :global(.button:last-child > div > p) {
+        margin: 0;
+        font-weight: 600;
+        color: var(--tg-theme-accent-text-color);
+        font-size: 14px;
+    }
+
+    .bulletin.isiOS > :global(.button:last-child > div > p) {
+        font-weight: 500;
+        font-size: 16px;
     }
 
     .timerContainer {
@@ -260,41 +294,5 @@
     .timerContainer > svg {
         transform: rotate(-90deg);
         width: 22px;
-    }
-
-    .bulletin > div > :global(div:last-child:has(.buttonContent)) {
-        margin-left: auto;
-    }
-
-    .buttonContent {
-        padding-inline: 10px;
-        padding-block: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-
-    .buttonContent > :global(svg) {
-        width: 24px;
-        fill: var(--tg-theme-accent-text-color);
-        transform: rotate(0deg) translateY(-1px);
-    }
-
-    .buttonContent:not(:has(:global(svg))) > p {
-        padding-block: 5px;
-        padding-inline: 5px;
-    }
-
-    .buttonContent > p {
-        margin: 0;
-        font-weight: 600;
-        color: var(--tg-theme-accent-text-color);
-        font-size: 14px;
-    }
-
-    .buttonContent.isiOS > p {
-        font-weight: 500;
-        font-size: 16px;
     }
 </style>
