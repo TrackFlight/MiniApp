@@ -1,7 +1,7 @@
 <!--suppress CssUnusedSymbol -->
 <script lang="ts">
     import { isiOS, isDesktop } from "../lib/telegram";
-    import { fade } from 'svelte/transition';
+    import { fade, slide } from 'svelte/transition';
 
     let {
         type,
@@ -100,7 +100,7 @@
     {/if}
     <div>
         {#if type === 'text' && text}
-            <span class="sizer">{displayText}</span>
+            <span transition:slide={{ duration: 150 }} class="sizer">{displayText}</span>
             {#key text}
                 <span class="fade-text" class:isiOS transition:fade={{ duration: 150 }}>
                     {displayText}
