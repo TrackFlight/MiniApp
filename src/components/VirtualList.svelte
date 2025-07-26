@@ -16,7 +16,7 @@
     let totalHeightTween: Tween<number> | undefined = $state();
     let visibleItems = $derived(Math.ceil((clientHeight - currentTop) / averageHeight));
 
-    let indexedData = $derived(data.map((item: any, i: number) => ({ __vid: i, ...item })));
+    let indexedData = $derived(data.map((item: any, i: number) => (item.hasOwnProperty('__vid') ? item : { __vid: i, ...item })));
     let start = $derived(Math.max(0, Math.floor(-currentTop / averageHeight) - 3));
     let end = $derived(Math.max(1, isNaN(visibleItems) ? 1 : visibleItems + 3));
     let visible = $derived(indexedData.slice(start, end));
@@ -61,7 +61,7 @@
 </script>
 
 <div bind:this={viewport} style="height: {totalHeightTween?.current}px; overflow-anchor: none; flex: 0 0 auto; visibility: hidden; width: 100%; position: relative;">
-    {#each visible as item, index (item.id ?? item.__vid)}
+    {#each visible as item, index (item.__vid)}
         <ItemWrapper top={averageHeight * (start + index)}>
             {@render children(item)}
         </ItemWrapper>
