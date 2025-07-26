@@ -3,7 +3,7 @@ import {currentUser, telegram} from "../telegram";
 import {internalRequest} from "./base";
 
 export const sessionStore = {
-    linksList: [] as App[],
+    appList: [] as App[],
     currentJWT: '',
     langPack: {} as Record<string, string>,
     langCode: '',
@@ -27,7 +27,7 @@ export async function tryLogin() {
         if (userResponse.error) {
             return false;
         }
-        sessionStore.linksList = userResponse.response || [];
+        sessionStore.appList = userResponse.response || [];
         const langPackResponse = await internalRequest<{
             lang_code: string;
             strings: Record<string, string>;

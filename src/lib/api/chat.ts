@@ -20,7 +20,7 @@ export async function trackLink(url_or_id: string | number) : Promise<ServerErro
         trackLinkData
     );
     if (res.error === undefined) {
-        sessionStore.linksList = sessionStore.linksList
+        sessionStore.appList = sessionStore.appList
             .reduce<{ items: App[]; found: boolean }>((acc, app, idx, arr) => {
                 if (app.id === res.response?.id) {
                     acc.items.push({ ...app, links: [...app.links, ...res.response?.links] });
@@ -40,7 +40,7 @@ export async function trackLink(url_or_id: string | number) : Promise<ServerErro
 }
 
 export async function removeApp(app_id: number) {
-    const appInfo = sessionStore.linksList
+    const appInfo = sessionStore.appList
         .find((link) => link.id === app_id)!
         .links.
         flatMap(link => link.id);
@@ -49,5 +49,5 @@ export async function removeApp(app_id: number) {
         "DELETE",
         appInfo,
     );
-    sessionStore.linksList = sessionStore.linksList.filter(link => link.id !== app_id);
+    sessionStore.appList = sessionStore.appList.filter(link => link.id !== app_id);
 }

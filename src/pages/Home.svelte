@@ -12,7 +12,7 @@
     import VirtualList from "../components/VirtualList.svelte";
 
     let deletable = $state(!isiOS);
-    let items = $state(sessionStore.linksList);
+    let items = $state(sessionStore.appList);
 
     function removeItem(id: number) {
         telegram.showPopup(
@@ -41,12 +41,12 @@
                         text: T('UNDO_BTN'),
                         isUndo: true,
                         on_click: () => {
-                            items = sessionStore.linksList;
+                            items = sessionStore.appList;
                         }
                     },
                     async () => {
                         await withUIProgress(removeApp(id));
-                        if (sessionStore.linksList.length === 0 && isiOS) {
+                        if (sessionStore.appList.length === 0 && isiOS) {
                             deletable = false;
                         }
                     },
@@ -68,7 +68,7 @@
                 telegram.showBulletin("error", T('INVALID_LINK_FORMAT'));
             } else {
                 telegram.showBulletin("link_added", T('LINK_ADDED'));
-                items = sessionStore.linksList;
+                items = sessionStore.appList;
             }
         });
     }
