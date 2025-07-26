@@ -17,8 +17,8 @@
     function removeItem(id: number) {
         telegram.showPopup(
             {
-                title: T('DELETE_LINK_CONFIRM_TITLE'),
-                message: T('DELETE_LINK_CONFIRM_DESC'),
+                title: T('REMOVE_APP_CONFIRM_TITLE'),
+                message: T('REMOVE_APP_CONFIRM_DESC'),
                 buttons: [
                     {
                         id: "delete",
@@ -32,11 +32,23 @@
             },
             async (result: string) => {
                 if (result !== "delete") return;
+                const appInfo = sessionStore.appList.find(item => item.id === id)!;
                 telegram.showBulletin(
                     "timer",
-                    T('LINK_REMOVED'),
+                    T(
+                        'APP_REMOVED_DESC',
+                        {
+                            Amount: appInfo.links.length,
+                        },
+                        appInfo.links.length,
+                    ),
                     5000,
-                    undefined,
+                    T(
+                        'APP_REMOVED_TITLE',
+                        {
+                            AppName: appInfo.name,
+                        }
+                    ),
                     {
                         text: T('UNDO_BTN'),
                         isUndo: true,
