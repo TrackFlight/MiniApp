@@ -8,13 +8,13 @@
     import Button from "../components/Button.svelte";
     import ItemView from "../components/ItemView.svelte";
     import {ReadableDateDifference, T} from "../lib/translator";
-    import {removeApp, ServerErrorCode, sessionStore, trackLink, withUIProgress, type App} from "../lib/api";
+    import {removeApp, ServerErrorCode, sessionStore, trackLink, withUIProgress, type App, getAppID} from "../lib/api";
     import VirtualList from "../components/VirtualList.svelte";
 
     let deletable = $state(!isiOS);
     let items = $state(sessionStore.appList);
 
-    function removeItem(id: number) {
+    function removeItem(app: App) {
         telegram.showPopup(
             {
                 title: T('REMOVE_APP_CONFIRM_TITLE'),
@@ -32,21 +32,23 @@
             },
             async (result: string) => {
                 if (result !== "delete") return;
-                const appInfo = sessionStore.appList.find(item => item.id === id)!;
+                const isUnknownApp = app.name == null;
                 telegram.showBulletin(
                     "timer",
+                    isUnknownApp ? T('LINK_REMOVED') :
                     T(
                         'APP_REMOVED_DESC',
                         {
-                            Amount: appInfo.links.length,
+                            Amount: app.links.length,
                         },
-                        appInfo.links.length,
+                        app.links.length,
                     ),
                     5000,
+                    isUnknownApp ? undefined :
                     T(
                         'APP_REMOVED_TITLE',
                         {
-                            AppName: appInfo.name,
+                            AppName: app.name!,
                         }
                     ),
                     {
@@ -57,13 +59,13 @@
                         }
                     },
                     async () => {
-                        await withUIProgress(removeApp(id));
+                        await withUIProgress(removeApp(app));
                         if (sessionStore.appList.length === 0 && isiOS) {
                             deletable = false;
                         }
                     },
                 );
-                items = items.filter(item => item.id !== id);
+                items = items.filter(item => getAppID(item) !== getAppID(app));
             },
         );
     }
@@ -104,11 +106,12 @@
 <ListView header={T('LINKS_HEADER')}>
     <ItemView icon="add" title={T('TRACK_LINK_BTN')} on_click={addLink}/>
     <!--suppress JSUnusedGlobalSymbols -->
-    <VirtualList data={items}>
+    <VirtualList data={[...items].map((item) => ({ __vid: getAppID(item), ...item }))}>
         {#snippet children(item: App)}
             <ItemView
-                title={item.name}
-                desc="{
+                title={item.name ? item.name : T('UNKNOWN_APP')}
+                desc={
+                    item.name ?
                     T(
                         'LINK_AMOUNT',
                         {
@@ -116,7 +119,7 @@
                         },
                         item.links.length,
                     )
-                } • {
+                    + ' • ' +
                     T(
                         'LAST_UPDATE_TIME',
                         {
@@ -125,11 +128,11 @@
                                 Math.floor(Date.now() / 1000),
                             ),
                         }
-                    )
-                }"
-                icon={item.icon_url}
+                    ) : item.links[0].url
+                }
+                icon={item.icon_url ? item.icon_url : 'link_loading'}
                 bind:deletable
-                on_delete={() => removeItem(item.id)}
+                on_delete={() => removeItem(item)}
             />
         {/snippet}
     </VirtualList>

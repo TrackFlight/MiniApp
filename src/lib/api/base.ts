@@ -1,5 +1,5 @@
 import {telegram} from "../telegram";
-import type {ResponseData} from "./types";
+import type {App, ResponseData} from "./types";
 import {sessionStore} from "./auth";
 
 export async function withUIProgress<T>(promise: Promise<T>): Promise<T> {
@@ -47,4 +47,11 @@ export async function internalRequest<T, C>(path: string, method: string = "GET"
         response.response = await rawResponse.json() as T;
     }
     return response;
+}
+
+export function getAppID(app: App) : string {
+    if (app.id === null) {
+        return `link_${app.links[0].id}`;
+    }
+    return `app_${app.id}`;
 }

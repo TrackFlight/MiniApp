@@ -1,14 +1,14 @@
 export interface App {
-    id: number;
-    name: string;
-    icon_url: string;
-    description: string;
+    id: number | null;
+    name: string | null;
+    icon_url: string | null;
+    description: string | null;
     links: Link[];
 }
 
 export interface Link {
     id: number;
-    display_name: string;
+    url: string;
     status: "available" | "full" | "closed";
     last_availability: number;
     last_update: number;
