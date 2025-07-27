@@ -15,14 +15,15 @@
     let items = $state(sessionStore.appList);
 
     function removeItem(app: App) {
+        const isUnknownApp = app.name == null;
         telegram.showPopup(
             {
-                title: T('REMOVE_APP_CONFIRM_TITLE'),
-                message: T('REMOVE_APP_CONFIRM_DESC'),
+                title: T(isUnknownApp ? 'REMOVE_LINK_CONFIRM_TITLE' : 'REMOVE_APP_CONFIRM_TITLE'),
+                message: T(isUnknownApp ? 'REMOVE_LINK_CONFIRM_DESC' : 'REMOVE_APP_CONFIRM_DESC'),
                 buttons: [
                     {
                         id: "delete",
-                        text: T('DELETE_BTN'),
+                        text: T('REMOVE_BTN'),
                         type: "destructive",
                     },
                     {
@@ -32,7 +33,6 @@
             },
             async (result: string) => {
                 if (result !== "delete") return;
-                const isUnknownApp = app.name == null;
                 telegram.showBulletin(
                     "timer",
                     isUnknownApp ? T('LINK_REMOVED') :
