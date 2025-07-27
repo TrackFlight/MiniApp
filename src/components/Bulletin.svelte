@@ -6,6 +6,7 @@
     import StickerView from "./StickerView.svelte";
     import Button from "./Button.svelte";
     import {LRUCache} from "../lib/lru-cache";
+    import {onDestroy} from "svelte";
 
     const defaultDuration = 1800;
 
@@ -83,6 +84,11 @@
             close(true, resolve);
         });
     }
+
+    onDestroy(() => {
+        clearTimeout(closeTimeout);
+        clearTimeout(shakeTimeout);
+    });
 
     function on_sticker_load() {
         player?.play();
