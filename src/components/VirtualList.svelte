@@ -21,23 +21,36 @@
     let end = $derived(Math.max(1, isNaN(visibleItems) ? 1 : visibleItems + 3));
     let visible = $derived(indexedData.slice(start, end));
 
+    let resizeObserver: ResizeObserver;
+    let resizeObserverElement: ResizeObserver;
+
     onMount(async () => {
-        await tick();
-        await tick();
-        parentElement = viewport.parentElement!;
-        while (parentElement && parentElement !== document.body) {
-            if (parentElement.scrollHeight > parentElement.clientHeight) {
-                parentElement.addEventListener('scroll', onScroll);
-                break
+        resizeObserver = new ResizeObserver(() => {
+            if (!parentElement) {
+                parentElement = viewport.parentElement!;
+                while (parentElement && parentElement !== document.body) {
+                    if (parentElement.scrollHeight > parentElement.clientHeight) {
+                        parentElement.addEventListener('scroll', onScroll);
+                        break
+                    }
+                    parentElement = parentElement.parentElement!;
+                }
+                clientHeight = parentElement!.clientHeight;
+                resizeObserverElement = new ResizeObserver(() => {
+                    clientHeight = parentElement!.clientHeight;
+                    currentTop = viewport.getBoundingClientRect().top;
+                });
+                resizeObserverElement.observe(parentElement!);
+                currentTop = viewport.getBoundingClientRect().top;
             }
-            parentElement = parentElement.parentElement!;
-        }
-        clientHeight = parentElement!.parentElement!.clientHeight
-        currentTop = viewport.getBoundingClientRect().top;
+        });
+        resizeObserver.observe(viewport!);
     });
 
     onDestroy(() => {
         if (parentElement) parentElement.removeEventListener("scroll", onScroll);
+        resizeObserver?.disconnect();
+        resizeObserverElement?.disconnect();
     });
 
     $effect(() => {
