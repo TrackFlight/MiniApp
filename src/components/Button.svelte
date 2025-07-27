@@ -29,6 +29,17 @@
         }
     }
 
+    function handleClick(e: MouseEvent) {
+        if (on_click) {
+            const target = e.target as HTMLElement;
+            if (target.closest('.button') !== rippleHandler) {
+                return;
+            }
+            e.preventDefault();
+            on_click();
+        }
+    }
+
     let rippleHandler: HTMLElement;
     function onRippleStart(e: MouseEvent | TouchEvent) {
         if ((e instanceof MouseEvent && !isDesktop && styles.includes('opaque')) || isiOS) {
@@ -91,7 +102,7 @@
      class:isDesktop
      role="button"
      tabindex="0"
-     onclick={on_click}
+     onclick={handleClick}
      ontouchstart={onRippleStart}
      onmousedown={onRippleStart}
      onkeydown={onKey}>
