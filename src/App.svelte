@@ -1,11 +1,12 @@
 <script lang="ts">
     import {telegram} from "./lib/telegram";
     import {fade} from 'svelte/transition';
-    import Home from "./pages/Home.svelte";
-    import Navbar from "./components/Navbar.svelte";
     import {tryLogin} from "./lib/api";
     import LoadingDialog from "./components/LoadingDialog.svelte";
-    import Bulletin from "./components/Bulletin.svelte";
+    import MainActivity from "./activities/MainActivity.svelte";
+    import ActivityManager from "./lib/navigation/ActivityManager.svelte";
+    import type {Component} from "svelte";
+    import AppInfoActivity from "./activities/AppInfoActivity.svelte";
 
     telegram?.ready();
     telegram?.setHeaderColor("secondary_bg_color");
@@ -29,17 +30,16 @@
             telegram?.close();
         });
     });
+
+    const activities = {
+        main: MainActivity,
+        appInfo: AppInfoActivity,
+    };
 </script>
 
 {#if logged}
     <main transition:fade={{ duration: 450 }}>
-        <div class="content">
-            <div>
-                <Home/>
-            </div>
-            <Bulletin/>
-        </div>
-        <Navbar/>
+        <ActivityManager {activities} initialActivity="main"/>
         {#if loading}
             <LoadingDialog/>
         {/if}
@@ -47,22 +47,6 @@
 {/if}
 
 <style>
-    .content {
-        flex: 1;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .content > div {
-        height: 100%;
-        overflow-y: auto;
-        padding-bottom: 10px;
-    }
-
-    .content > div::-webkit-scrollbar {
-        display: none;
-    }
-
     main {
         height: 100vh;
         display: flex;

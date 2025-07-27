@@ -22,6 +22,12 @@ export interface HapticFeedback {
     notificationOccurred(type: 'success' | 'warning' | 'error'): void;
 }
 
+export interface BackButton {
+    onClick(callback: () => void): void;
+    show(): void;
+    hide(): void;
+}
+
 interface WebAppInitData {
     user: WebAppUser
 }
@@ -37,6 +43,7 @@ interface TelegramWebApp {
     initDataUnsafe: WebAppInitData;
     platform: 'ios' | 'android' | 'tdesktop' | 'weba' | 'webk' | 'macos';
     HapticFeedback: HapticFeedback;
+    BackButton: BackButton;
     ready(): void;
     showAlert(message: string, callback?: () => void): void;
     showConfirm(message: string, callback?: (result: boolean) => void): void;
