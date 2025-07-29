@@ -124,7 +124,7 @@
                     T(
                         'LINK_AMOUNT',
                         {
-                            Amount: item.links.length,
+                            Amount: item.links.length
                         },
                         item.links.length,
                     )
@@ -139,7 +139,8 @@
                         }
                     ) : item.links[0].url
                 }
-                icon={item.icon_url ? item.icon_url : 'link_loading'}
+                icon={item.icon_url ? item.icon_url : item.links[0].status ? '' : 'link_loading'}
+                id={item.links[0].id}
                 bind:deletable
                 on_click={() => openItem(item)}
                 on_delete={() => removeItem(item)}

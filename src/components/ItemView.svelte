@@ -1,12 +1,14 @@
 <script lang="ts">
     import Button from "./Button.svelte";
     import {isiOS, isDesktop} from "../lib/telegram";
+    import NamedIcon from "./NamedIcon.svelte";
 
     let {
         icon,
         title,
         desc,
         tag,
+        id,
         on_click,
         on_delete,
         deletable = $bindable(),
@@ -16,6 +18,7 @@
         title?: string,
         desc?: string,
         tag?: string,
+        id?: number,
         on_click?: () => void,
         on_delete?: () => void,
         deletable?: boolean,
@@ -89,8 +92,10 @@
                         <path d="M54.9072 41.1865C54.9072 46.5576 50.3906 51.0498 45.0684 51.0498C39.6729 51.0498 35.2295 46.6064 35.2295 41.1865C35.2295 35.791 39.6729 31.3477 45.0684 31.3477C50.4639 31.3477 54.9072 35.791 54.9072 41.1865ZM43.8965 35.6201L43.8965 40.1855L40.5762 40.1855C39.8926 40.1855 39.2822 40.7715 39.2822 41.4551C39.2822 42.1387 39.8682 42.7246 40.5762 42.7246L45.1904 42.7246C45.8984 42.7246 46.4355 42.1631 46.4355 41.4551L46.4355 35.6201C46.4355 34.9365 45.874 34.375 45.1904 34.375C44.458 34.375 43.8965 34.9365 43.8965 35.6201Z"/>
                     </g>
                 </svg>
-            {:else}
+            {:else if icon.length > 0}
                 <img src="{icon}" alt="ItemIcon" loading="lazy">
+            {:else}
+                <NamedIcon name={title ? title:''} id={id ? id : 0} size="40px"/>
             {/if}
             <div class="textContainer">
                 <div>
@@ -203,7 +208,8 @@
         margin-inline: 20px;
     }
 
-    img {
+    /*noinspection CssUnusedSymbol*/
+    img, .itemView > :global(div > div > div.named-icon) {
         width: 40px;
         height: 40px;
         border-radius: 50%;
