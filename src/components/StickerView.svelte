@@ -73,7 +73,6 @@
 
     function loadSticker() {
         if (sticker) {
-            console.log("Loading sticker:", sticker, autoplay);
             const options = {
                 loop: loop,
                 autoplay: autoplay,
