@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { ComponentsMap } from './ActivityManager';
-    import { initActivityManager } from './ActivityManager';
-    import {onDestroy} from "svelte";
-    import {Tween} from "svelte/motion";
-    import {cubicInOut} from "svelte/easing";
+    import type {TransitionConfig} from 'svelte/transition';
+    import type {ComponentsMap} from './ActivityManager';
+    import {initActivityManager} from './ActivityManager';
+    import {onDestroy} from 'svelte';
+    import {cubicOut} from 'svelte/easing';
 
     let {
         activities,
@@ -13,53 +13,117 @@
         initialActivity: keyof typeof activities
     } = $props();
 
-    const { current, stack } = initActivityManager(initialActivity);
+    const { current, stack, getDomPath } = initActivityManager(initialActivity);
 
+    let currentActivityElement: HTMLElement | undefined = $state();
     let currentState: any = $state();
-    let currentStack: any[] = $state([]);
-    const transition = new Tween(1, {
-        duration: 275,
-        easing: cubicInOut
-    });
-
+    let prevStack: typeof stack = $state([]);
+    let currentStack: typeof stack = $state([]);
+    const scrollCache = new Map<string, { top: number, left: number }>();
 
     const unsubscribe = current.subscribe(async (state) => {
-        let oldStack = currentStack;
-        if (oldStack.length > stack.length) {
-            await transition.set(stack.length);
+        prevStack = currentStack;
+        if (prevStack.length < stack.length && currentState) {
+            saveScroll(currentState!.name);
+        } else if (prevStack.length > stack.length && currentState) {
+            for (const [key] of scrollCache.entries()) {
+                if (key.startsWith(`${currentState.name}:`)) {
+                    scrollCache.delete(key);
+                }
+            }
         }
-        currentState = state;
         currentStack = [...stack];
-
-        if (oldStack.length <= stack.length) {
-            await transition.set(stack.length);
-        }
+        currentState = state;
     });
 
     onDestroy(unsubscribe);
 
-    function getTransform(i: number): string {
-        const delta = i + 1 - transition.current;
-        if (delta < 0) {
-            return `translateX(${delta * 20}px)`;
-        } else if (delta === 0) {
-            return 'translateX(0)';
-        } else {
-            return `translateX(${100 * delta}%)`;
+    $effect(() => {
+        if (!currentActivityElement || !currentState) return;
+        const observer = new MutationObserver(() => {
+            restoreScroll(currentState!.name);
+            observer.disconnect();
+        });
+        observer.observe(currentActivityElement, { childList: true, subtree: true });
+    });
+
+    const CurrentActivity = $derived(currentState ? activities[currentState.name] : null);
+    let goingBack = $derived(prevStack.length > currentStack.length);
+
+    function flyBackIn(
+        _: Element,
+        { duration }: { duration: number }
+    ): TransitionConfig {
+        return {
+            duration,
+            easing: cubicOut,
+            css: (t: number): string => `transform: translateX(${goingBack ? -30 * (1 - t) : 100 * (1 - t)}%);z-index: ${goingBack ? 0:1};`
+        };
+    }
+
+    function flyBackOut(
+        _: Element,
+        { duration }: { duration: number }
+    ): TransitionConfig {
+        return {
+            duration,
+            easing: cubicOut,
+            css: (t: number): string => `transform: translateX(${goingBack ? 100 * (1 - t) : -30 * (1 - t)}%);z-index: ${goingBack ? 1:0};`
+        };
+    }
+
+    function isScrollable(el: Element): boolean {
+        const style = getComputedStyle(el);
+        return (
+            (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
+            el.scrollHeight > el.clientHeight
+        ) || (
+            (style.overflowX === 'auto' || style.overflowX === 'scroll') &&
+            el.scrollWidth > el.clientWidth
+        );
+    }
+
+    function saveScroll(activityId: string) {
+        if (!currentActivityElement) return;
+        const elements = currentActivityElement!.querySelectorAll('*');
+        for (const el of elements) {
+            if (isScrollable(el)) {
+                const key = `${activityId}:${getDomPath(el)}`;
+                scrollCache.set(key, {
+                    top: (el as HTMLElement).scrollTop,
+                    left: (el as HTMLElement).scrollLeft,
+                });
+            }
+        }
+    }
+
+    function restoreScroll(activityId: string) {
+        if (!currentActivityElement) return;
+        const elements = currentActivityElement!.querySelectorAll('*');
+        for (const el of elements) {
+            const key = `${activityId}:${getDomPath(el)}`;
+            const saved = scrollCache.get(key);
+            if (saved) {
+                if (el instanceof HTMLElement) {
+                    el.scrollTop = saved.top;
+                    el.scrollLeft = saved.left;
+                }
+            }
         }
     }
 </script>
 
 
 <div class="viewport">
-    {#each currentStack as entry, i (entry.name)}
-        {@const Activity = activities[entry.name]}
-        <div class="activity" style="z-index: {i};transform: {getTransform(i)};pointer-events: {i + 1 === Math.round(transition.current) ? 'auto' : 'none'};">
-            <Activity
-                {...currentState.props}
-            />
-        </div>
-    {/each}
+    {#if currentState}
+        {#key currentState.id}
+            <div class="activity" in:flyBackIn={{duration: 350}} out:flyBackOut={{duration: 350}} bind:this={currentActivityElement}>
+                <CurrentActivity
+                    {...currentState.props}
+                />
+            </div>
+        {/key}
+    {/if}
 </div>
 
 <style>
