@@ -27,7 +27,7 @@ export interface ActivityManagerContext<Props extends Record<string, any> = Reco
     startActivity: (name: string, props?: Props) => void;
     finishActivity: () => void;
     getDomPath: (el: Element) => string
-    getComponentContext: (el: Element) => ComponentContext;
+    getComponentContext: (el: Element, subName?: string) => ComponentContext;
 }
 
 let nextId = 1;
@@ -115,8 +115,8 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         return path.join(' > ');
     }
 
-    function getComponentContext(el: Element): ComponentContext {
-        let key =  `${stack[stack.length - 1].name}:${getDomPath(el)}`;
+    function getComponentContext(el: Element, subName?: string): ComponentContext {
+        let key = `${stack[stack.length - 1].name}:${getDomPath(el)}${`:${subName}` || ''}`;
         return {
             onCapture: (fn: () => any) => {
                 onCaptureCallbacks.set(key, fn);

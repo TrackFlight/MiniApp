@@ -30,7 +30,7 @@
     const {getComponentContext} =  getApplicationContext();
 
     onMount(async () => {
-        const {onCapture, onRestore} = getComponentContext(currentElement);
+        const {onCapture, onRestore} = getComponentContext(currentElement, sticker);
 
         onCapture(() => {
             return {
