@@ -63,3 +63,11 @@ https://www.apple.com/wss/fonts/SF-Pro-Text/v3/sf-pro-text_regular.woff2
     font-style: normal;
     font-display: swap;
 }
+
+@font-face {
+    font-family: 'SFProRounded';
+    src: url('assets/fonts/SFProRounded-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
