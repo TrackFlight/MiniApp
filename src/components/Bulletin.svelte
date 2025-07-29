@@ -34,6 +34,7 @@
             message: message,
             duration: duration || defaultDuration,
             button: button,
+            icon: icon,
             on_close: on_close,
         };
         if (showBulletin && !isSame) {
