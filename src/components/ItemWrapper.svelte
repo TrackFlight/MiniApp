@@ -1,17 +1,16 @@
 <script lang="ts">
-    import { Tween } from 'svelte/motion';
-    import { cubicOut } from 'svelte/easing';
     const { top = $bindable(), children } : {top: number, children: any} = $props();
-
-    let topTween = new Tween(top, {
-        duration: 250,
-        easing: cubicOut
-    });
-    $effect(() => {
-        topTween.set(top);
-    });
 </script>
 
-<div style="position: absolute; top: {topTween.current}px; width: 100%; visibility: visible;">
+<div class="item-wrapper" style="top: {top}px;">
     {@render children?.()}
 </div>
+
+<style>
+    .item-wrapper {
+        position: absolute;
+        transition: top 225ms cubic-bezier(0.55, 0, 0.1, 1);
+        width: 100%;
+        visibility: visible;
+    }
+</style>

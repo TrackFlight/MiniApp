@@ -1,19 +1,15 @@
 <script lang="ts">
     import {onDestroy, onMount, tick} from "svelte";
     import ItemWrapper from "./ItemWrapper.svelte";
-    import {Tween} from "svelte/motion";
-    import {cubicOut} from "svelte/easing";
 
     const { data = $bindable(), children } : {data: any, children: any} = $props();
 
     let viewport: HTMLElement;
-    let wasEmpty = data.length === 0;
     let currentTop = $state(0);
     let clientHeight = $state(0);
     let averageHeight = $state(0);
     let parentElement: HTMLElement;
     let totalHeight = $derived(data.length * averageHeight);
-    let totalHeightTween: Tween<number> | undefined = $state();
     let visibleItems = $derived(Math.ceil((clientHeight - currentTop) / averageHeight));
 
     let indexedData = $derived(data.map((item: any, i: number) => (item.hasOwnProperty('__vid') ? item : { __vid: i, ...item })));
@@ -23,26 +19,27 @@
 
     let resizeObserver: ResizeObserver;
     let resizeObserverElement: ResizeObserver;
+    let ready = $state(false);
 
     onMount(async () => {
         resizeObserver = new ResizeObserver(() => {
-            if (!parentElement) {
-                parentElement = viewport.parentElement!;
-                while (parentElement && parentElement !== document.body) {
-                    if (parentElement.scrollHeight > parentElement.clientHeight) {
-                        parentElement.addEventListener('scroll', onScroll);
-                        break
-                    }
-                    parentElement = parentElement.parentElement!;
+            parentElement = viewport.parentElement!;
+            while (parentElement && parentElement !== document.body) {
+                if (parentElement.scrollHeight > parentElement.clientHeight) {
+                    parentElement.addEventListener('scroll', onScroll);
+                    break
                 }
-                clientHeight = parentElement!.clientHeight;
-                resizeObserverElement = new ResizeObserver(() => {
-                    clientHeight = parentElement!.clientHeight;
-                    currentTop = viewport.getBoundingClientRect().top;
-                });
-                resizeObserverElement.observe(parentElement!);
-                currentTop = viewport.getBoundingClientRect().top;
+                parentElement = parentElement.parentElement!;
             }
+            clientHeight = parentElement!.clientHeight;
+            currentTop = viewport.getBoundingClientRect().top;
+            resizeObserver?.disconnect();
+            ready = true;
+            resizeObserverElement = new ResizeObserver(() => {
+                clientHeight = parentElement!.clientHeight;
+                currentTop = viewport.getBoundingClientRect().top;
+            });
+            resizeObserverElement.observe(parentElement!);
         });
         resizeObserver.observe(viewport!);
     });
@@ -57,14 +54,7 @@
         if (data.length > 0 && averageHeight === 0) {
             tick().then(() => {
                 averageHeight = viewport.children[0].getBoundingClientRect().height;
-                totalHeightTween = new Tween(wasEmpty ? 0:totalHeight, {
-                    duration: 250,
-                    easing: cubicOut
-                });
-                wasEmpty = false;
             })
-        } else {
-            totalHeightTween?.set(totalHeight);
         }
     });
 
@@ -73,10 +63,24 @@
     }
 </script>
 
-<div bind:this={viewport} style="height: {totalHeightTween?.current}px; overflow-anchor: none; flex: 0 0 auto; visibility: hidden; width: 100%; position: relative;">
+<div class="virtual-list" bind:this={viewport} style="height: {totalHeight}px;" class:ready>
     {#each visible as item, index (item.__vid)}
         <ItemWrapper top={averageHeight * (start + index)}>
             {@render children(item)}
         </ItemWrapper>
     {/each}
 </div>
+
+<style>
+    .virtual-list {
+        overflow-anchor: none;
+        flex: 0 0 auto;
+        visibility: hidden;
+        width: 100%;
+        position: relative;
+    }
+
+    .virtual-list.ready {
+        transition: height 225ms cubic-bezier(0.55, 0, 0.1, 1);
+    }
+</style>
