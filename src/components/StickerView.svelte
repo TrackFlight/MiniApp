@@ -2,8 +2,10 @@
     import {onMount} from "svelte";
     import {fade} from 'svelte/transition';
     import {DotLottie} from "@lottiefiles/dotlottie-web";
+    import {stickersInstance} from "./StickerView";
+    import {getApplicationContext} from "../lib/navigation/ActivityManager";
 
-    const {
+    let {
         size,
         sticker = $bindable(),
         loop = false,
@@ -12,7 +14,7 @@
         children
     } : {
         size: string
-        sticker?: string | ArrayBuffer,
+        sticker?: string,
         loop?: boolean,
         autoplay?: boolean,
         on_load?: () => void,
@@ -22,8 +24,37 @@
     let dotLottie: DotLottie;
     let loaded = $state(false);
     let lottieEl: HTMLCanvasElement;
+    let currentElement: HTMLElement;
+    let startFrame = $state(0);
+
+    const {getComponentContext} =  getApplicationContext();
 
     onMount(async () => {
+        const {onCapture, onRestore} = getComponentContext(currentElement);
+
+        onCapture(() => {
+            return {
+                currentFrame: dotLottie.currentFrame,
+                totalFrames: dotLottie.totalFrames,
+                duration: dotLottie.duration,
+                pausedAt: Date.now(),
+                isPlaying: dotLottie.isPlaying
+            }
+        });
+
+        onRestore((state: { currentFrame: number, pausedAt: number, totalFrames: number, duration: number, isPlaying: boolean }) => {
+            if (state.isPlaying) {
+                const frameDuration = (state.duration / state.totalFrames) * 1000;
+                const elapsedFrames = Math.floor((Date.now() - state.pausedAt) / frameDuration);
+                startFrame = Math.min(state.currentFrame + elapsedFrames, state.totalFrames - 1);
+            } else {
+                startFrame = state.currentFrame;
+            }
+            if (startFrame == state.totalFrames - 1 && !loop) {
+                autoplay = false;
+            }
+        });
+
         dotLottie = new DotLottie({
             canvas:  lottieEl,
         });
@@ -31,14 +62,18 @@
         dotLottie.addEventListener("ready", loadSticker);
         dotLottie.addEventListener("load", () => {
             loaded = true;
+            if (startFrame > 0) {
+                dotLottie.setFrame(startFrame);
+            }
             if (on_load) on_load();
         });
-    });
 
-    $effect(loadSticker);
+        $effect(loadSticker);
+    });
 
     function loadSticker() {
         if (sticker) {
+            console.log("Loading sticker:", sticker, autoplay);
             const options = {
                 loop: loop,
                 autoplay: autoplay,
@@ -46,17 +81,14 @@
                     freezeOnOffscreen: true,
                 },
             };
-            if (sticker instanceof ArrayBuffer) {
+            stickersInstance.getSticker(sticker).then((stickerData) => {
                 dotLottie.load({
-                    data: sticker,
+                    data: stickerData,
                     ...options
-                })
-            } else {
-                dotLottie.load({
-                    src: `src/assets/stickers/${sticker}.lottie`,
-                    ...options
-                })
-            }
+                });
+            }).catch((error) => {
+                console.error("Failed to load sticker:", error);
+            });
         }
     }
 
@@ -65,7 +97,7 @@
     }
 </script>
 
-<div class="sticker-view" style="width: {size}; height: {size};" class:loaded>
+<div bind:this={currentElement} class="sticker-view" style="width: {size}; height: {size};" class:loaded>
     {#if !loaded}
     <div out:fade="{{ duration: 300 }}">
         {@render children?.()}

@@ -8,14 +8,14 @@
     import Button from "../components/Button.svelte";
     import ItemView from "../components/ItemView.svelte";
     import {ReadableDateDifference, T} from "../lib/translator";
-    import {useActivityManager} from "../lib/navigation/ActivityManager.js";
+    import {getApplicationContext} from "../lib/navigation/ActivityManager";
     import {removeApp, ServerErrorCode, sessionStore, trackLink, withUIProgress, type App, getAppID} from "../lib/api";
     import VirtualList from "../components/VirtualList.svelte";
 
     let deletable = $state(!isiOS);
     let items = $state(sessionStore.appList);
 
-    const {startActivity} = useActivityManager();
+    const {startActivity} =  getApplicationContext();
 
     function removeItem(app: App) {
         const isUnknownApp = app.name == null;

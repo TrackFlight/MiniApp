@@ -5,8 +5,8 @@
     import {Tween} from "svelte/motion";
     import StickerView from "./StickerView.svelte";
     import Button from "./Button.svelte";
-    import {LRUCache} from "../lib/lru-cache";
     import {onDestroy} from "svelte";
+    import {stickersInstance} from "./StickerView";
 
     const defaultDuration = 1800;
 
@@ -16,13 +16,11 @@
     let progress = $state<Tween<number>>();
     let closeTimeout: ReturnType<typeof setTimeout>;
     let shakeTimeout: ReturnType<typeof setTimeout>;
-    const lruCache = new LRUCache<string, ArrayBuffer>(10);
 
     let current: {
         title?: string,
         message: string,
         icon?: string,
-        iconData?: ArrayBuffer,
         button?: BulletinButton,
         duration: number,
         on_close?: () => void,
@@ -121,22 +119,7 @@
             current.icon = 'timer';
             return;
         }
-        if (lruCache.has(new_icon)) {
-            current.icon = new_icon;
-            current.iconData = lruCache.get(new_icon);
-            return;
-        }
-        if (current.icon === new_icon && current.iconData) {
-            return;
-        }
-        const url = `src/assets/stickers/${new_icon}.lottie`;
-        let response = await fetch(url);
-        if (!response.ok) {
-            throw new Error("Failed to load sticker");
-        }
-        current.icon = new_icon;
-        current.iconData = await response.arrayBuffer();
-        lruCache.set(new_icon, current.iconData);
+        await stickersInstance.preloadSticker(new_icon);
     }
 </script>
 
@@ -171,7 +154,7 @@
                 </div>
             </div>
         {:else if current.icon}
-            <StickerView bind:this={player} size="40px" sticker={current.iconData} on_load={on_sticker_load}/>
+            <StickerView bind:this={player} size="40px" sticker={current.icon} on_load={on_sticker_load}/>
         {/if}
         <div class="container">
             <p>{current.title}</p>
