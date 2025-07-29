@@ -5,7 +5,6 @@
     import LoadingDialog from "./components/LoadingDialog.svelte";
     import MainActivity from "./activities/MainActivity.svelte";
     import ActivityManager from "./lib/navigation/ActivityManager.svelte";
-    import type {Component} from "svelte";
     import AppInfoActivity from "./activities/AppInfoActivity.svelte";
 
     telegram?.ready();
