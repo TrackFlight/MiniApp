@@ -47,9 +47,7 @@
             </div>
         {:else}
             {#if isiOS}
-                <div class="deleteBtn" role="button" tabindex="0" onkeydown={onKeyDelete} onclick={() => {if (on_delete) on_delete()}} class:deletable class:isiOS>
-                    <div></div>
-                </div>
+                <div class="deleteBtn" role="button" tabindex="0" onkeydown={onKeyDelete} onclick={() => {if (on_delete) on_delete()}} class:deletable class:isiOS></div>
             {/if}
             {#if icon === "link_loading"}
                 <svg fill="var(--tg-theme-hint-color)" style="margin-inline: 12px;margin-block: 11px;" width="44px" height="44px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 57.7637 53.8818">
@@ -171,23 +169,34 @@
         flex-shrink: 0;
     }
 
-    :not(svg).deleteBtn.isiOS > div {
+    :not(svg).deleteBtn.isiOS:before,
+    :not(svg).deleteBtn.isiOS:after {
+        transform: translateX(calc(-14px - var(--delete-width)));
+        transition: transform 210ms ease-in-out 0ms;
+    }
+
+    :not(svg).deleteBtn.isiOS.deletable:before,
+    :not(svg).deleteBtn.isiOS.deletable:after {
+        transform: translateX(0);
+        transition: transform 400ms ease;
+    }
+
+    :not(svg).deleteBtn.isiOS:before {
+        content: "";
         position: absolute;
         background: var(--tg-theme-destructive-text-color);
         width: 24px;
         height: 24px;
         border-radius: 50%;
         margin-left: 14px;
-        transform: translateX(calc(-14px - var(--delete-width)));
-        transition: transform 210ms ease 0ms;
     }
 
-    :not(svg).deleteBtn.isiOS >:after {
+    :not(svg).deleteBtn.isiOS:after {
         content: "";
         position: absolute;
         width: 12px;
         height: 2px;
-        left: calc(50% - 6px);
+        left: calc(50% + 1px);
         top: calc(50% - 1px);
         border-radius: 1px;
         background: #fff;
@@ -195,11 +204,6 @@
 
     .deleteBtn.isiOS.deletable {
         width: var(--delete-width);
-    }
-
-    .deleteBtn.isiOS.deletable > div {
-        transform: translateX(0);
-        transition: transform 400ms ease;
     }
 
     /** Icons and Description **/
