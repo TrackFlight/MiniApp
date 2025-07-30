@@ -34,7 +34,8 @@ https://www.apple.com/wss/fonts/SF-Pro-Text/v3/sf-pro-text_regular.woff2
 
 @font-face {
     font-family: 'SFProText';
-    src: url('assets/fonts/SFProText-Regular.woff2') format('woff2');
+    src: url('assets/fonts/SFProText-Regular.woff2') format('woff2'),
+        url('assets/fonts/SFProText-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -42,7 +43,8 @@ https://www.apple.com/wss/fonts/SF-Pro-Text/v3/sf-pro-text_regular.woff2
 
 @font-face {
     font-family: 'SFProText';
-    src: url('assets/fonts/SFProText-Medium.woff2') format('woff2');
+    src: url('assets/fonts/SFProText-Medium.woff2') format('woff2'),
+        url('assets/fonts/SFProText-Medium.woff') format('woff');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -50,7 +52,8 @@ https://www.apple.com/wss/fonts/SF-Pro-Text/v3/sf-pro-text_regular.woff2
 
 @font-face {
     font-family: 'SFProText';
-    src: url('assets/fonts/SFProText-SemiBold.woff2') format('woff2');
+    src: url('assets/fonts/SFProText-SemiBold.woff2') format('woff2'),
+        url('assets/fonts/SFProText-SemiBold.woff') format('woff');
     font-weight: 600;
     font-style: normal;
     font-display: swap;
@@ -58,7 +61,8 @@ https://www.apple.com/wss/fonts/SF-Pro-Text/v3/sf-pro-text_regular.woff2
 
 @font-face {
     font-family: 'SFProText';
-    src: url('assets/fonts/SFProText-Bold.woff2') format('woff2');
+    src: url('assets/fonts/SFProText-Bold.woff2') format('woff2'),
+        url('assets/fonts/SFProText-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -66,7 +70,8 @@ https://www.apple.com/wss/fonts/SF-Pro-Text/v3/sf-pro-text_regular.woff2
 
 @font-face {
     font-family: 'SFProRounded';
-    src: url('assets/fonts/SFProRounded-Bold.woff2') format('woff2');
+    src: url('assets/fonts/SFProRounded-Bold.woff2') format('woff2'),
+        url('assets/fonts/SFProRounded-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
