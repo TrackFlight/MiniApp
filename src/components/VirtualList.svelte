@@ -1,6 +1,5 @@
 <script lang="ts">
     import {onDestroy, onMount, tick} from "svelte";
-    import ItemWrapper from "./ItemWrapper.svelte";
 
     const { data = $bindable(), children } : {data: any, children: any} = $props();
 
@@ -65,9 +64,9 @@
 
 <div class="virtual-list" bind:this={viewport} style="height: {totalHeight}px;" class:ready>
     {#each visible as item, index (item.__vid)}
-        <ItemWrapper top={averageHeight * (start + index)}>
+        <div style="top: {averageHeight * (start + index)}px;">
             {@render children(item)}
-        </ItemWrapper>
+        </div>
     {/each}
 </div>
 
@@ -81,6 +80,16 @@
     }
 
     .virtual-list.ready {
-        transition: height 225ms cubic-bezier(0.55, 0, 0.1, 1);
+        transition: height 250ms cubic-bezier(0.55, 0, 0.1, 1);
+    }
+
+    .virtual-list.ready > div {
+        transition: top 250ms cubic-bezier(0.55, 0, 0.1, 1);
+    }
+
+    .virtual-list > div {
+        position: absolute;
+        width: 100%;
+        visibility: visible;
     }
 </style>
