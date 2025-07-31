@@ -1,6 +1,6 @@
-import {type App, type Link, ServerErrorCode} from "./types";
+import {type App, ServerErrorCode} from "./types";
 import {sessionStore} from "./auth";
-import {getAppID, internalRequest} from "./base";
+import {internalRequest} from "./base";
 
 export async function trackLink(url_or_id: string | number) : Promise<ServerErrorCode | null> {
     let trackLinkData: {
@@ -22,7 +22,7 @@ export async function trackLink(url_or_id: string | number) : Promise<ServerErro
     if (res.error === undefined) {
         sessionStore.appList = sessionStore.appList
             .reduce<{ items: App[]; found: boolean }>((acc, app, idx, arr) => {
-                if (getAppID(app) === getAppID(res.response!)) {
+                if (app.id === res.response!.id) {
                     acc.items.push({ ...app, links: [...app.links, ...res.response!.links] });
                     acc.found = true;
                 } else {
@@ -46,5 +46,5 @@ export async function removeApp(app: App) {
         "DELETE",
         appInfo,
     );
-    sessionStore.appList = sessionStore.appList.filter(item => getAppID(item) !== getAppID(app));
+    sessionStore.appList = sessionStore.appList.filter(item => item.id !== app.id);
 }

@@ -11,7 +11,7 @@
     let totalHeight = $derived(data.length * averageHeight);
     let visibleItems = $derived(Math.ceil((clientHeight - currentTop) / averageHeight));
 
-    let indexedData = $derived(data.map((item: any, i: number) => (item.hasOwnProperty('__vid') ? item : { __vid: i, ...item })));
+    let indexedData = $derived(data.map((item: any, i: number) => (item.hasOwnProperty('__vid') ? item : { __vid: item.hasOwnProperty('id') ? item.id : i, ...item })));
     let start = $derived(Math.max(0, Math.floor(-currentTop / averageHeight) - 3));
     let end = $derived(Math.max(1, isNaN(visibleItems) ? 1 : visibleItems + 3));
     let visible = $derived(indexedData.slice(start, end));

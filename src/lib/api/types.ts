@@ -1,5 +1,5 @@
 export interface App {
-    id: number | null;
+    id: number;
     name: string | null;
     icon_url: string | null;
     description: string | null;

@@ -9,7 +9,7 @@
     import ItemView from "../components/ItemView.svelte";
     import {ReadableDateDifference, T} from "../lib/translator";
     import {getApplicationContext} from "../lib/navigation/ActivityManager";
-    import {removeApp, ServerErrorCode, sessionStore, trackLink, withUIProgress, type App, getAppID} from "../lib/api";
+    import {removeApp, ServerErrorCode, sessionStore, trackLink, withUIProgress, type App} from "../lib/api";
     import VirtualList from "../components/VirtualList.svelte";
 
     let deletable = $state(!isiOS);
@@ -68,7 +68,7 @@
                         }
                     },
                 );
-                items = items.filter(item => getAppID(item) !== getAppID(app));
+                items = items.filter(item => item.id !== app.id);
             },
         );
     }
@@ -115,7 +115,7 @@
 <ListView header={T('LINKS_HEADER')}>
     <ItemView icon="add" title={T('TRACK_LINK_BTN')} on_click={addLink}/>
     <!--suppress JSUnusedGlobalSymbols -->
-    <VirtualList data={[...items].map((item) => ({ __vid: getAppID(item), ...item }))}>
+    <VirtualList data={items}>
         {#snippet children(item: App)}
             <ItemView
                 title={item.name ? item.name : T('UNKNOWN_APP')}

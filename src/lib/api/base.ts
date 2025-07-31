@@ -48,10 +48,3 @@ export async function internalRequest<T, C>(path: string, method: string = "GET"
     }
     return response;
 }
-
-export function getAppID(app: App) : string {
-    if (app.id === null) {
-        return `link_${app.links[0].id}`;
-    }
-    return `app_${app.id}`;
-}
