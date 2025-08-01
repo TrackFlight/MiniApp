@@ -12,7 +12,7 @@
 </script>
 
 <div class="named-icon {colorName}" style="width: {size}; height: {size};">
-    <p>{initials()}</p>
+    <p style="font-size: {parseInt(size, 10) * 37.5 / 100}px">{initials()}</p>
 </div>
 
 <style>
