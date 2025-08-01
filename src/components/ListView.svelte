@@ -23,7 +23,7 @@
     }
 
     .listView:not(.isiOS) > p {
-        font-weight: bold;
+        font-weight: 600;
         font-size: 15px;
         margin-top: 10px;
     }
