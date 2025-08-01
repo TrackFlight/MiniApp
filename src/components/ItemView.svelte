@@ -13,6 +13,7 @@
         on_delete,
         deletable = $bindable(),
         highlight = false,
+        small = false,
     } : {
         icon: string,
         title?: string,
@@ -23,6 +24,7 @@
         on_delete?: () => void,
         deletable?: boolean,
         highlight?: boolean,
+        small?: boolean,
     } = $props();
 
     function onKeyDelete(e: KeyboardEvent) {
@@ -97,10 +99,10 @@
             {/if}
             <div class="textContainer">
                 <div>
-                    <p class="itemTitle">{title}</p>{#if tag}<p class="itemTag">[<span>#{tag}</span>]</p>{/if}
+                    <p class="itemTitle" class:small>{title}</p>{#if tag}<p class="itemTag">[<span>#{tag}</span>]</p>{/if}
                 </div>
                 {#if desc}
-                    <p class="itemDesc" class:highlight>{desc}</p>
+                    <p class="itemDesc" class:highlight class:small>{desc}</p>
                 {/if}
             </div>
             {#if !isiOS && deletable}
@@ -242,6 +244,10 @@
         text-overflow: ellipsis;
     }
 
+    .itemTitle.small {
+        font-size: 16px;
+    }
+
     .itemTag {
         margin: 0;
         font-weight: 500;
@@ -263,6 +269,10 @@
         margin: 2px 0 0;
         font-size: 15px;
         color: var(--tg-theme-subtitle-text-color);
+    }
+
+    .itemDesc.small {
+        font-size: 14px;
     }
 
     .itemDesc.highlight {
