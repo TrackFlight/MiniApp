@@ -63,6 +63,7 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
     async function finishActivity() {
         if (stack.length <= 1 || stack[stack.length - 1].id === 1) return;
         stack.pop();
+        await telegram.closeBulletin();
         if (stack.length <= 1) {
             telegram.BackButton.hide();
         }
