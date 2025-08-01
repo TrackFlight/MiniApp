@@ -283,10 +283,6 @@
         color: var(--tg-theme-subtitle-text-color);
     }
 
-    .itemDesc.small {
-        font-size: 14px;
-    }
-
     .itemDesc.highlight {
         color: var(--tg-theme-accent-text-color);
     }
