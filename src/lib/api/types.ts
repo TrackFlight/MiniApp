@@ -3,6 +3,7 @@ export interface App {
     name: string | null;
     icon_url: string | null;
     description: string | null;
+    followers: number;
     links: Link[];
 }
 
