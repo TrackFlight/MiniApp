@@ -281,6 +281,9 @@
         margin: 2px 0 0;
         font-size: 15px;
         color: var(--tg-theme-subtitle-text-color);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     .itemDesc.highlight {
