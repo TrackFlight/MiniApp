@@ -2,6 +2,8 @@ import {telegram} from "../telegram";
 import type {App, ResponseData} from "./types";
 import {sessionStore} from "./auth";
 
+const appListChangeCallbacks: (() => void)[] = [];
+
 export async function withUIProgress<T>(promise: Promise<T>): Promise<T> {
     let res = await withTimeout(
         promise,
@@ -47,4 +49,12 @@ export async function internalRequest<T, C>(path: string, method: string = "GET"
         response.response = await rawResponse.json() as T;
     }
     return response;
+}
+
+export function notifyAppListChanged() {
+    appListChangeCallbacks.forEach(callback => callback());
+}
+
+export function onAppListChanged(callback: () => void) {
+    appListChangeCallbacks.push(callback);
 }
