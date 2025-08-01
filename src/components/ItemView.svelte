@@ -52,7 +52,7 @@
                 <div class="deleteBtn" role="button" tabindex="0" onkeydown={onKeyDelete} onclick={() => {if (on_delete) on_delete()}} class:deletable class:isiOS></div>
             {/if}
             {#if icon === "link_loading"}
-                <svg style="margin-inline: 12px;margin-block: 11px;" width="44px" height="44px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 57.7637 53.8818">
+                <svg style="margin-inline: 12px;margin-block: 11px;min-width: 44px" width="44px" height="44px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 57.7637 53.8818">
                     <defs>
                         <mask id="circle-mask">
                             <rect x="0" y="0" width="100%" height="100%" fill="white"/>
@@ -93,7 +93,7 @@
                     </g>
                 </svg>
             {:else if icon === "link"}
-                <svg style="margin-inline: 16px;margin-block: 11px;" width="38px" height="38px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+                <svg style="margin-inline: 16px;margin-block: 11px;min-width: 38px" width="38px" height="38px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
                     <circle
                         cx="20"
                         cy="20"
