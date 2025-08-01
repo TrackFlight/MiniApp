@@ -1,4 +1,4 @@
-import {type App, ServerErrorCode} from "./types";
+import {type App, type Link, ServerErrorCode} from "./types";
 import {sessionStore} from "./auth";
 import {internalRequest} from "./base";
 
@@ -40,11 +40,25 @@ export async function trackLink(url_or_id: string | number) : Promise<ServerErro
 }
 
 export async function removeApp(app: App) {
-    const appInfo = app.links.flatMap(link => link.id);
+    const linkIDs = app.links.flatMap(link => link.id);
     await internalRequest(
         `users/links`,
         "DELETE",
-        appInfo,
+        linkIDs,
     );
     sessionStore.appList = sessionStore.appList.filter(item => item.id !== app.id);
+}
+
+export async function removeLink(link: Link) {
+    await internalRequest(
+        `users/links`,
+        "DELETE",
+        [link.id],
+    );
+    sessionStore.appList = sessionStore.appList
+        .map(app => ({
+            ...app,
+            links: app.links.filter(l => l.id !== link.id)
+        }))
+        .filter(app => app.links.length > 0);
 }
