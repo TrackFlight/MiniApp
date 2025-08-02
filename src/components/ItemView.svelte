@@ -16,6 +16,7 @@
         deletable = $bindable(),
         highlight = false,
         small = false,
+        allowShowSpoilers = true
     } : {
         icon: string,
         title?: string,
@@ -27,14 +28,22 @@
         deletable?: boolean,
         highlight?: boolean,
         small?: boolean,
+        allowShowSpoiler?: boolean
     } = $props();
 
     let titleWithSpoilers = $derived(parseTextWithSpoilers(title))
+    let currentSpoilersStatus = $state(true);
 
     function onKeyDelete(e: KeyboardEvent) {
         if ((e.key === "Enter" || e.key === " ") && on_delete) {
             e.preventDefault();
             on_delete();
+        }
+    }
+
+    function showSpoilers() {
+        if (allowShowSpoilers) {
+            currentSpoilersStatus = false;
         }
     }
 </script>
@@ -120,7 +129,7 @@
                             {#if part.type === "text"}
                                 {@html part.content}
                             {:else if part.type === "spoiler"}
-                                <SimpleSpoiler text={part.content} />
+                                <SimpleSpoiler text={part.content} on_click={showSpoilers} hide={currentSpoilersStatus} />
                             {/if}
                         {/each}
                     </p>
