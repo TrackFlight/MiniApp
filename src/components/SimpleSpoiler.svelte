@@ -1,7 +1,8 @@
 <script lang="ts">
-    import {onMount, tick} from "svelte";
+    import {onDestroy, onMount, tick} from "svelte";
+    import {fade} from 'svelte/transition';
 
-    const { text } : {text: string} = $props();
+    const { text, on_click, hide = true } : {text: string, on_click: () => void, hide?: boolean} = $props();
 
     interface Point {
         mx: number;
@@ -19,13 +20,20 @@
         t: number;
     }
 
-    let canvas: HTMLCanvasElement;
+    let canvas: HTMLCanvasElement | undefined = $state();
     const max_d = 1;
     const fps = 30;
     const l_sec = 0.6;
     let last_render = 0;
     let points: Point[] = [];
+    let animationFrame: number;
     const interval = 1000 / fps;
+
+    export function showSpoiler() {
+        if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+        }
+    }
 
     function random(x: number, y: number) {
         return x + Math.floor(Math.random() * (y + 1 - x));
@@ -86,10 +94,14 @@
             }
             last_render = now;
         }
-        requestAnimationFrame(() => animate(ctx, width, height));
+        if (!hide) return;
+        animationFrame = requestAnimationFrame(() => animate(ctx, width, height));
     }
 
     onMount(async () => {
+        if (!canvas) {
+            return;
+        }
         await tick();
         const ctx = canvas.getContext("2d")!;
 
@@ -124,12 +136,15 @@
 
         animate(ctx!, width, height);
     })
+
+    onDestroy(() => {
+        if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+        }
+    });
 </script>
 
-<span>
-    <canvas bind:this={canvas}></canvas>
-    <span>{text}</span>
-</span>
+<span>{#if hide}<canvas transition:fade={{duration: 100}} bind:this={canvas} class="button" onclick={on_click}></canvas>{/if}<span class:hide>{text}</span></span>
 
 <style>
     span {
@@ -137,7 +152,13 @@
     }
 
     span > span {
+        opacity: 1;
+        transition: opacity 100ms ease-in-out;
+    }
+
+    span > span.hide {
         visibility: hidden;
+        opacity: 0;
     }
 
     canvas {
