@@ -11,6 +11,7 @@ export interface Link {
     id: number;
     url: string;
     status: "available" | "full" | "closed";
+    is_public: boolean;
     last_availability: number;
     last_update: number;
 }

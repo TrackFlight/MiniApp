@@ -98,10 +98,10 @@
         {#if isiOS}
             <Button text={deletable ? T('DONE_BTN') : T('EDIT_BTN')} on_click={() => deletable = !deletable}/>
         {/if}
-        {#if app.name}
+        {#if app.icon_url}
             <img src={app.icon_url} alt="App Icon"/>
         {:else}
-            <NamedIcon name={T('UNKNOWN_APP')} id={app.links[0].id} size="{isiOS ? 120:55}px"/>
+            <NamedIcon name={app.name ? app.name : T('UNKNOWN_APP')} id={app.links[0].id} size="{isiOS ? 120:55}px"/>
         {/if}
         <div>
             <h1>{app.name ? app.name : T('UNKNOWN_APP')}</h1>
@@ -124,7 +124,7 @@
         <VirtualList data={linksList}>
             {#snippet children(item: Link)}
                 <ItemView
-                    title={item.url.replace(/\/(X+)$/, '/<spoiler>$1</spoiler>')}
+                    title={item.is_public ? item.url : item.url.replace(/\/(\w+)$/, '/<spoiler>$1</spoiler>')}
                     icon={item.status ? 'link' : 'link_loading'}
                     desc={
                         item.status ?
