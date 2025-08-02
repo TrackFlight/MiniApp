@@ -4,7 +4,6 @@
         type Link,
         notifyAppListChanged,
         removeLink,
-        sessionStore,
         withUIProgress
     } from "../lib/api";
     import {isiOS, telegram} from "../lib/telegram";
@@ -18,6 +17,7 @@
     import Button from "../components/Button.svelte";
     import Bulletin from "../components/Bulletin.svelte";
     import {getApplicationContext} from "../lib/navigation/ActivityManager";
+    import SimpleSpoiler from "../components/SimpleSpoiler.svelte";
 
     let {app} : { app: App } = $props();
     let deletable = $state(!isiOS);
@@ -124,7 +124,7 @@
         <VirtualList data={linksList}>
             {#snippet children(item: Link)}
                 <ItemView
-                    title={item.url}
+                    title={item.url.replace(/\/(X+)$/, '/<spoiler>$1</spoiler>')}
                     icon={item.status ? 'link' : 'link_loading'}
                     desc={
                         item.status ?
