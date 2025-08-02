@@ -2,6 +2,8 @@
     import Button from "./Button.svelte";
     import {isiOS, isDesktop} from "../lib/telegram";
     import NamedIcon from "./NamedIcon.svelte";
+    import {parseTextWithSpoilers} from "./SimpleSpoiler";
+    import SimpleSpoiler from "./SimpleSpoiler.svelte";
 
     let {
         icon,
@@ -26,6 +28,8 @@
         highlight?: boolean,
         small?: boolean,
     } = $props();
+
+    let titleWithSpoilers = $derived(parseTextWithSpoilers(title))
 
     function onKeyDelete(e: KeyboardEvent) {
         if ((e.key === "Enter" || e.key === " ") && on_delete) {
@@ -111,7 +115,18 @@
             {/if}
             <div class="textContainer">
                 <div>
-                    <p class="itemTitle" class:small>{title}</p>{#if tag}<p class="itemTag">[<span>#{tag}</span>]</p>{/if}
+                    <p class="itemTitle" class:small>
+                        {#each titleWithSpoilers as part}
+                            {#if part.type === "text"}
+                                {@html part.content}
+                            {:else if part.type === "spoiler"}
+                                <SimpleSpoiler text={part.content} />
+                            {/if}
+                        {/each}
+                    </p>
+                    {#if tag}
+                        <p class="itemTag">[<span>#{tag}</span>]</p>
+                    {/if}
                 </div>
                 {#if desc}
                     <p class="itemDesc" class:highlight class:small>{desc}</p>
