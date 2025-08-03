@@ -2,6 +2,10 @@
     import Bulletin from "../components/Bulletin.svelte";
     import HomeFragment from "../fragments/HomeFragment.svelte";
     import Navbar from "../components/Navbar.svelte";
+    import {onMount} from "svelte";
+    import {telegram} from "../lib/telegram";
+
+    onMount(telegram.BackButton.hide);
 </script>
 
 <div class="content">
