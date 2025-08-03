@@ -55,6 +55,7 @@ interface TelegramWebApp {
     showPopup(params: PopupParams, callback?: (result: string) => void): void;
     showPrompt(message: string, callback?: (result: string | null) => void): void;
     showBulletin(icon: string, message: string, duration?: number, title?: string, button?: BulletinButton, on_close?: () => void): void;
+    showBottomSheet(id: string, data?: any): void;
     closeBulletin(): Promise<void>;
     setHeaderColor(color: string): void;
     showLoadingProgress(show: boolean): void;
