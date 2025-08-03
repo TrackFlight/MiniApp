@@ -1,6 +1,7 @@
 <script lang="ts">
     import {onDestroy, onMount, tick} from "svelte";
     import {fade} from 'svelte/transition';
+    import {telegram} from "../lib/telegram";
 
     const { text, on_click, hide = true } : {text: string, on_click: () => void, hide?: boolean} = $props();
 
@@ -75,7 +76,7 @@
         ctx.globalAlpha = (t < d ? (t / d) : (t < d * 2 ? 1 : (d * 3 - t) / d)) * 0.95;
         ctx.beginPath();
         ctx.arc(x, y, point.s * 2, 0, 2 * Math.PI);
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = telegram.themeParams.text_color;
         ctx.fill();
         ctx.globalAlpha = 1.0;
     }
