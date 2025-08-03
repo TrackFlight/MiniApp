@@ -74,7 +74,7 @@
         width: 100%;
         max-width: 420px;
         border-radius: 12px 12px 0 0;
+        overflow: hidden;
         background-color: var(--tg-theme-secondary-bg-color);
-        padding: 14px;
     }
 </style>
