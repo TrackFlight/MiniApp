@@ -163,6 +163,10 @@
         padding-bottom: 10px;
     }
 
+    .content::-webkit-scrollbar {
+        display: none;
+    }
+
     .app-header.isiOS > :global(div:first-child) {
         position: absolute;
         left: 7px;
