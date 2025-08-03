@@ -163,7 +163,7 @@
     }
 
     .button:is(.text, .accent) > .ripple-mask > .ripple {
-        background-color:  var(--tg-theme-accent-text-color);
+        background-color:  var(--tg-theme-button-color);
     }
 
     .button.rounded {
@@ -223,7 +223,7 @@
     }
 
     .button:not(.isiOS):is(.text, .accent)::after {
-        background: var(--tg-theme-accent-text-color);
+        background: var(--tg-theme-button-color);
     }
 
     .button:not(.opaque):not(.isiOS).isDesktop:hover::after,
