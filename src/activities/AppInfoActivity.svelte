@@ -169,8 +169,8 @@
 
     .app-header.isiOS > :global(div:first-child) {
         position: absolute;
-        left: 7px;
-        top: 0;
+        left: 14px;
+        top: 14px;
     }
 
     .app-header {
