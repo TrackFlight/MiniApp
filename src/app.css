@@ -23,7 +23,9 @@ body > div {
     font-family: 'SFProText', serif;
     -webkit-tap-highlight-color: transparent;
     box-sizing: border-box;
-    letter-spacing: -0.48px
+    letter-spacing: -0.48px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /*
