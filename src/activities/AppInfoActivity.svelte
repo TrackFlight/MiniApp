@@ -228,7 +228,7 @@
     }
 
     .app-header > div > p {
-        color: var(--tg-theme-subtitle-text-color);
+        color: var(--tg-theme-hint-color);
         margin: 3px 0 0;
         font-size: 14px;
     }
@@ -284,7 +284,7 @@
     .description-container > .more-button {
         position: absolute;
         z-index: 1;
-        color: var(--tg-theme-accent-text-color);
+        color: var(--tg-theme-link-color);
         bottom: 15px;
         right: 17px;
         margin: 0;
