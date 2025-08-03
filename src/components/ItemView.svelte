@@ -28,7 +28,7 @@
         deletable?: boolean,
         highlight?: boolean,
         small?: boolean,
-        allowShowSpoiler?: boolean
+        allowShowSpoilers?: boolean
     } = $props();
 
     let titleWithSpoilers = $derived(parseTextWithSpoilers(title))
