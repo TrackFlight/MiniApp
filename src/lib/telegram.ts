@@ -32,6 +32,10 @@ interface WebAppInitData {
     user: WebAppUser
 }
 
+interface ThemeParams {
+    text_color: string;
+}
+
 export type BulletinButton = {
     text: string,
     isUndo?: boolean,
@@ -44,6 +48,7 @@ interface TelegramWebApp {
     platform: 'ios' | 'android' | 'tdesktop' | 'weba' | 'webk' | 'macos';
     HapticFeedback: HapticFeedback;
     BackButton: BackButton;
+    themeParams: ThemeParams;
     ready(): void;
     showAlert(message: string, callback?: () => void): void;
     showConfirm(message: string, callback?: (result: boolean) => void): void;
