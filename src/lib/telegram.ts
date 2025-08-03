@@ -65,5 +65,5 @@ interface TelegramWindow extends Window {
 
 export const telegram = (window as unknown as TelegramWindow).Telegram!.WebApp
 export const currentUser = telegram!.initDataUnsafe.user;
-export const isDesktop = (telegram.platform === 'tdesktop' || telegram.platform === 'macos' || telegram.platform.startsWith('web')) && !('ontouchstart' in window);
+export const isDesktop = telegram.platform === 'tdesktop' || telegram.platform === 'macos' || (telegram.platform.startsWith('web') && !('ontouchstart' in window));
 export const isiOS = telegram.platform === 'ios' || telegram.platform === 'macos';
