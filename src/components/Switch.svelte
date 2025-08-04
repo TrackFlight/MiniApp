@@ -17,7 +17,7 @@
 
     export function toggle() {
         switchElement.checked = !switchElement.checked;
-        on_switch_change(new Event('change'));
+        if (on_change) on_change(switchElement.checked);
     }
 </script>
 
