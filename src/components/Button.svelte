@@ -15,12 +15,12 @@
         on_click?: () => void
     } = $props();
 
-    let displayText = $derived(!isiOS && text ? text.toUpperCase() : text);
     type = type || 'default';
-    if (text) {
+    if (text && !type.includes('delete')) {
         type = 'text';
     }
     const styles = type.split(' ');
+    const displayText = $derived(!isiOS && text && !styles.includes('delete') ? text.toUpperCase() : text);
 
     function onKey(e: KeyboardEvent) {
         if ((e.key === "Enter" || e.key === " ") && on_click) {
@@ -117,6 +117,8 @@
                     {displayText}
                 </span>
             {/key}
+        {:else if type === 'delete'}
+            {displayText}
         {:else}
             {@render children?.()}
         {/if}
@@ -163,7 +165,7 @@
     }
 
     .button:is(.text, .accent) > .ripple-mask > .ripple {
-        background-color:  var(--tg-theme-button-color);
+        background-color: var(--tg-theme-button-color);
     }
 
     .button.rounded {
@@ -226,8 +228,8 @@
         background: var(--tg-theme-button-color);
     }
 
-    .button:not(.opaque):not(.isiOS).isDesktop:hover::after,
-    .button:is(.default, .text):not(.isDesktop):not(.isiOS):active::after {
+    .button:not(.opaque):not(.isiOS).isDesktop:hover:after,
+    .button:is(.default, .text, .delete):not(.isDesktop):not(.isiOS):active:after {
         opacity: 0.05;
     }
 
@@ -241,5 +243,50 @@
 
     .button.default:not(.text).isiOS:active > div {
         transform: scale(var(--tap-scale));
+    }
+
+    .button.delete > div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-block: 12px;
+        font-size: 17px;
+    }
+
+    .button:not(.isiOS).delete > div {
+        margin-block: 15px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .button:not(.isiOS):not(.default).delete {
+        background: var(--tg-theme-destructive-text-color);
+        border-radius: 6px;
+        color: white;
+    }
+
+    .button.isiOS:not(.default).delete {
+        color: var(--tg-theme-destructive-text-color);
+    }
+
+    .button.delete > .ripple-mask > .ripple {
+        background-color: black;
+    }
+
+    .button.delete::after {
+        background: black;
+    }
+
+    .button:not(.opaque):not(.isiOS).isDesktop:hover:after,
+    .button.delete:not(.isDesktop):not(.isiOS):active::after {
+        opacity: 0.1;
+    }
+
+    .button.delete.isiOS:active::after {
+        opacity: 0.2;
+    }
+
+    .button.delete > .ripple-mask {
+        opacity: 0.06;
     }
 </style>
