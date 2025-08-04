@@ -4,6 +4,7 @@
     import NamedIcon from "./NamedIcon.svelte";
     import {parseTextWithSpoilers} from "./SimpleSpoiler";
     import SimpleSpoiler from "./SimpleSpoiler.svelte";
+    import Switch from "./Switch.svelte";
 
     let {
         icon,
@@ -13,10 +14,14 @@
         id,
         on_click,
         on_delete,
+        on_switch_change,
         deletable = $bindable(),
+        switchable = $bindable(),
         highlight = false,
         small = false,
-        allowShowSpoilers = true
+        no_ellipsis = false,
+        allowShowSpoilers = true,
+        switchDefault = false
     } : {
         icon: string,
         title?: string,
@@ -25,12 +30,18 @@
         id?: number,
         on_click?: () => void,
         on_delete?: () => void,
+        on_switch_change?: (checked: boolean) => void,
         deletable?: boolean,
+        switchable?: boolean,
         highlight?: boolean,
         small?: boolean,
-        allowShowSpoilers?: boolean
+        noBoldTitle?: boolean,
+        no_ellipsis?: boolean,
+        allowShowSpoilers?: boolean,
+        switchDefault?: boolean
     } = $props();
 
+    let switchElement: Switch | undefined = $state();
     let titleWithSpoilers = $derived(parseTextWithSpoilers(title))
     let currentSpoilersStatus = $state(true);
 
@@ -41,6 +52,14 @@
         }
     }
 
+    function onClickButton() {
+        if (switchable) {
+            switchElement?.toggle();
+        }else if (on_click && (!deletable || !isiOS)) {
+            on_click();
+        }
+    }
+
     function showSpoilers() {
         if (allowShowSpoilers) {
             currentSpoilersStatus = false;
@@ -48,8 +67,8 @@
     }
 </script>
 
-<div class="itemView" class:deletable class:isiOS class:isDesktop>
-    <Button on_click={() => {if (on_click && (!deletable || !isiOS)) on_click()}}>
+<div class="itemView" class:deletable class:switchable class:isiOS class:isDesktop>
+    <Button on_click={onClickButton}>
         {#if icon === "add"}
             <svg class="icon" width="28px" height="28px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22.627 18.252">
                 <g>
@@ -117,14 +136,30 @@
                         <path d="M 7.9883 23.3203 C 5.918 21.2695 6.1133 18.7305 8.5156 16.3086 L 11.1914 13.6718 C 10.9375 14.5117 10.957 15.5274 11.2695 16.1914 L 9.8828 17.539 C 8.2422 19.1406 8.0664 20.7617 9.2969 21.9726 C 10.5274 23.2031 12.1289 22.9687 13.75 21.4062 L 15.7813 19.3359 C 17.4414 17.7149 17.6562 16.0938 16.4649 14.8438 C 16.1523 14.5508 15.625 14.2969 14.9414 14.1797 C 15.1953 13.5742 15.8008 12.9102 16.3086 12.5782 C 16.6797 12.6562 17.2851 13.0274 17.7539 13.5547 C 19.8438 15.6054 19.6094 18.1446 17.1484 20.6054 L 15 22.7539 C 12.5782 25.1758 10.0195 25.3516 7.9883 23.3203 Z M 23.0469 8.2031 C 25.1172 10.2734 24.9218 12.8125 22.5195 15.2344 L 19.8633 17.8711 C 20.1172 17.0117 20.0782 16.0156 19.7851 15.3516 L 21.1718 14.0039 C 22.793 12.4023 22.9687 10.7617 21.7383 9.5508 C 20.5078 8.3398 18.9062 8.5547 17.3047 10.1367 L 15.2734 12.207 C 13.6133 13.8282 13.3789 15.4492 14.5703 16.6992 C 14.9023 16.9726 15.4102 17.2461 16.1133 17.3633 C 15.8398 17.9492 15.2344 18.6133 14.7461 18.9649 C 14.375 18.8867 13.75 18.5156 13.3008 17.9883 C 11.211 15.918 11.4258 13.3789 13.8867 10.918 L 16.0547 8.7695 C 18.4766 6.3477 21.0156 6.1914 23.0469 8.2031 Z" fill="white"/>
                     </g>
                 </svg>
-            {:else if icon.length > 0}
+            {:else if icon === "available_icon"}
+                <svg style="margin-inline: 18px;margin-block: 13px;min-width: 36px" width="36px" height="36px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68.2861 62.3291">
+                    <g>
+                        <path d="M38.0859 10.8887L54.9072 22.7539C56.7139 24.0479 57.251 25.4883 57.251 28.1738L57.251 37.0649C56.7022 36.977 56.1385 36.9385 55.5664 36.9385C55.0029 36.9385 54.4474 36.9761 53.9062 37.062L53.9062 27.5635C53.9062 27.5227 53.9058 27.4824 53.9039 27.4437L42.7481 38.5996L45.909 41.4469C45.2086 42.2589 44.6143 43.1634 44.1538 44.1427L35.7422 36.5723C35.2051 36.084 34.5947 35.8398 33.96 35.8398C33.3496 35.8398 32.7393 36.084 32.2021 36.5723L17.1739 50.0977L42.8947 50.0977C42.9218 51.2517 43.119 52.3641 43.4516 53.418L16.9189 53.418C12.7686 53.418 10.6934 51.3916 10.6934 47.29L10.6934 28.1738C10.6934 25.4883 11.2305 24.0479 13.0371 22.7539L29.834 10.8887C32.9346 8.71582 34.9854 8.71582 38.0859 10.8887ZM14.0381 27.5635L14.0381 47.29C14.0381 47.7445 14.0981 48.1447 14.2151 48.4893L25.188 38.5913L14.0404 27.4437ZM32.251 13.2568L15.8174 24.7041L27.5626 36.4493L30.3223 33.96C31.4453 32.959 32.6904 32.4707 33.96 32.4707C35.2539 32.4707 36.499 32.959 37.5977 33.96L40.372 36.4591L52.1265 24.7046L35.6689 13.2568C34.375 12.3291 33.5205 12.3291 32.251 13.2568Z" fill="var(--tg-theme-hint-color)"/>
+                        <path d="M65.4297 49.6338C65.4297 55.0049 60.9131 59.4727 55.5664 59.4727C50.1709 59.4727 45.7275 55.0537 45.7275 49.6338C45.7275 44.2383 50.1709 39.7949 55.5664 39.7949C60.9863 39.7949 65.4297 44.2383 65.4297 49.6338ZM54.4189 44.0674L54.4189 48.6328L51.0986 48.6328C50.3906 48.6328 49.8047 49.1943 49.8047 49.9023C49.8047 50.5859 50.3662 51.1719 51.0986 51.1719L55.6885 51.1719C56.4209 51.1719 56.958 50.6104 56.958 49.9023L56.958 44.0674C56.958 43.3838 56.3965 42.8223 55.6885 42.8223C54.9805 42.8223 54.4189 43.3838 54.4189 44.0674Z" fill="var(--tg-theme-hint-color)"/>
+                    </g>
+                </svg>
+            {:else if icon === "closed_icon"}
+                <svg style="margin-inline: 18px;margin-block: 13px;min-width: 36px" width="36px" height="36px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68.2861 51.5381">
+                    <g>
+                        <path d="M57.251 15.2344L57.251 26.2739C56.7022 26.186 56.1385 26.1475 55.5664 26.1475C55.0029 26.1475 54.4474 26.1851 53.9062 26.271L53.9062 15.2344C53.9062 15.098 53.9008 14.9666 53.8885 14.8416L42.6839 24.9349L47.1464 29.3974C46.3395 30.0999 45.6311 30.9108 45.0333 31.8009L40.3077 27.0753L37.5977 29.5166C36.499 30.542 35.2539 31.0059 33.96 31.0059C32.6904 31.0059 31.4453 30.542 30.3223 29.5166L27.6261 27.0846L15.7043 38.9847C16.0186 39.086 16.3764 39.1357 16.7725 39.1357L42.886 39.1357C42.9012 40.2885 43.0827 41.4019 43.4052 42.4561L16.9189 42.4561C12.7686 42.4561 10.6934 40.4297 10.6934 36.3281L10.6934 15.2344C10.6934 11.1328 12.7441 9.10645 16.2354 9.10645L51.0254 9.10645C55.1514 9.10645 57.251 11.1328 57.251 15.2344ZM14.0381 15.21L14.0381 36.1547L25.2401 24.9323L14.0537 14.8417C14.0429 14.9595 14.0381 15.0826 14.0381 15.21ZM16.7725 12.4268C16.5584 12.4268 16.3555 12.4413 16.1645 12.4704L32.2021 26.9043C32.7393 27.417 33.3496 27.6611 33.96 27.6611C34.5947 27.6611 35.2051 27.417 35.7422 26.9043L51.7774 12.4726C51.58 12.442 51.3698 12.4268 51.1475 12.4268Z" fill="var(--tg-theme-hint-color)"/>
+                        <path d="M65.4297 38.8428C65.4297 44.2139 60.9131 48.6816 55.5664 48.6816C50.1709 48.6816 45.7275 44.2627 45.7275 38.8428C45.7275 33.4473 50.1709 29.0039 55.5664 29.0039C60.9863 29.0039 65.4297 33.4473 65.4297 38.8428ZM50.7324 37.5732C50.0244 37.5732 49.4629 38.1836 49.4629 38.8428C49.4629 39.502 50.0244 40.1123 50.7324 40.1123L60.4248 40.1123C61.1328 40.1123 61.6943 39.502 61.6943 38.8428C61.6943 38.1836 61.1328 37.5732 60.4248 37.5732Z" fill="var(--tg-theme-hint-color)"/>
+                    </g>
+                </svg>
+            {:else if icon !== "no_icon" && icon.length > 0}
                 <img src="{icon}" alt="ItemIcon" loading="lazy">
-            {:else}
+            {:else if icon !== "no_icon"}
                 <NamedIcon name={title ? title:''} id={id ? id : 0} size="40px"/>
             {/if}
-            <div class="textContainer">
+            {@const isNoIcon = icon === "no_icon"}
+            {@const isNoDesc = !desc || desc.length === 0}
+            <div class="textContainer" class:isNoIcon class:isNoDesc>
                 <div>
-                    <p class="itemTitle" class:small>
+                    <p class="itemTitle" class:small class:switchable>
                         {#each titleWithSpoilers as part}
                             {#if part.type === "text"}
                                 {@html part.content}
@@ -138,15 +173,18 @@
                     {/if}
                 </div>
                 {#if desc}
-                    <p class="itemDesc" class:highlight class:small>{desc}</p>
+                    <p class="itemDesc" class:no_ellipsis class:highlight class:small class:switchable>{desc}</p>
                 {/if}
             </div>
-            {#if !isiOS && deletable}
+            {#if !isiOS && deletable && !switchable}
                 <Button on_click={() => {if (on_delete) on_delete()}} type="default circle">
-                    <svg class="deleteBtn" class:isiOS class:isDesktop width="18" height="22" viewBox="0 0 18 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="deleteBtn" class:isiOS class:isDesktop width="18" height="22" viewBox="0 0 18 22" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M5.19995 3.19999C5.19995 1.6536 6.45355 0.399994 7.99995 0.399994H9.99995C11.5463 0.399994 12.8 1.6536 12.8 3.19999V3.39999H17C17.4418 3.39999 17.7999 3.75817 17.7999 4.19999C17.7999 4.64182 17.4418 4.99999 17 4.99999H0.999951C0.558124 4.99999 0.199951 4.64182 0.199951 4.19999C0.199951 3.75817 0.558124 3.39999 0.999951 3.39999H5.19995V3.19999ZM11.2 3.19999V3.39999H6.79995V3.19999C6.79995 2.53725 7.33721 1.99999 7.99995 1.99999H9.99995C10.6627 1.99999 11.2 2.53725 11.2 3.19999ZM2.79544 7.11466C2.74831 6.67535 2.35397 6.35743 1.91467 6.40456C1.47536 6.45169 1.15744 6.84602 1.20456 7.28533L2.51481 19.4987C2.66743 20.9213 3.86805 22 5.29883 22H12.7168C14.1489 22 15.3502 20.9193 15.5012 19.4951L16.7955 7.28432C16.8421 6.84496 16.5237 6.45102 16.0843 6.40445C15.645 6.35788 15.251 6.6763 15.2045 7.11566L13.9101 19.3265C13.8454 19.9368 13.3305 20.4 12.7168 20.4H5.29883C4.68564 20.4 4.17109 19.9377 4.10568 19.328L2.79544 7.11466Z"/>
                     </svg>
                 </Button>
+            {/if}
+            {#if switchable && !deletable}
+                <Switch bind:this={switchElement} on_change={on_switch_change} defaultState={switchDefault}/>
             {/if}
         {/if}
     </Button>
@@ -160,7 +198,8 @@
         --delete-width: 45px;
     }
 
-    .itemView.deletable > :global(div.default.isiOS:not(:has(.icon)):active > div) {
+    /*noinspection CssUnusedSymbol*/
+    :is(.itemView.deletable, .itemView.switchable) > :global(div.default.isiOS:not(:has(.icon)):active > div) {
         transform: scale(1);
     }
 
@@ -175,6 +214,11 @@
         margin-inline: 7px;
         margin-block: 5px;
         fill: var(--tg-theme-destructive-text-color);
+    }
+
+    .itemView > :global(div > div > label) {
+        margin-left: auto;
+        margin-right: 20px;
     }
 
     .itemView > :global(div > div > div:last-child:has(.deleteBtn)) {
@@ -264,6 +308,15 @@
         padding-right: 20px;
     }
 
+    .textContainer.isNoIcon {
+        padding-inline: 17px;
+        padding-block: 10px;
+    }
+
+    .textContainer.isNoDesc {
+        padding-block: 14px;
+    }
+
     .textContainer > div {
         display: flex;
         align-items: center;
@@ -282,6 +335,10 @@
 
     .itemTitle.small {
         font-size: 16px;
+    }
+
+    .itemTitle.switchable {
+        font-weight: normal;
     }
 
     .itemTag {
@@ -305,9 +362,17 @@
         margin: 2px 0 0;
         font-size: 15px;
         color: var(--tg-theme-subtitle-text-color);
+    }
+
+    .itemDesc:not(.no_ellipsis) {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+    }
+
+    .itemDesc.switchable {
+        margin: 5px 0 0;
+        font-size: 14px;
     }
 
     .itemDesc.highlight {
