@@ -39,6 +39,8 @@
         registerBottomSheet(id, (newData: any) => {
             show = true;
             data = newData;
+        }, () => {
+            show = false;
         });
     });
 

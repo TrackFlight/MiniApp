@@ -1,6 +1,7 @@
 import {telegram} from "../lib/telegram";
 
 const showBottomSheetCallbacks: Record<string, (data: any) => void> = {};
+const closeBottomSheetCallbacks: Record<string, () => void> = {};
 
 telegram.showBottomSheet = (id: string, data: any) => {
     const callback = showBottomSheetCallbacks[id];
@@ -11,8 +12,18 @@ telegram.showBottomSheet = (id: string, data: any) => {
     }
 }
 
-export function registerBottomSheet(id: string, callback: (data: any) => void) {
-    showBottomSheetCallbacks[id] = callback;
+telegram.closeBottomSheet = (id: string) => {
+    const callback = closeBottomSheetCallbacks[id];
+    if (callback) {
+        callback();
+    } else {
+        console.warn(`No callback registered for closing bottom sheet with id: ${id}`);
+    }
+};
+
+export function registerBottomSheet(id: string, callbackShow: (data: any) => void, callbackClose: () => void) {
+    showBottomSheetCallbacks[id] = callbackShow;
+    closeBottomSheetCallbacks[id] = callbackClose;
 }
 
 export function unregisterBottomSheet(id: string) {
