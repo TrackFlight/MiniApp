@@ -12,6 +12,8 @@ export interface Link {
     url: string;
     status: "available" | "full" | "closed";
     is_public: boolean;
+    notify_available: boolean;
+    notify_closed: boolean;
     last_availability: number;
     last_update: number;
 }
