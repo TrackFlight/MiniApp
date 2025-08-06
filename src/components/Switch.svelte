@@ -3,26 +3,33 @@
     let {
         on_change,
         defaultState = false,
+        switchLocked = false
     } : {
         on_change?: (checked: boolean) => void;
         defaultState?: boolean;
+        switchLocked?: boolean;
     } = $props();
     
     let switchElement: HTMLInputElement;
 
     function on_switch_change(event: Event) {
-        if (!on_change) return;
+        if (!on_change || switchLocked) return;
         on_change((event.target as HTMLInputElement).checked);
     }
 
     export function toggle() {
-        switchElement.checked = !switchElement.checked;
-        if (on_change) on_change(switchElement.checked);
+        switchElement.checked = !switchElement.checked && !switchLocked;
+        if (on_change && !switchLocked) on_change(switchElement.checked);
     }
 </script>
 
 <label class="switch button" class:isiOS>
-    <input type="checkbox" bind:this={switchElement} onchange={on_switch_change} defaultChecked={defaultState}/>
+    <input type="checkbox" bind:this={switchElement} onchange={on_switch_change} defaultChecked={defaultState && !switchLocked} disabled={switchLocked}/>
+    {#if switchLocked}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26.5381 38.7451">
+            <path d="M4.44336 37.7441L21.7529 37.7441C24.707 37.7441 26.1963 36.2305 26.1963 33.0322L26.1963 20.166C26.1963 16.9922 24.707 15.4785 21.7529 15.4785L4.44336 15.4785C1.48926 15.4785 0 16.9922 0 20.166L0 33.0322C0 36.2305 1.48926 37.7441 4.44336 37.7441ZM3.32031 17.1631L6.7627 17.1631L6.7627 10.3271C6.7627 5.59082 9.81445 3.27148 13.0859 3.27148C16.3818 3.27148 19.458 5.59082 19.458 10.3271L19.458 17.1631L22.9004 17.1631L22.9004 10.8154C22.9004 3.34473 17.9932 0 13.0859 0C8.20312 0 3.32031 3.34473 3.32031 10.8154Z" fill="var(--unactive-color)"/>
+        </svg>
+    {/if}
 </label>
 
 <style>
@@ -46,6 +53,18 @@
         padding: 2px;
         border-radius: 17px;
         background-color: color-mix(in srgb, var(--tg-theme-text-color) 15%, transparent);
+    }
+
+    .switch > svg {
+        position: absolute;
+        z-index: 1;
+        width: 10px;
+        transform: translateX(9px);
+    }
+
+    .switch:not(.isiOS) > svg {
+        width: 8px;
+        transform: translateX(2px);
     }
 
     input {

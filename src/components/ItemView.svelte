@@ -17,6 +17,7 @@
         on_switch_change,
         deletable = $bindable(),
         switchable = $bindable(),
+        switchLocked = $bindable(),
         highlight = false,
         small = false,
         no_ellipsis = false,
@@ -33,6 +34,7 @@
         on_switch_change?: (checked: boolean) => void,
         deletable?: boolean,
         switchable?: boolean,
+        switchLocked?: boolean,
         highlight?: boolean,
         small?: boolean,
         noBoldTitle?: boolean,
@@ -184,7 +186,7 @@
                 </Button>
             {/if}
             {#if switchable && !deletable}
-                <Switch bind:this={switchElement} on_change={on_switch_change} defaultState={switchDefault}/>
+                <Switch bind:this={switchElement} switchLocked={switchLocked} on_change={on_switch_change} defaultState={switchDefault}/>
             {/if}
         {/if}
     </Button>
