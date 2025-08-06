@@ -98,6 +98,10 @@
                 telegram.showBulletin("error", T('LINK_ALREADY_FOLLOWING'));
             } else if (res == ServerErrorCode.BadRequest) {
                 telegram.showBulletin("error", T('INVALID_LINK_FORMAT'));
+            } else if (res === ServerErrorCode.LimitExceeded) {
+                telegram.showBulletin("forbidden", T('MAX_FOLLOWING_LINKS_LIMIT', {
+                    Limit: sessionStore.maxFollowingLinks,
+                }));
             } else {
                 telegram.showBulletin("link_added", T('LINK_ADDED'));
                 items = sessionStore.appList;

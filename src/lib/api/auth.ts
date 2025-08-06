@@ -7,6 +7,9 @@ export const sessionStore = {
     currentJWT: '',
     langPack: {} as Record<string, string>,
     langCode: '',
+    maxFreeLinks: 0,
+    maxPremiumLinks: 0,
+    maxFollowingLinks: 0,
 };
 
 export async function tryLogin() {
@@ -39,6 +42,20 @@ export async function tryLogin() {
         }
         sessionStore.langPack = langPackResponse.response?.strings || {};
         sessionStore.langCode = langPackResponse.response?.lang_code || '';
+
+        const getConfigResponse = await internalRequest<{
+            limit_free: number;
+            limit_premium: number;
+            max_following_links: number;
+        }, null>('get_config');
+
+        if (getConfigResponse.error) {
+            return false;
+        }
+
+        sessionStore.maxFreeLinks = getConfigResponse.response?.limit_free!;
+        sessionStore.maxPremiumLinks = getConfigResponse.response?.limit_premium!;
+        sessionStore.maxFollowingLinks = getConfigResponse.response?.max_following_links!;
         return true;
     }
     return false;

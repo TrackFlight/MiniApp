@@ -7,10 +7,21 @@ export async function trackLink(url_or_id: string | number) : Promise<ServerErro
         id?: number,
         link?: string,
     };
+    if (sessionStore.appList.reduce((acc, app) => acc + app.links.length, 0) >= sessionStore.maxFollowingLinks) {
+        return ServerErrorCode.LimitExceeded;
+    }
 
     if (typeof url_or_id === "number") {
         trackLinkData = { id: url_or_id };
     } else {
+        const existingApp = sessionStore.appList.find(
+            app => app.links.some(
+                link => link.url === url_or_id.replace(/https?:\/\//, '')
+            )
+        );
+        if (existingApp) {
+            return ServerErrorCode.LinkAlreadyFollowing;
+        }
         trackLinkData = { link: url_or_id };
     }
 

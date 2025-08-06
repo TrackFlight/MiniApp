@@ -32,4 +32,5 @@ export type ErrorResponse = {
 export enum ServerErrorCode {
     LinkAlreadyFollowing = "LINK_ALREADY_FOLLOWING",
     BadRequest = "BAD_REQUEST",
+    LimitExceeded = "LIMIT_EXCEEDED",
 }
