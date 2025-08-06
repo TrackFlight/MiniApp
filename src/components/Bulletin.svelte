@@ -28,8 +28,9 @@
     let currentTextTimerStatus = $derived((current?.duration || defaultDuration) / 1000 - Math.floor((current?.duration || defaultDuration) * (progress?.current || 0) / 1000));
 
     telegram.showBulletin = async (icon: string, message: string, duration?: number, title?: string, button?: BulletinButton, on_close?: () => void) => {
-        let isSame = current && current.icon === icon && current.message === message && current.title === title && current?.icon !== 'timer';
-        let newData = {
+        const isSame = current && current.icon === icon && current.message === message && current.title === title && current?.icon !== 'timer';
+        const isVisible = document.getElementsByClassName('bulletin').length > 0;
+        const newData = {
             title: title,
             message: message,
             duration: duration || defaultDuration,
@@ -37,7 +38,7 @@
             icon: icon,
             on_close: on_close,
         };
-        if (showBulletin && !isSame) {
+        if (isVisible && !isSame) {
             clearTimeout(closeTimeout);
             close(true);
             closeTimeout = setTimeout(async () => {
@@ -53,7 +54,7 @@
         }
 
         clearTimeout(closeTimeout);
-        if (showBulletin && isSame) {
+        if (isVisible && isSame) {
             shakeBulletin = true;
             clearTimeout(shakeTimeout);
             telegram.HapticFeedback.notificationOccurred("error");
