@@ -263,7 +263,7 @@
     .description-container > .more-button {
         position: absolute;
         z-index: 1;
-        color: var(--tg-theme-link-color);
+        color: var(--tg-theme-accent-text-color);
         bottom: 15px;
         right: 17px;
         margin: 0;

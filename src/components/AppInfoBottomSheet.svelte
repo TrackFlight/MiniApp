@@ -109,7 +109,7 @@
     .bottom-sheet-header > p {
         margin: 2px 0 0;
         font-size: 14px;
-        color: var(--tg-theme-hint-color);
+        color: var(--tg-theme-subtitle-text-color);
         text-align: center;
     }
 
