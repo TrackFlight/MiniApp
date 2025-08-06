@@ -18,6 +18,7 @@
         background: rgba(0, 0, 0, 0.3);
         width: 100%;
         height: 100%;
+        z-index: 1000;
     }
 
     .progress-bar > div {
