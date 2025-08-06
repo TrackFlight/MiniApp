@@ -2,25 +2,23 @@
     import {
         type App,
         type Link,
-        notifyAppListChanged,
-        removeLink,
+        notifyAppListChanged, onAppListChanged,
+        removeLink, sessionStore,
         withUIProgress
     } from "../lib/api";
     import {isiOS, telegram} from "../lib/telegram";
-    import {ReadableDateDifference, T} from "../lib/translator";
+    import {GetLinkDescription, T} from "../lib/translator";
     import NamedIcon from "../components/NamedIcon.svelte";
     import Divider from "../components/Divider.svelte";
     import ListView from "../components/ListView.svelte";
     import VirtualList from "../components/VirtualList.svelte";
     import ItemView from "../components/ItemView.svelte";
     import {onMount, tick} from "svelte";
-    import Button from "../components/Button.svelte";
     import Bulletin from "../components/Bulletin.svelte";
     import {getApplicationContext} from "../lib/navigation/ActivityManager";
-    import SimpleSpoiler from "../components/SimpleSpoiler.svelte";
+    import AppInfoBottomSheet from "../components/AppInfoBottomSheet.svelte";
 
     let {app} : { app: App } = $props();
-    let deletable = $state(!isiOS);
     let showMore = $state(true);
     let moreTextSize = $state(0);
     let linksList = $state<Link[]>(app.links);
@@ -28,6 +26,13 @@
     let moreButton: HTMLParagraphElement | undefined = $state();
 
     const {finishActivity} =  getApplicationContext();
+
+    onAppListChanged(() => {
+        const appInfo = sessionStore.appList.find(a => a.id === app.id);
+        if (appInfo) {
+            linksList = sessionStore.appList.find(a => a.id === app.id)!.links;
+        }
+    });
 
     onMount(async () => {
         await tick();
@@ -95,9 +100,6 @@
 
 <div class="content">
     <div class="app-header" class:isiOS>
-        {#if isiOS}
-            <Button text={deletable ? T('DONE_BTN') : T('EDIT_BTN')} on_click={() => deletable = !deletable}/>
-        {/if}
         {#if app.icon_url}
             <img src={app.icon_url} alt="App Icon"/>
         {:else}
@@ -126,27 +128,9 @@
                 <ItemView
                     title={item.is_public ? item.url : item.url.replace(/\/(\w+)$/, '/<spoiler>$1</spoiler>')}
                     icon={item.status ? 'link' : 'link_loading'}
-                    desc={
-                        item.status ?
-                        item.status === 'available' ?
-                        T('STATUS_AVAILABLE') :
-                        T(
-                            item.last_availability ? 'LAST_AVAILABLE_TIME' : 'LAST_UPDATE_TIME',
-                            {
-                                Time: ReadableDateDifference(
-                                    item.last_availability ? item.last_availability : item.last_update,
-                                    Math.floor(Date.now() / 1000),
-                                ),
-                            }
-                        ) + ' • ' + (
-                            item.status === 'full' ?
-                            T('STATUS_FULL') :
-                            T('STATUS_CLOSED')
-                        ) :
-                        T('STATUS_CHECKING')
-                    }
+                    desc={GetLinkDescription(item)}
                     highlight={item.status === 'available'}
-                    deletable={deletable}
+                    on_click={() => telegram.showBottomSheet('link-info', item)}
                     on_delete={() => removeItem(item)}
                     small
                 />
@@ -155,6 +139,7 @@
     </ListView>
 </div>
 <Bulletin/>
+<AppInfoBottomSheet on_remove={removeItem}/>
 
 <style>
     .content {
@@ -165,12 +150,6 @@
 
     .content::-webkit-scrollbar {
         display: none;
-    }
-
-    .app-header.isiOS > :global(div:first-child) {
-        position: absolute;
-        left: 14px;
-        top: 14px;
     }
 
     .app-header {

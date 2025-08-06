@@ -60,6 +60,33 @@ export async function removeApp(app: App) {
     sessionStore.appList = sessionStore.appList.filter(item => item.id !== app.id);
 }
 
+export async function updateLinkPreferences(link: Link) {
+    await internalRequest(
+        `users/links/${link.id}`,
+        "PATCH",
+        {
+            notify_available: link.notify_available,
+            notify_closed: link.notify_closed
+        }
+    );
+    sessionStore.appList = sessionStore.appList.reduce<App[]>((acc, app) => {
+        acc.push({
+            ...app,
+            links: app.links.map(l => {
+                if (l.id === link.id) {
+                    return {
+                        ...l,
+                        notify_available: link.notify_available,
+                        notify_closed: link.notify_closed
+                    };
+                }
+                return l;
+            })
+        });
+        return acc;
+    }, []);
+}
+
 export async function removeLink(link: Link) {
     await internalRequest(
         `users/links`,

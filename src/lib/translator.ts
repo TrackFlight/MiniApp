@@ -1,4 +1,4 @@
-import {sessionStore} from "./api";
+import {type Link, sessionStore} from "./api";
 
 export function T(id: string, values: Record<string, string | number> = {}, count: number = 1): string {
     const pr = new Intl.PluralRules(sessionStore.langCode);
@@ -38,4 +38,24 @@ export function ReadableDateDifference(from: number, to: number): string {
     }
 
     return T('TIME_NOW');
+}
+
+export function GetLinkDescription(link: Link): string {
+    return link.status ?
+        link.status === 'available' ?
+            T('STATUS_AVAILABLE') :
+            T(
+                link.last_availability ? 'LAST_AVAILABLE_TIME' : 'LAST_UPDATE_TIME',
+                {
+                    Time: ReadableDateDifference(
+                        link.last_availability ? link.last_availability : link.last_update,
+                        Math.floor(Date.now() / 1000),
+                    ),
+                }
+            ) + ' • ' + (
+                link.status === 'full' ?
+                    T('STATUS_FULL') :
+                    T('STATUS_CLOSED')
+            ) :
+        T('STATUS_CHECKING');
 }
