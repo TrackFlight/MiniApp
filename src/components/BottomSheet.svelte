@@ -3,6 +3,7 @@
     import {cubicOut} from "svelte/easing";
     import {onDestroy, onMount} from "svelte";
     import {registerBottomSheet, unregisterBottomSheet} from "./BottomSheet";
+    import {telegram} from "../lib/telegram";
 
     const {id,  children } : {id: string, children: any} = $props();
 
@@ -11,7 +12,7 @@
 
     function onClickOutside(event: MouseEvent) {
         if (event.target instanceof Element && !event.target.closest('.bottom-sheet > div')) {
-            show = false;
+            telegram.closeBottomSheet(id)
         }
     }
 
