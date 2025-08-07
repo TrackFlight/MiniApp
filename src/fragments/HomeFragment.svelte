@@ -91,22 +91,23 @@
     async function addLink() {
         await telegram.closeBulletin();
         deletable = isiOS ? false : deletable;
-        telegram.showPrompt(T('ADD_LINK_PROMPT'), async (link: string | null) => {
-            if (!link) return;
-            let res = await withUIProgress(trackLink(link));
-            if (res === ServerErrorCode.LinkAlreadyFollowing) {
-                telegram.showBulletin("error", T('LINK_ALREADY_FOLLOWING'));
-            } else if (res == ServerErrorCode.BadRequest) {
-                telegram.showBulletin("error", T('INVALID_LINK_FORMAT'));
-            } else if (res === ServerErrorCode.LimitExceeded) {
-                telegram.showBulletin("forbidden", T('MAX_FOLLOWING_LINKS_LIMIT', {
-                    Limit: sessionStore.maxFollowingLinks,
-                }));
-            } else {
-                telegram.showBulletin("link_added", T('LINK_ADDED'));
-                items = sessionStore.appList;
-            }
-        });
+        telegram.showBottomSheet('add-link');
+        //telegram.showPrompt(T('ADD_LINK_PROMPT'), async (link: string | null) => {
+        //    if (!link) return;
+        //    let res = await withUIProgress(trackLink(link));
+        //    if (res === ServerErrorCode.LinkAlreadyFollowing) {
+        //        telegram.showBulletin("error", T('LINK_ALREADY_FOLLOWING'));
+        //    } else if (res == ServerErrorCode.BadRequest) {
+        //        telegram.showBulletin("error", T('INVALID_LINK_FORMAT'));
+        //    } else if (res === ServerErrorCode.LimitExceeded) {
+        //        telegram.showBulletin("forbidden", T('MAX_FOLLOWING_LINKS_LIMIT', {
+        //            Limit: sessionStore.maxFollowingLinks,
+        //        }));
+        //    } else {
+        //        telegram.showBulletin("link_added", T('LINK_ADDED'));
+        //        items = sessionStore.appList;
+        //    }
+        //});
     }
 
     async function openItem(app: App) {
@@ -118,7 +119,7 @@
 <Header>
     <UserIcon user={currentUser} />
     {#if isiOS && items.length > 0}
-        <Button text={deletable ? T('DONE_BTN') : T('EDIT_BTN')} on_click={() => deletable = !deletable} secondary />
+        <Button text={deletable ? T('DONE_BTN') : T('EDIT_BTN')} on_click={() => deletable = !deletable} destructive secondary />
     {/if}
 </Header>
 <StickerContainer

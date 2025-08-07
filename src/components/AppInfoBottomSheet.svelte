@@ -77,7 +77,7 @@
                 <Button on_click={() => {
                     on_remove(data);
                     telegram.closeBottomSheet('link-info');
-                }} text={T('REMOVE_LINK_BTN')} accent="var(--tg-theme-destructive-text-color)"/>
+                }} text={T('REMOVE_LINK_BTN')} accent="var(--tg-theme-destructive-text-color)" destructive/>
             </div>
         </div>
     {/snippet}

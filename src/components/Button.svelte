@@ -9,12 +9,14 @@
         secondary = false,
         undo = false,
         accent = 'var(--tg-theme-accent-text-color)',
+        destructive = false,
     } : {
         text?: string,
         on_click?: () => void,
         secondary?: boolean,
         undo?: boolean,
         accent?: string,
+        destructive?: boolean,
     } = $props();
 
     const displayText = $derived(!isiOS && text && secondary ? text.toUpperCase() : text);
@@ -34,7 +36,7 @@
     }
 </script>
 
-<div style="--accent-color: {accent}" class="button clickable" class:isDesktop class:isiOS class:secondary role="button" tabindex="0" onclick={handleClick} onkeydown={onKey}>
+<div style="--accent-color: {accent}" class="button clickable" class:isDesktop class:destructive class:isiOS class:secondary role="button" tabindex="0" onclick={handleClick} onkeydown={onKey}>
     {#if !isiOS}
         <RippleEffect rippleColor="color-mix(in srgb, {secondary ? 'var(--accent-color)' : 'black'} {secondary ? '8':'15'}%, transparent)"/>
     {/if}
@@ -72,7 +74,8 @@
         padding-block: 6px;
     }
 
-    .button:not(.isiOS):not(.secondary) {
+    .button:not(.isiOS):not(.secondary),
+    .button:not(.secondary):not(.destructive).isiOS {
         background: var(--accent-color);
     }
 
@@ -143,11 +146,13 @@
     }
 
     .button.isiOS > .fade-text {
-        color: var(--accent-color);
+        color: white;
+        font-weight: 500;
         font-size: 17px;
     }
 
-    .button.isiOS > .fade-text {
+    .button.isiOS.destructive > .fade-text {
+        color: var(--accent-color);
         font-weight: normal;
     }
 
