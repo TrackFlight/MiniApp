@@ -31,19 +31,16 @@ export async function trackLink(url_or_id: string | number) : Promise<ServerErro
         trackLinkData
     );
     if (res.error === undefined) {
-        sessionStore.appList = sessionStore.appList
-            .reduce<{ items: App[]; found: boolean }>((acc, app, idx, arr) => {
-                if (app.id === res.response!.id) {
-                    acc.items.push({ ...app, links: [...app.links, ...res.response!.links] });
-                    acc.found = true;
-                } else {
-                    acc.items.push(app);
-                }
-                if (idx === arr.length - 1 && !acc.found) {
-                    acc.items.push(res.response!);
-                }
-                return acc;
-            }, { items: [] as App[], found: false }).items
+        const existingIndex = sessionStore.appList.findIndex(app => app.id === res.response!.id);
+        if (existingIndex !== -1) {
+            const app = sessionStore.appList[existingIndex];
+            sessionStore.appList[existingIndex] = {
+                ...app,
+                links: [...app.links, ...res.response!.links],
+            };
+        } else {
+            sessionStore.appList.push(res.response!);
+        }
     } else {
         return res.error.code;
     }
