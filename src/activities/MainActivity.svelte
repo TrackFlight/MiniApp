@@ -4,6 +4,7 @@
     import Navbar from "../components/Navbar.svelte";
     import {onMount} from "svelte";
     import {telegram} from "../lib/telegram";
+    import AddLinkBottomSheet from "../components/AddLinkBottomSheet.svelte";
 
     onMount(telegram.BackButton.hide);
 </script>
@@ -15,6 +16,7 @@
     <Bulletin/>
 </div>
 <Navbar/>
+<AddLinkBottomSheet/>
 
 <style>
     .content {
