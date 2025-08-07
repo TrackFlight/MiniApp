@@ -5,9 +5,9 @@
         defaultState = false,
         switchLocked = false
     } : {
-        on_change?: (checked: boolean) => void;
-        defaultState?: boolean;
-        switchLocked?: boolean;
+        on_change?: (checked: boolean) => void,
+        defaultState?: boolean,
+        switchLocked?: boolean,
     } = $props();
     
     let switchElement: HTMLInputElement;
