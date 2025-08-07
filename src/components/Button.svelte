@@ -1,26 +1,23 @@
-<!--suppress CssUnusedSymbol -->
 <script lang="ts">
-    import { isiOS, isDesktop } from "../lib/telegram";
-    import { fade, slide } from 'svelte/transition';
+    import {isiOS, isDesktop} from "../lib/telegram";
+    import {fade} from 'svelte/transition';
+    import RippleEffect from "./RippleEffect.svelte";
 
     let {
-        type,
         text,
-        children,
-        on_click
+        on_click,
+        secondary = false,
+        undo = false,
+        accent = 'var(--tg-theme-accent-text-color)',
     } : {
-        type?: string,
         text?: string,
-        children?: any,
-        on_click?: () => void
+        on_click?: () => void,
+        secondary?: boolean,
+        undo?: boolean,
+        accent?: string,
     } = $props();
 
-    type = type || 'default';
-    if (text && !type.includes('delete')) {
-        type = 'text';
-    }
-    const styles = type.split(' ');
-    const displayText = $derived(!isiOS && text && !styles.includes('delete') ? text.toUpperCase() : text);
+    const displayText = $derived(!isiOS && text && secondary ? text.toUpperCase() : text);
 
     function onKey(e: KeyboardEvent) {
         if ((e.key === "Enter" || e.key === " ") && on_click) {
@@ -31,149 +28,92 @@
 
     function handleClick(e: MouseEvent) {
         if (on_click) {
-            const target = e.target as HTMLElement;
-            if (target.closest('.button') !== rippleHandler) {
-                return;
-            }
             e.preventDefault();
             on_click();
         }
     }
-
-    let rippleHandler: HTMLElement;
-    function onRippleStart(e: MouseEvent | TouchEvent) {
-        if ((e instanceof MouseEvent && !isDesktop && styles.includes('opaque')) || isiOS) {
-            return;
-        }
-        const target = e.target as HTMLElement;
-        if (target.closest('.button') !== rippleHandler) {
-            return;
-        }
-
-        let clientY;
-        let clientX;
-        const rippleMask = rippleHandler.querySelector('.ripple-mask') as HTMLElement;
-        const rect = rippleMask.getBoundingClientRect();
-
-        if (e instanceof TouchEvent) {
-            clientX = e.targetTouches[0].clientX;
-            clientY = e.targetTouches[0].clientY;
-        } else if (e instanceof MouseEvent) {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        } else {
-            return;
-        }
-        const rippleX = (clientX - rect.left) - rippleMask.offsetWidth / 2;
-        const rippleY = (clientY - rect.top) - rippleMask.offsetHeight / 2;
-        const ripple = rippleHandler.querySelector('.ripple') as HTMLElement;
-        ripple.style.transition = 'none';
-        ripple.offsetTop + 1;
-        ripple.style.transform = 'translate3d(' + rippleX + 'px, ' + rippleY + 'px, 0) scale3d(0.2, 0.2, 1)';
-        ripple.style.opacity = "1";
-        ripple.offsetTop + 1;
-        ripple.style.transform = 'translate3d(' + rippleX + 'px, ' + rippleY + 'px, 0) scale3d(1, 1, 1)';
-        ripple.style.transition = '';
-
-        function onRippleEnd() {
-            ripple.style.transitionDuration = 'var(--ripple-end-duration, .2s)';
-            ripple.style.opacity = "0";
-            if (e instanceof TouchEvent) {
-                document.removeEventListener('touchend', onRippleEnd);
-                document.removeEventListener('touchcancel', onRippleEnd);
-            } else {
-                document.removeEventListener('mouseup', onRippleEnd);
-            }
-        }
-
-        if (e instanceof TouchEvent) {
-            document.addEventListener('touchend', onRippleEnd);
-            document.addEventListener('touchcancel', onRippleEnd);
-        } else {
-            document.addEventListener('mouseup', onRippleEnd);
-        }
-    }
 </script>
 
-<div transition:fade={{ duration: 150 }}
-     bind:this={rippleHandler}
-     class="button {styles.join(' ')}"
-     class:isiOS
-     class:isDesktop
-     role="button"
-     tabindex="0"
-     onclick={handleClick}
-     ontouchstart={onRippleStart}
-     onmousedown={onRippleStart}
-     onkeydown={onKey}>
-    {#if !isiOS && !styles.includes('opaque')}
-        <span class="ripple-mask"><span class="ripple"></span></span>
+<div style="--accent-color: {accent}" class="button clickable" class:isDesktop class:isiOS class:secondary role="button" tabindex="0" onclick={handleClick} onkeydown={onKey}>
+    {#if !isiOS}
+        <RippleEffect rippleColor="color-mix(in srgb, {secondary ? 'var(--accent-color)' : 'black'} {secondary ? '8':'15'}%, transparent)"/>
     {/if}
-    <div>
-        {#if type === 'text' && text}
-            <span transition:slide={{ duration: 150 }} class="sizer">{displayText}</span>
-            {#key text}
-                <span class="fade-text" class:isiOS transition:fade={{ duration: 150 }}>
-                    {displayText}
-                </span>
-            {/key}
-        {:else if type === 'delete'}
-            {displayText}
-        {:else}
-            {@render children?.()}
+    {#if undo}
+        {#if !isiOS}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path d="M320-200q-17 0-28.5-11.5T280-240q0-17 11.5-28.5T320-280h244q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l76 76q11 11 11 28t-11 28q-11 11-28 11t-28-11L188-572q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l144-144q11-11 28-11t28 11q11 11 11 28t-11 28l-76 76h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H320Z"/>
+            </svg>
         {/if}
-    </div>
+        <p>{displayText}</p>
+    {:else}
+        <span class="sizer">{displayText}</span>
+        {#key text}
+        <span class="fade-text" transition:fade={{ duration: 150 }}>
+            {displayText}
+        </span>
+        {/key}
+    {/if}
 </div>
 
 <style>
     .button {
+        gap: 6px;
         display: flex;
-        flex-shrink: 0;
-        align-items: center;
         position: relative;
-        user-select: none;
         overflow: hidden;
-        --tap-scale: 0.97;
-        --ripple-duration: .45s;
+        padding-inline: 15px;
+        padding-block: 12px;
         cursor: pointer;
+        flex-shrink: 0;
     }
 
-    .button > .ripple-mask {
-        position: absolute;
-        left: 0; right: 0;
-        top: 0; bottom: 0;
-        transform: translateZ(0);
-        overflow: hidden;
-        opacity: 0.04;
-        border-radius: inherit;
+    .button:has(svg) {
+        padding-inline: 10px;
+        padding-block: 6px;
     }
 
-    .button > .ripple-mask > .ripple {
-        position: absolute;
-        width: 200%;
-        left: 50%; top: 50%;
-        margin: -100% 0 0 -100%;
-        padding-top: 200%;
-        border-radius: 50%;
-        background-color:  var(--tg-theme-text-color);
+    .button:not(.isiOS):not(.secondary) {
+        background: var(--accent-color);
+    }
 
-        transition:
-                transform var(--ripple-duration) ease-out,
-                opacity var(--ripple-duration) ease-out,
-                background-color var(--ripple-duration) ease-out;
+    .button.secondary.isiOS {
+        padding-block: 10px;
+    }
+
+    .button:not(.secondary), .button:has(svg) {
+        align-items: center;
+        justify-content: center;
+    }
+
+    .button:is(.isDesktop, .isiOS):not(.secondary):before,
+    .button.isDesktop:not(.isiOS).secondary:before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: black;
         opacity: 0;
+        transition: opacity 150ms ease-out;
     }
 
-    .button:is(.text, .accent) > .ripple-mask > .ripple {
-        background-color: var(--tg-theme-button-color);
+    .button.isDesktop:not(.isiOS).secondary:before {
+        background: var(--accent-color);
     }
 
-    .button.rounded {
+    .button.isiOS:not(.secondary):active:before {
+        opacity: 0.2;
+        z-index: 1;
+    }
+
+    .button.isDesktop:not(.isiOS):hover:before {
+        opacity: 0.1;
+    }
+
+    .button.isiOS:not(.secondary) {
+        padding-block: 14px;
+    }
+
+    .button:not(.isiOS) {
         border-radius: 6px;
-    }
-
-    .button.circle {
-        border-radius: 50%;
     }
 
     .sizer {
@@ -183,110 +123,58 @@
 
     .fade-text {
         position: absolute;
-        top: 0;
-        left: 0;
         font-weight: 500;
-        color: var(--tg-theme-accent-text-color);
+        margin: 0;
     }
 
-    .fade-text.isiOS {
-        font-weight: normal;
-    }
-
-    .button:not(.default).text {
-        font-size: 18px;
-        padding-inline: 15px;
-        padding-block: 6px;
-        border-radius: 10px;
-        color: var(--tg-theme-accent-text-color);
-    }
-
-    .button:not(.isiOS).text > div {
-        font-size: 15px;
-    }
-
-    .button > div {
-        transition: transform 140ms ease-out;
-        transform-origin: center;
-        display: flex;
-        align-items: center;
-        position: relative;
-        width: 100%;
-    }
-
-    .button::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: var(--tg-theme-text-color);
-        opacity: 0;
-        transition: opacity 120ms ease-out;
-        pointer-events: none;
-    }
-
-    .button:not(.isiOS):is(.text, .accent)::after {
-        background: var(--tg-theme-button-color);
-    }
-
-    .button:not(.opaque):not(.isiOS).isDesktop:hover:after,
-    .button:is(.default, .text, .delete):not(.isDesktop):not(.isiOS):active:after {
-        opacity: 0.05;
-    }
-
-    .button.isiOS:is(.opaque, .text) {
-        transition: opacity 120ms ease-out;
-    }
-
-    .button.isiOS:active:is(.opaque, .text) {
-        opacity: 0.4;
-    }
-
-    .button.default:not(.text).isiOS:active > div {
-        transform: scale(var(--tap-scale));
-    }
-
-    .button.delete > div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-block: 12px;
-        font-size: 17px;
-    }
-
-    .button:not(.isiOS).delete > div {
-        margin-block: 15px;
+    .button:not(.isiOS):not(.secondary) > .fade-text {
+        color: white;
         font-size: 14px;
         font-weight: 600;
     }
 
-    .button:not(.isiOS):not(.default).delete {
-        background: var(--tg-theme-destructive-text-color);
-        border-radius: 6px;
-        color: white;
+    .button:not(.isiOS).secondary > .fade-text {
+        font-size: 15px;
+        color: var(--accent-color);
     }
 
-    .button.isiOS:not(.default).delete {
-        color: var(--tg-theme-destructive-text-color);
+    .button.secondary.isiOS:active > :is(.fade-text, p) {
+        opacity: 0.4;
     }
 
-    .button.delete > .ripple-mask > .ripple {
-        background-color: black;
+    .button.isiOS > .fade-text {
+        color: var(--accent-color);
+        font-size: 17px;
     }
 
-    .button.delete::after {
-        background: black;
+    .button.isiOS > .fade-text {
+        font-weight: normal;
     }
 
-    .button:not(.opaque):not(.isiOS).isDesktop:hover:after,
-    .button.delete:not(.isDesktop):not(.isiOS):active::after {
-        opacity: 0.1;
+    .button.secondary.isiOS > .fade-text {
+        font-size: 18px;
+        transition: opacity 120ms ease-out;
     }
 
-    .button.delete.isiOS:active::after {
-        opacity: 0.2;
+    .button > svg {
+        min-width: 24px;
+        fill: var(--accent-color);
+        transform: rotate(0deg) translateY(-1px);
     }
 
-    .button.delete > .ripple-mask {
-        opacity: 0.06;
+    .button > p {
+        margin: 0;
+        color: var(--accent-color);
+    }
+
+    .button.isiOS > p {
+        font-size: 16px;
+        font-weight: 500;
+        transition: opacity 120ms ease-out;
+    }
+
+    .button:not(.isiOS) > p {
+        font-size: 14px;
+        font-weight: 600;
     }
 </style>
