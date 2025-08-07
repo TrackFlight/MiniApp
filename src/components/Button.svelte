@@ -10,6 +10,7 @@
         undo = false,
         accent = 'var(--tg-theme-accent-text-color)',
         destructive = false,
+        disabled = false,
     } : {
         text?: string,
         on_click?: () => void,
@@ -17,26 +18,27 @@
         undo?: boolean,
         accent?: string,
         destructive?: boolean,
+        disabled?: boolean,
     } = $props();
 
     const displayText = $derived(!isiOS && text && secondary ? text.toUpperCase() : text);
 
     function onKey(e: KeyboardEvent) {
-        if ((e.key === "Enter" || e.key === " ") && on_click) {
+        if ((e.key === "Enter" || e.key === " ") && on_click && !disabled) {
             e.preventDefault();
             on_click();
         }
     }
 
     function handleClick(e: MouseEvent) {
-        if (on_click) {
+        if (on_click && !disabled) {
             e.preventDefault();
             on_click();
         }
     }
 </script>
 
-<div style="--accent-color: {accent}" class="button clickable" class:isDesktop class:destructive class:isiOS class:secondary role="button" tabindex="0" onclick={handleClick} onkeydown={onKey}>
+<div style="--accent-color: {accent}" class="button clickable" class:isDesktop class:isiOS class:disabled class:destructive class:secondary role="button" tabindex="0" onclick={handleClick} onkeydown={onKey}>
     {#if !isiOS}
         <RippleEffect rippleColor="color-mix(in srgb, {secondary ? 'var(--accent-color)' : 'black'} {secondary ? '8':'15'}%, transparent)"/>
     {/if}
@@ -143,6 +145,10 @@
 
     .button.secondary.isiOS:active > :is(.fade-text, p) {
         opacity: 0.4;
+    }
+
+    .button.disabled > .fade-text {
+        opacity: 0.5;
     }
 
     .button.isiOS > .fade-text {
