@@ -135,7 +135,7 @@
         overflow: hidden;
         --tap-scale: 0.97;
         --ripple-duration: .45s;
-        --ripple-end-duration: .3s;
+        cursor: pointer;
     }
 
     .button > .ripple-mask {

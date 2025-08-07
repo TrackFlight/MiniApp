@@ -197,6 +197,7 @@
     .itemView {
         position: relative;
         width: 100%;
+        cursor: pointer;
         --delete-width: 45px;
     }
 

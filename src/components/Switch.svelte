@@ -34,6 +34,7 @@
 
 <style>
     .switch {
+        cursor: pointer;
         --switch-width: 30px;
         --switch-height: 14px;
         --unactive-color: color-mix(in srgb, var(--tg-theme-subtitle-text-color) 80%, var(--tg-theme-secondary-bg-color));
