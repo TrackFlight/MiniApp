@@ -116,9 +116,9 @@
     }
 </script>
 <Header>
-    <Button type="opaque"><UserIcon user={currentUser} /></Button>
+    <UserIcon user={currentUser} />
     {#if isiOS && items.length > 0}
-        <Button text={deletable ? T('DONE_BTN') : T('EDIT_BTN')} on_click={() => deletable = !deletable}/>
+        <Button text={deletable ? T('DONE_BTN') : T('EDIT_BTN')} on_click={() => deletable = !deletable} secondary />
     {/if}
 </Header>
 <StickerContainer

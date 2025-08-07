@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Button from "./Button.svelte";
     import {isiOS, isDesktop} from "../lib/telegram";
     import NamedIcon from "./NamedIcon.svelte";
     import {parseTextWithSpoilers} from "./SimpleSpoiler";
     import SimpleSpoiler from "./SimpleSpoiler.svelte";
     import Switch from "./Switch.svelte";
+    import RippleEffect from "./RippleEffect.svelte";
 
     let {
         icon,
@@ -54,11 +54,22 @@
         }
     }
 
-    function onClickButton() {
+    function onClickButton(e: MouseEvent | KeyboardEvent) {
+        const target = e.target as HTMLElement;
+        if (!target.closest('.clickable')?.classList.contains('itemView')) {
+            return;
+        }
         if (switchable) {
             switchElement?.toggle();
         }else if (on_click && (!deletable || !isiOS)) {
             on_click();
+        }
+    }
+
+    function onKeyButton(e: KeyboardEvent) {
+        if ((e.key === "Enter" || e.key === " ") && on_click) {
+            e.preventDefault();
+            onClickButton(e);
         }
     }
 
@@ -69,8 +80,11 @@
     }
 </script>
 
-<div class="itemView" class:deletable class:switchable class:isiOS class:isDesktop>
-    <Button on_click={onClickButton}>
+<div class="itemView clickable" class:deletable class:switchable class:isiOS class:isDesktop role="button" tabindex="0" onclick={onClickButton} onkeydown={onKeyButton}>
+    {#if !isiOS}
+        <RippleEffect rippleColor="color-mix(in srgb, var(--tg-theme-text-color) 5%, transparent)"/>
+    {/if}
+    <div>
         {#if icon === "add"}
             <svg class="icon" width="28px" height="28px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22.627 18.252">
                 <g>
@@ -179,17 +193,18 @@
                 {/if}
             </div>
             {#if !isiOS && deletable && !switchable}
-                <Button on_click={() => {if (on_delete) on_delete()}} type="default circle">
-                    <svg class="deleteBtn" class:isiOS class:isDesktop width="18" height="22" viewBox="0 0 18 22" xmlns="http://www.w3.org/2000/svg">
+                <div class="deleteBtn clickable" role="button" tabindex="0" onkeydown={onKeyDelete} onclick={() => {if (on_delete) on_delete()}} class:isiOS class:isDesktop>
+                    <svg width="18" height="22" viewBox="0 0 18 22" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M5.19995 3.19999C5.19995 1.6536 6.45355 0.399994 7.99995 0.399994H9.99995C11.5463 0.399994 12.8 1.6536 12.8 3.19999V3.39999H17C17.4418 3.39999 17.7999 3.75817 17.7999 4.19999C17.7999 4.64182 17.4418 4.99999 17 4.99999H0.999951C0.558124 4.99999 0.199951 4.64182 0.199951 4.19999C0.199951 3.75817 0.558124 3.39999 0.999951 3.39999H5.19995V3.19999ZM11.2 3.19999V3.39999H6.79995V3.19999C6.79995 2.53725 7.33721 1.99999 7.99995 1.99999H9.99995C10.6627 1.99999 11.2 2.53725 11.2 3.19999ZM2.79544 7.11466C2.74831 6.67535 2.35397 6.35743 1.91467 6.40456C1.47536 6.45169 1.15744 6.84602 1.20456 7.28533L2.51481 19.4987C2.66743 20.9213 3.86805 22 5.29883 22H12.7168C14.1489 22 15.3502 20.9193 15.5012 19.4951L16.7955 7.28432C16.8421 6.84496 16.5237 6.45102 16.0843 6.40445C15.645 6.35788 15.251 6.6763 15.2045 7.11566L13.9101 19.3265C13.8454 19.9368 13.3305 20.4 12.7168 20.4H5.29883C4.68564 20.4 4.17109 19.9377 4.10568 19.328L2.79544 7.11466Z"/>
                     </svg>
-                </Button>
+                    <RippleEffect rippleColor="color-mix(in srgb, var(--tg-theme-text-color) 5%, transparent)"/>
+                </div>
             {/if}
             {#if switchable && !deletable}
                 <Switch bind:this={switchElement} switchLocked={switchLocked} on_change={on_switch_change} defaultState={switchDefault}/>
             {/if}
         {/if}
-    </Button>
+    </div>
 </div>
 
 <style>
@@ -197,53 +212,73 @@
     .itemView {
         position: relative;
         width: 100%;
+        user-select: none;
         cursor: pointer;
         --delete-width: 45px;
     }
 
-    /*noinspection CssUnusedSymbol*/
-    :is(.itemView.deletable, .itemView.switchable) > :global(div.default.isiOS:not(:has(.icon)):active > div) {
-        transform: scale(1);
+    .itemView > div {
+        display: flex;
+        align-items: center;
+        width: 100%;
     }
 
-    .itemView.deletable.isDesktop > :global(div:hover:has(div:hover > div > .deleteBtn)::after),
-    .itemView.deletable > :global(div:active:has(div:active > div > .deleteBtn)::after),
-    .itemView.deletable.isiOS > :global(div:has(:active, :hover):has(div.deleteBtn)::after) {
+    .itemView.isiOS > div {
+        transition: transform 140ms ease-out;
+        transform-origin: center;
+    }
+
+    .itemView:not(:is(.deletable, .switchable)).isiOS:active > div {
+        transform: scale(0.97);
+    }
+
+    .itemView:before, .deleteBtn:not(.isiOS):before {
+        content: "";
+        position: absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        background: var(--tg-theme-text-color);
         opacity: 0;
+        transition: opacity 120ms ease-out;
+        pointer-events: none;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    .itemView.isDesktop:hover:not(:has(.deleteBtn:hover, .deleteBtn:active)):before,
+    .deleteBtn:not(.isiOS):is(.isDesktop:hover, :active):before {
+        opacity: 0.04;
     }
 
     /** Delete button **/
-    .deleteBtn:not(.isiOS) {
+    .deleteBtn:not(.isiOS) > svg {
         margin-inline: 7px;
         margin-block: 5px;
         fill: var(--tg-theme-destructive-text-color);
     }
 
-    .itemView > :global(div > div > label) {
-        margin-left: auto;
-        margin-right: 20px;
-    }
-
-    .itemView > :global(div > div > div:last-child:has(.deleteBtn)) {
+    .deleteBtn:not(.isiOS) {
         margin-left: auto;
         margin-right: 24px;
         padding: 5px;
+        position: relative;
+        width: 41px;
+        height: 41px;
+        border-radius: 50%;
+        overflow: hidden;
     }
 
-    .itemView > :global(div > div > div.isDesktop:last-child:hover > div > svg) {
+    .deleteBtn.isDesktop:hover > svg {
         fill: var(--tg-theme-text-color);
     }
 
-    .deleteBtn.isDesktop {
+    .deleteBtn.isDesktop > svg {
         fill: var(--tg-theme-hint-color);
         transition: fill 120ms ease-in-out;
     }
 
-    .deleteBtn.isiOS:not(:first-child) {
-        display: none;
-    }
-
-    :not(svg).deleteBtn.isiOS {
+    .deleteBtn.isiOS {
         width: 0;
         display: flex;
         align-items: center;
@@ -254,19 +289,19 @@
         flex-shrink: 0;
     }
 
-    :not(svg).deleteBtn.isiOS:before,
-    :not(svg).deleteBtn.isiOS:after {
+    .deleteBtn.isiOS:before,
+    .deleteBtn.isiOS:after {
         transform: translateX(calc(-14px - var(--delete-width)));
         transition: transform 210ms ease-in-out 0ms;
     }
 
-    :not(svg).deleteBtn.isiOS.deletable:before,
-    :not(svg).deleteBtn.isiOS.deletable:after {
+    .deleteBtn.isiOS.deletable:before,
+    .deleteBtn.isiOS.deletable:after {
         transform: translateX(0);
         transition: transform 400ms ease;
     }
 
-    :not(svg).deleteBtn.isiOS:before {
+    .deleteBtn.isiOS:before {
         content: "";
         position: absolute;
         background: var(--tg-theme-destructive-text-color);
@@ -276,7 +311,7 @@
         margin-left: 14px;
     }
 
-    :not(svg).deleteBtn.isiOS:after {
+    .deleteBtn.isiOS:after {
         content: "";
         position: absolute;
         width: 12px;
@@ -298,7 +333,7 @@
     }
 
     /*noinspection CssUnusedSymbol*/
-    img, .itemView > :global(div > div > div.named-icon) {
+    img, .itemView > div > :global(div.named-icon) {
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -380,5 +415,10 @@
 
     .itemDesc.highlight {
         color: var(--tg-theme-accent-text-color);
+    }
+
+    .itemView > div > :global(label) {
+        margin-left: auto;
+        margin-right: 20px;
     }
 </style>

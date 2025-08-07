@@ -145,7 +145,7 @@
     });
 </script>
 
-<span>{#if hide}<canvas transition:fade={{duration: 100}} bind:this={canvas} class="button" onclick={on_click}></canvas>{/if}<span class:hide>{text}</span></span>
+<span class="clickable">{#if hide}<canvas transition:fade={{duration: 100}} bind:this={canvas} class="button" onclick={on_click}></canvas>{/if}<span class:hide>{text}</span></span>
 
 <style>
     span {

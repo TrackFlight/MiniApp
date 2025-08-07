@@ -74,10 +74,10 @@
                 />
             </div>
             <div class="delete-section" class:isiOS>
-                <Button type="delete" on_click={() => {
+                <Button on_click={() => {
                     on_remove(data);
                     telegram.closeBottomSheet('link-info');
-                }} text={T('REMOVE_LINK_BTN')}/>
+                }} text={T('REMOVE_LINK_BTN')} accent="var(--tg-theme-destructive-text-color)"/>
             </div>
         </div>
     {/snippet}
