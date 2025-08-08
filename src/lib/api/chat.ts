@@ -2,32 +2,26 @@ import {type App, type Link, ServerErrorCode} from "./types";
 import {sessionStore} from "./auth";
 import {internalRequest} from "./base";
 
-export async function trackLink(url_or_id: string | number, notifyAvailable: boolean, notifyClosed: boolean) : Promise<ServerErrorCode | null> {
-    let trackLinkData: {
-        id?: number,
-        link?: string,
-        notify_available?: boolean,
-        notify_closed?: boolean
-    };
+export async function trackLink(url: string, notifyAvailable: boolean, notifyClosed: boolean) : Promise<ServerErrorCode | null> {
     if (sessionStore.appList.reduce((acc, app) => acc + app.links.length, 0) >= sessionStore.maxFollowingLinks) {
         return ServerErrorCode.LimitExceeded;
     }
 
-    if (typeof url_or_id === "number") {
-        trackLinkData = { id: url_or_id };
-    } else {
-        const existingApp = sessionStore.appList.find(
-            app => app.links.some(
-                link => link.url === url_or_id.replace(/https?:\/\//, '')
-            )
-        );
-        if (existingApp) {
-            return ServerErrorCode.LinkAlreadyFollowing;
-        }
-        trackLinkData = { link: url_or_id };
+    const existingApp = sessionStore.appList.find(
+        app => app.links.some(
+            link => link.url === url.replace(/https?:\/\//, '')
+        )
+    );
+
+    if (existingApp) {
+        return ServerErrorCode.LinkAlreadyFollowing;
     }
-    trackLinkData.notify_available = notifyAvailable;
-    trackLinkData.notify_closed = notifyClosed;
+
+    const trackLinkData = {
+        link: url,
+        notify_available: notifyAvailable,
+        notify_closed: notifyClosed
+    };
 
     let res = await internalRequest<App, typeof trackLinkData>(
         "users/links",
