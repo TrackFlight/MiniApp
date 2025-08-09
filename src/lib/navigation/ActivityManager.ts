@@ -1,6 +1,7 @@
 import {getContext, setContext} from 'svelte';
 import {writable, type Writable} from "svelte/store";
 import {telegram} from "../telegram";
+import {ScrollCache} from "../scroll-cache";
 
 export interface ActivityEntry<Props extends Record<string, any> = Record<string, any>> {
     id: number;
@@ -17,6 +18,12 @@ export interface ComponentContext {
     onRestore: (fn: (state: any) => void) => void;
 }
 
+export interface CaptureStateAPI {
+    captureRawStates: () => any[];
+    restoreRawStates: (savedRawStates: any[]) => void;
+    onRegisterCapture: (fn: () => void) => void;
+}
+
 export interface ActivityManagerContext<Props extends Record<string, any> = Record<string, any>> {
     current: Writable<ActivityEntry<Props> | null>;
     stack: ActivityEntry<Props>[];
@@ -26,8 +33,8 @@ export interface ActivityManagerContext<Props extends Record<string, any> = Reco
 
     startActivity: (name: string, props?: Props) => void;
     finishActivity: () => void;
-    getDomPath: (el: Element) => string
     getComponentContext: (el: Element, subName?: string) => ComponentContext;
+    getCaptureStateAPI: () => CaptureStateAPI;
 }
 
 let nextId = 1;
@@ -39,9 +46,10 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         { id: nextId++, name: initialName, props: {} as Props }
     ];
     const current = writable<ActivityEntry<Props> | null>(stack[0]);
-    const onCaptureCallbacks = new Map<string, () => any>();
+    const onCaptureCallbacks = new Map<string, () => any[]>();
     const onRestoreCallbacks = new Map<string, (state: any) => void>();
-    const savedStates = new Map<string, any>();
+    const onCaptureAPIRestoreCallbacks = new Map<string, (() => void)[]>();
+    const savedStates = new Map<string, any[]>();
 
     telegram.BackButton.onClick(() => finishActivity());
 
@@ -71,13 +79,36 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         current.set(stack[stack.length - 1]);
         nextId--;
         restoreActivity(currentActivity.name);
-        savedStates.delete(currentActivity.name);
+    }
+
+    function captureRawStates(): any[] {
+        const savedRawStates: any[] = [];
+        onCaptureCallbacks.forEach((fn, name) => {
+            if (stack[stack.length - 1].name !== name.split(':')[0]) return;
+            savedRawStates.push(fn());
+            onCaptureCallbacks.delete(name);
+            onRestoreCallbacks.delete(name);
+        });
+        return savedRawStates;
+    }
+
+    function restoreRawStates(savedRawStates: any[]) {
+        onRestoreCallbacks.forEach((fn, name) => {
+            if (stack[stack.length - 1].name !== name.split(':')[0]) return;
+            const state = savedRawStates.shift();
+            if (state !== undefined) {
+                fn(state);
+            }
+        });
     }
 
     function captureActivity(activityName: string) {
         onCaptureCallbacks.forEach((fn, name) => {
             if (activityName !== name.split(':')[0]) return;
-            savedStates.set(name, fn());
+            if (!savedStates.has(name)) {
+                savedStates.set(name, []);
+            }
+            savedStates.get(name)?.push(fn());
             onCaptureCallbacks.delete(name);
             onRestoreCallbacks.delete(name);
         })
@@ -86,50 +117,65 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
     function restoreActivity(activityName: string) {
         onRestoreCallbacks.forEach((fn, name) => {
             if (activityName !== name.split(':')[0]) return;
-            const state = savedStates.get(name);
+            const state = savedStates.get(name)?.shift();
             if (state !== undefined) {
                 fn(state);
+            }
+            if (savedStates.get(name)?.length === 0) {
+                savedStates.delete(name);
             }
         })
     }
 
     function onCapture(fn: () => any) {
-        onCaptureCallbacks.set(stack[stack.length - 1].name, fn);
+        internalOnCapture(stack[stack.length - 1].name, fn);
     }
 
     function onRestore(fn: (state: any) => void) {
-        let key = stack[stack.length - 1].name;
-        if (savedStates.has(key)) {
-            fn(savedStates.get(key));
-            savedStates.delete(key);
-        }
-        onRestoreCallbacks.set(key, fn);
+        internalOnRestore(stack[stack.length - 1].name, fn);
     }
 
-    function getDomPath(el: Element): string {
-        const path = [];
-        let current: Element | null = el;
-        while (current && current.parentElement) {
-            path.unshift(`${current.tagName.toLowerCase()}`);
-            current = current.parentElement;
+    function internalOnCapture(key: string, fn: () => any) {
+        onCaptureCallbacks.set(key, fn);
+    }
+
+    function internalOnRestore(key: string, fn: (state: any) => void) {
+        const activityName = key.split(':')[0];
+        if (savedStates.has(key)) {
+            const state = savedStates.get(key)?.shift();
+            fn(state);
+            if (savedStates.get(key)?.length === 0) {
+                savedStates.delete(key);
+            }
         }
-        return path.join(' > ');
+        onRestoreCallbacks.set(key, fn);
+        if (onCaptureAPIRestoreCallbacks.has(activityName)) {
+            onCaptureAPIRestoreCallbacks.get(activityName)?.forEach((fn) => fn());
+        }
+    }
+
+    function onRegisterCapture(fn: () => void) {
+        const activityName = stack[stack.length - 1].name;
+        if (!onCaptureAPIRestoreCallbacks.has(activityName)) {
+            onCaptureAPIRestoreCallbacks.set(activityName, []);
+        }
+        onCaptureAPIRestoreCallbacks.get(activityName)?.push(fn);
     }
 
     function getComponentContext(el: Element, subName?: string): ComponentContext {
-        let key = `${stack[stack.length - 1].name}:${getDomPath(el)}${`:${subName}` || ''}`;
+        let key = `${stack[stack.length - 1].name}:${ScrollCache.getDomPath(el)}${`:${subName}` || ''}`;
         return {
-            onCapture: (fn: () => any) => {
-                onCaptureCallbacks.set(key, fn);
-            },
-            onRestore: (fn: (state: any) => void) => {
-                if (savedStates.has(key)) {
-                    fn(savedStates.get(key));
-                    savedStates.delete(key);
-                }
-                onRestoreCallbacks.set(key, fn);
-            }
+            onCapture: (fn: () => any) => internalOnCapture(key, fn),
+            onRestore: (fn: (state: any) => void) => internalOnRestore(key, fn)
         }
+    }
+
+    function getCaptureStateAPI(): CaptureStateAPI {
+        return {
+            captureRawStates,
+            restoreRawStates,
+            onRegisterCapture
+        };
     }
 
     setContext<ActivityManagerContext<Props>>(CTX, {
@@ -139,19 +185,19 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         finishActivity,
         onCapture,
         onRestore,
-        getDomPath,
-        getComponentContext
+        getComponentContext,
+        getCaptureStateAPI
     });
 
     return {
-        current,
         stack,
+        current,
         startActivity,
         finishActivity,
         onCapture,
         onRestore,
-        getDomPath,
-        getComponentContext
+        getComponentContext,
+        getCaptureStateAPI
     };
 }
 

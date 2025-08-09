@@ -4,6 +4,7 @@
     import {initActivityManager} from './ActivityManager';
     import {onDestroy} from 'svelte';
     import {cubicOut} from 'svelte/easing';
+    import {ScrollCache} from "../scroll-cache";
 
     let {
         activities,
@@ -13,24 +14,20 @@
         initialActivity: keyof typeof activities
     } = $props();
 
-    const { current, stack, getDomPath } = initActivityManager(initialActivity);
+    const { current, stack } = initActivityManager(initialActivity);
 
     let currentActivityElement: HTMLElement | undefined = $state();
     let currentState: any = $state();
     let prevStack: typeof stack = $state([]);
     let currentStack: typeof stack = $state([]);
-    const scrollCache = new Map<string, { top: number, left: number }>();
+    const scrollCache = new ScrollCache();
 
     const unsubscribe = current.subscribe(async (state) => {
         prevStack = currentStack;
         if (prevStack.length < stack.length && currentState) {
-            saveScroll(currentState!.name);
+            scrollCache.save(currentState!.name, currentActivityElement)
         } else if (prevStack.length > stack.length && currentState) {
-            for (const [key] of scrollCache.entries()) {
-                if (key.startsWith(`${currentState.name}:`)) {
-                    scrollCache.delete(key);
-                }
-            }
+            scrollCache.delete(currentState!.name);
         }
         currentStack = [...stack];
         currentState = state;
@@ -41,7 +38,7 @@
     $effect(() => {
         if (!currentActivityElement || !currentState) return;
         const observer = new MutationObserver(() => {
-            restoreScroll(currentState!.name);
+            scrollCache.restore(currentState!.name, currentActivityElement);
             observer.disconnect();
         });
         observer.observe(currentActivityElement, { childList: true, subtree: true });
@@ -57,7 +54,7 @@
         return {
             duration,
             easing: cubicOut,
-            css: (t: number): string => `transform: translateX(${goingBack ? -30 * (1 - t) : 100 * (1 - t)}%);z-index: ${goingBack ? 0:1};`
+            css: (t: number): string => `transform: translate3d(${goingBack ? -30 * (1 - t) : 100 * (1 - t)}%, 0, 0);z-index: ${goingBack ? 0:1};`
         };
     }
 
@@ -68,48 +65,8 @@
         return {
             duration,
             easing: cubicOut,
-            css: (t: number): string => `transform: translateX(${goingBack ? 100 * (1 - t) : -30 * (1 - t)}%);z-index: ${goingBack ? 1:0};`
+            css: (t: number): string => `transform: translate3d(${goingBack ? 100 * (1 - t) : -30 * (1 - t)}%, 0, 0);z-index: ${goingBack ? 1:0};`
         };
-    }
-
-    function isScrollable(el: Element): boolean {
-        const style = getComputedStyle(el);
-        return (
-            (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
-            el.scrollHeight > el.clientHeight
-        ) || (
-            (style.overflowX === 'auto' || style.overflowX === 'scroll') &&
-            el.scrollWidth > el.clientWidth
-        );
-    }
-
-    function saveScroll(activityId: string) {
-        if (!currentActivityElement) return;
-        const elements = currentActivityElement!.querySelectorAll('*');
-        for (const el of elements) {
-            if (isScrollable(el)) {
-                const key = `${activityId}:${getDomPath(el)}`;
-                scrollCache.set(key, {
-                    top: (el as HTMLElement).scrollTop,
-                    left: (el as HTMLElement).scrollLeft,
-                });
-            }
-        }
-    }
-
-    function restoreScroll(activityId: string) {
-        if (!currentActivityElement) return;
-        const elements = currentActivityElement!.querySelectorAll('*');
-        for (const el of elements) {
-            const key = `${activityId}:${getDomPath(el)}`;
-            const saved = scrollCache.get(key);
-            if (saved) {
-                if (el instanceof HTMLElement) {
-                    el.scrollTop = saved.top;
-                    el.scrollLeft = saved.left;
-                }
-            }
-        }
     }
 </script>
 
