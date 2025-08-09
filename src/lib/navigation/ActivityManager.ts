@@ -19,8 +19,11 @@ export interface ComponentContext {
 }
 
 export interface CaptureStateAPI {
-    captureRawStates: () => any[];
-    restoreRawStates: (savedRawStates: any[]) => void;
+    onCapture: (fn: () => any) => void;
+    onRestore: (fn: (state: any) => void) => void;
+
+    captureRawStates: () => Record<string, any>;
+    restoreRawStates: (savedRawStates: Record<string, any>) => void;
     onRegisterCapture: (fn: () => void) => void;
 }
 
@@ -46,8 +49,8 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         { id: nextId++, name: initialName, props: {} as Props }
     ];
     const current = writable<ActivityEntry<Props> | null>(stack[0]);
-    const onCaptureCallbacks = new Map<string, () => any[]>();
-    const onRestoreCallbacks = new Map<string, (state: any) => void>();
+    const onCaptureCallbacks = new Map<string, {callback: () => any[], onlyAPI: boolean}>();
+    const onRestoreCallbacks = new Map<string, {callback: (state: any) => void, onlyAPI: boolean}>();
     const onCaptureAPIRestoreCallbacks = new Map<string, (() => void)[]>();
     const savedStates = new Map<string, any[]>();
 
@@ -81,45 +84,43 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         restoreActivity(currentActivity.name);
     }
 
-    function captureRawStates(): any[] {
-        const savedRawStates: any[] = [];
+    function captureRawStates(): Record<string, any> {
+        const savedRawStates: Record<string, any> = {};
         onCaptureCallbacks.forEach((fn, name) => {
             if (stack[stack.length - 1].name !== name.split(':')[0]) return;
-            savedRawStates.push(fn());
+            savedRawStates[name] = fn.callback();
             onCaptureCallbacks.delete(name);
             onRestoreCallbacks.delete(name);
         });
         return savedRawStates;
     }
 
-    function restoreRawStates(savedRawStates: any[]) {
+    function restoreRawStates(savedRawStates: Record<string, any>) {
         onRestoreCallbacks.forEach((fn, name) => {
             if (stack[stack.length - 1].name !== name.split(':')[0]) return;
-            const state = savedRawStates.shift();
-            if (state !== undefined) {
-                fn(state);
-            }
+            fn.callback(savedRawStates[name]);
         });
     }
 
     function captureActivity(activityName: string) {
         onCaptureCallbacks.forEach((fn, name) => {
-            if (activityName !== name.split(':')[0]) return;
+            if (activityName !== name.split(':')[0] || fn.onlyAPI) return;
             if (!savedStates.has(name)) {
                 savedStates.set(name, []);
             }
-            savedStates.get(name)?.push(fn());
+            savedStates.get(name)?.push(fn.callback());
             onCaptureCallbacks.delete(name);
             onRestoreCallbacks.delete(name);
         })
+        onCaptureAPIRestoreCallbacks.delete(activityName);
     }
 
     function restoreActivity(activityName: string) {
         onRestoreCallbacks.forEach((fn, name) => {
-            if (activityName !== name.split(':')[0]) return;
+            if (activityName !== name.split(':')[0] || fn.onlyAPI) return;
             const state = savedStates.get(name)?.shift();
             if (state !== undefined) {
-                fn(state);
+                fn.callback(state);
             }
             if (savedStates.get(name)?.length === 0) {
                 savedStates.delete(name);
@@ -135,11 +136,11 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         internalOnRestore(stack[stack.length - 1].name, fn);
     }
 
-    function internalOnCapture(key: string, fn: () => any) {
-        onCaptureCallbacks.set(key, fn);
+    function internalOnCapture(key: string, fn: () => any, onlyAPI: boolean = false) {
+        onCaptureCallbacks.set(key, {callback: fn, onlyAPI: onlyAPI});
     }
 
-    function internalOnRestore(key: string, fn: (state: any) => void) {
+    function internalOnRestore(key: string, fn: (state: any) => void, onlyAPI: boolean = false) {
         const activityName = key.split(':')[0];
         if (savedStates.has(key)) {
             const state = savedStates.get(key)?.shift();
@@ -148,7 +149,7 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
                 savedStates.delete(key);
             }
         }
-        onRestoreCallbacks.set(key, fn);
+        onRestoreCallbacks.set(key, {callback: fn, onlyAPI: onlyAPI});
         if (onCaptureAPIRestoreCallbacks.has(activityName)) {
             onCaptureAPIRestoreCallbacks.get(activityName)?.forEach((fn) => fn());
         }
@@ -171,7 +172,11 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
     }
 
     function getCaptureStateAPI(): CaptureStateAPI {
+        const activityName = stack[stack.length - 1].name;
         return {
+            onCapture: (fn: () => any) => internalOnCapture(activityName, fn, true),
+            onRestore: (fn: (state: any) => void) => internalOnRestore(activityName, fn, true),
+
             captureRawStates,
             restoreRawStates,
             onRegisterCapture

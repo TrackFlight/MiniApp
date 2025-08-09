@@ -3,7 +3,7 @@
     import type {ComponentsMap} from './ActivityManager';
     import {initActivityManager} from './ActivityManager';
     import {onDestroy} from 'svelte';
-    import {cubicOut} from 'svelte/easing';
+    import {cubicInOut} from 'svelte/easing';
     import {ScrollCache} from "../scroll-cache";
 
     let {
@@ -53,7 +53,7 @@
     ): TransitionConfig {
         return {
             duration,
-            easing: cubicOut,
+            easing: cubicInOut,
             css: (t: number): string => `transform: translate3d(${goingBack ? -30 * (1 - t) : 100 * (1 - t)}%, 0, 0);z-index: ${goingBack ? 0:1};`
         };
     }
@@ -64,7 +64,7 @@
     ): TransitionConfig {
         return {
             duration,
-            easing: cubicOut,
+            easing: cubicInOut,
             css: (t: number): string => `transform: translate3d(${goingBack ? 100 * (1 - t) : -30 * (1 - t)}%, 0, 0);z-index: ${goingBack ? 1:0};`
         };
     }
