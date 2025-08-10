@@ -1,6 +1,6 @@
 <script lang="ts">
     import {fly, type TransitionConfig} from 'svelte/transition';
-    import {cubicOut} from "svelte/easing";
+    import {cubicInOut} from "svelte/easing";
     import {onDestroy, onMount} from "svelte";
     import {registerBottomSheet, unregisterBottomSheet} from "./BottomSheet";
     import {telegram} from "../lib/telegram";
@@ -31,7 +31,7 @@
     ): TransitionConfig {
         return {
             duration,
-            easing: cubicOut,
+            easing: cubicInOut,
             css: (t: number): string => `background-color: rgba(0, 0, 0, ${t * 0.3});`
         };
     }
@@ -52,7 +52,7 @@
 
 {#if show}
     <div transition:backgroundFade={{duration: 300}} class="bottom-sheet" role="button" tabindex="0" onclick={onClickOutside} onkeydown={onKey}>
-        <div transition:fly={{ y: "100%", duration: 300, easing: cubicOut, opacity: 1 }}>
+        <div transition:fly={{ y: "100%", duration: 300, easing: cubicInOut, opacity: 1 }}>
             {@render children(data)}
         </div>
     </div>

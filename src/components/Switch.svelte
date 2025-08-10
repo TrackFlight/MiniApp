@@ -45,7 +45,7 @@
         align-items: center;
         width: var(--switch-width);
         min-width: var(--switch-width);
-        transition: 225ms cubic-bezier(0.55, 0, 0.1, 1);
+        transition: 225ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
     .switch.isiOS {
@@ -79,7 +79,7 @@
         content: "";
         aspect-ratio: 1 / 1;
         border-radius: 50%;
-        transition: 225ms cubic-bezier(0.55, 0, 0.1, 1);
+        transition: 225ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
     .switch:not(.isiOS):before {
@@ -107,7 +107,7 @@
         transform: translateX(-2px);
         height: calc(var(--switch-height) + 2px);
         background-color: var(--tg-theme-section-bg-color);
-        transition: 225ms cubic-bezier(0.55, 0, 0.1, 1);
+        transition: 225ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
     .switch.isiOS:has(input:checked) {

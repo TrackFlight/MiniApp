@@ -80,11 +80,11 @@
     }
 
     .virtual-list.ready {
-        transition: height 250ms cubic-bezier(0.55, 0, 0.1, 1);
+        transition: height 250ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
     .virtual-list.ready > div {
-        transition: top 250ms cubic-bezier(0.55, 0, 0.1, 1);
+        transition: top 250ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
     .virtual-list > div {

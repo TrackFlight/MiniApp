@@ -1,7 +1,7 @@
 <script lang="ts">
     import {type BulletinButton, isiOS, telegram} from "../lib/telegram";
     import {fly} from 'svelte/transition';
-    import {cubicOut, linear} from "svelte/easing";
+    import {cubicInOut, linear} from "svelte/easing";
     import {Tween} from "svelte/motion";
     import StickerView from "./StickerView.svelte";
     import Button from "./Button.svelte";
@@ -129,7 +129,7 @@
     <div class="bulletin"
          class:isiOS
          class:shakeBulletin
-         transition:fly={{ y: "100%", duration: 250, easing: cubicOut }}
+         transition:fly={{ y: "100%", duration: 250, easing: cubicInOut }}
          role="alert" aria-live="polite"
     >
         {#if current.icon === "timer" && progress}

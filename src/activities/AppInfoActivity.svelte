@@ -257,7 +257,7 @@
         font-size: 16px;
         line-height: 1.3;
         overflow: hidden;
-        transition: max-height 1s cubic-bezier(0.55, 0, 0.1, 1);
+        transition: max-height 1s cubic-bezier(0.65, 0, 0.35, 1);
     }
 
     .description-container > .more-button {
