@@ -57,6 +57,7 @@
 
     nav > div > div {
         display: flex;
+        cursor: pointer;
         align-items: center;
         justify-content: center;
         position: relative;
