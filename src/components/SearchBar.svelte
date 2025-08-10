@@ -173,6 +173,5 @@
         top: 2%;
         left: 13px;
         font-size: 12px;
-        font-weight: 500;
     }
 </style>
