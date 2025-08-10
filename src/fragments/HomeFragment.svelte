@@ -19,6 +19,7 @@
         withUIProgress
     } from "../lib/api";
     import VirtualList from "../components/VirtualList.svelte";
+    import ScrollablePage from "../components/ScrollablePage.svelte";
 
     let deletable = $state(!isiOS);
     let items = $state(sessionStore.appList);
@@ -118,7 +119,7 @@
     }
 </script>
 
-<div class="content">
+<ScrollablePage>
     <Header>
         <UserIcon user={currentUser} />
         {#if isiOS && items.length > 0}
@@ -171,16 +172,4 @@
             {/snippet}
         </VirtualList>
     </ListView>
-</div>
-
-<style>
-    .content {
-        height: 100%;
-        overflow-y: auto;
-        padding-bottom: 10px;
-    }
-
-    .content::-webkit-scrollbar {
-        display: none;
-    }
-</style>
+</ScrollablePage>
