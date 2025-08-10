@@ -7,7 +7,6 @@
     import AddLinkBottomSheet from "../components/AddLinkBottomSheet.svelte";
     import ViewPager from "../components/ViewPager.svelte";
     import SearchFragment from "../fragments/SearchFragment.svelte";
-    import {fade} from 'svelte/transition';
 
     onMount(telegram.BackButton.hide);
 

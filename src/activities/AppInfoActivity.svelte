@@ -2,8 +2,10 @@
     import {
         type App,
         type Link,
-        notifyAppListChanged, onAppListChanged,
-        removeLink, sessionStore,
+        notifyAppListChanged,
+        onAppListChanged,
+        removeLink,
+        sessionStore,
         withUIProgress
     } from "../lib/api";
     import {isiOS, telegram} from "../lib/telegram";

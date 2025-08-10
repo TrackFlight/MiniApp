@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { isiOS } from "../lib/telegram";
+    import {isiOS} from "../lib/telegram";
     import StickerView from "./StickerView.svelte";
+
     const { title, desc, sticker, children } : {title: string, desc: string, sticker:string, children: any} = $props();
 </script>
 

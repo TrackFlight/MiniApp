@@ -1,5 +1,5 @@
 import {telegram} from "../telegram";
-import type {App, ResponseData} from "./types";
+import type {ResponseData} from "./types";
 import {sessionStore} from "./auth";
 
 const appListChangeCallbacks: (() => void)[] = [];

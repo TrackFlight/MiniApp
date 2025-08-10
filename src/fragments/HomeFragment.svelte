@@ -10,13 +10,13 @@
     import {ReadableDateDifference, T} from "../lib/translator";
     import {getApplicationContext} from "../lib/navigation/ActivityManager";
     import {
+        type App,
+        onAppListChanged,
         removeApp,
         ServerErrorCode,
         sessionStore,
         trackLink,
-        withUIProgress,
-        type App,
-        onAppListChanged
+        withUIProgress
     } from "../lib/api";
     import VirtualList from "../components/VirtualList.svelte";
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {isiOS, isDesktop} from "../lib/telegram";
+    import {isDesktop, isiOS} from "../lib/telegram";
     import NamedIcon from "./NamedIcon.svelte";
     import {parseTextWithSpoilers} from "./SimpleSpoiler";
     import SimpleSpoiler from "./SimpleSpoiler.svelte";

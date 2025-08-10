@@ -1,5 +1,6 @@
 <script lang="ts">
     import {isiOS} from "../lib/telegram";
+
     let {
         on_change,
         defaultState = false,

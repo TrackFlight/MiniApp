@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {isiOS, isDesktop} from "../lib/telegram";
+    import {isDesktop, isiOS} from "../lib/telegram";
     import ViewPager from "./ViewPager.svelte";
 
     let {
