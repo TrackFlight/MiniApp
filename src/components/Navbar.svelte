@@ -34,10 +34,11 @@
 <style>
     nav {
         display: flex;
-        height: 58px;
+        height: calc(50px + var(--tg-safe-area-inset-bottom));
         width: 100%;
         background: var(--tg-theme-bottom-bar-bg-color);
         border-top: 1px solid var(--tg-theme-section-separator-color);
+        padding-bottom: var(--tg-safe-area-inset-bottom);
         justify-content: space-evenly;
     }
 
