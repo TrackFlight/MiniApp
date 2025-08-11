@@ -47,6 +47,10 @@
         height: 62px;
     }
 
+    nav.isDesktop {
+        background: var(--tg-theme-section-bg-color);
+    }
+
     nav > div {
         display: flex;
         flex-direction: column;
@@ -124,14 +128,13 @@
         width: 26px;
         height: 26px;
         z-index: 0;
-        fill: color-mix(in srgb, var(--tg-theme-subtitle-text-color) 70%, transparent);
+        fill: color-mix(in srgb, var(--tg-theme-text-color) 35%, transparent);
         transition: fill 150ms ease-in-out;
     }
 
     nav.isiOS > div > div > :global(svg) {
         width: 28px;
         height: 28px;
-        fill: var(--tg-theme-subtitle-text-color);
     }
 
     @keyframes pulseSvg {
@@ -159,14 +162,17 @@
         margin: 0;
         font-size: 12px;
         font-weight: 600;
-        color: color-mix(in srgb, var(--tg-theme-subtitle-text-color) 70%, transparent);
+        color: color-mix(in srgb, var(--tg-theme-text-color) 35%, transparent);
         transition: color 150ms ease-in-out;
+    }
+
+    nav.isDesktop.isiOS > div > p {
+        display: none;
     }
 
     nav.isiOS > div > p {
         font-size: 10px;
         font-weight: 500;
-        color: var(--tg-theme-subtitle-text-color);
     }
 
     nav.isiOS > div.isActive > p {
