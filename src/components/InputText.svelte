@@ -26,7 +26,10 @@
 
     onMount(() => {
         const updateBg = () => {
-            backgroundColor = findBackgroundColor(searchBar);
+            const foundColor = findBackgroundColor(searchBar);
+            if (foundColor !== backgroundColor) {
+                backgroundColor = foundColor;
+            }
         };
 
         updateBg();
