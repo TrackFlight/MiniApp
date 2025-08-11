@@ -3,7 +3,7 @@
     import {fade} from 'svelte/transition';
     import {telegram} from "../lib/telegram";
 
-    const { text, on_click, hide = true } : {text: string, on_click: () => void, hide?: boolean} = $props();
+    const { text, on_click, hide = true, clickable = true } : {text: string, on_click: () => void, hide?: boolean, clickable?: boolean} = $props();
 
     interface Point {
         mx: number;
@@ -145,7 +145,7 @@
     });
 </script>
 
-<span class:clickable={hide}>{#if hide}<canvas transition:fade={{duration: 100}} bind:this={canvas} class="button" onclick={on_click}></canvas>{/if}<span class:hide>{text}</span></span>
+<span class:clickable={hide && clickable}>{#if hide}<canvas transition:fade={{duration: 100}} bind:this={canvas} class="button" onclick={() => {if (clickable) on_click();}}></canvas>{/if}<span class:hide>{text}</span></span>
 
 <style>
     span {

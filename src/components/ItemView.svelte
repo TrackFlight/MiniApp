@@ -72,12 +72,6 @@
             onClickButton(e);
         }
     }
-
-    function showSpoilers() {
-        if (allowShowSpoilers) {
-            currentSpoilersStatus = false;
-        }
-    }
 </script>
 
 <div class="itemView clickable" class:deletable class:switchable class:isiOS class:isDesktop role="button" tabindex="0" onclick={onClickButton} onkeydown={onKeyButton}>
@@ -180,7 +174,7 @@
                             {#if part.type === "text"}
                                 {@html part.content}
                             {:else if part.type === "spoiler"}
-                                <SimpleSpoiler text={part.content} on_click={showSpoilers} hide={currentSpoilersStatus} />
+                                <SimpleSpoiler text={part.content} clickable={allowShowSpoilers} on_click={() => currentSpoilersStatus = false} hide={currentSpoilersStatus} />
                             {/if}
                         {/each}
                     </p>
