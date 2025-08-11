@@ -136,7 +136,7 @@
         </svg>
     </StickerContainer>
     <Divider/>
-    <ListView header={T('LINKS_HEADER')}>
+    <ListView header={T('APPS_HEADER')}>
         <ItemView icon="add" title={T('TRACK_LINK_BTN')} on_click={addLink}/>
         <!--suppress JSUnusedGlobalSymbols -->
         <VirtualList data={items}>
