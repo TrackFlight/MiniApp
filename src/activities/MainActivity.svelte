@@ -7,6 +7,7 @@
     import AddLinkBottomSheet from "../components/AddLinkBottomSheet.svelte";
     import ViewPager from "../components/ViewPager.svelte";
     import SearchFragment from "../fragments/SearchFragment.svelte";
+    import {T} from "../lib/translator";
 
     onMount(telegram.BackButton.hide);
 
@@ -21,7 +22,7 @@
     <ViewPager fragments={fragments} bind:this={pager}/>
     <Bulletin/>
 </div>
-<Navbar pager={pager} tabs={['Home', 'Apps']}>
+<Navbar pager={pager} tabs={[T('HOME_TAB'), T('APPS_TAB')]}>
     {#snippet children(index: Number)}
         {#if index === 0}
             {#if isiOS}
