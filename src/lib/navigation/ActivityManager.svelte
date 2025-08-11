@@ -74,7 +74,7 @@
 <div class="viewport">
     {#if currentState}
         {#key currentState.id}
-            <div class="activity" in:flyBackIn={{duration: 300}} out:flyBackOut={{duration: 300}} bind:this={currentActivityElement}>
+            <div class="activity" in:flyBackIn={{duration: 250}} out:flyBackOut={{duration: 250}} bind:this={currentActivityElement}>
                 <CurrentActivity
                     {...currentState.props}
                 />

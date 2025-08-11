@@ -154,7 +154,7 @@
         background: var(--background-parent);
         padding-inline: 3px;
         pointer-events: none;
-        transition: 200ms cubic-bezier(0, 0, 0.2, 1);
+        transition: 150ms cubic-bezier(0, 0, 0.2, 1);
     }
 
     /*noinspection CssUnusedSymbol*/

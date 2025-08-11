@@ -51,8 +51,8 @@
 </script>
 
 {#if show}
-    <div transition:backgroundFade={{duration: 300}} class="bottom-sheet" role="button" tabindex="0" onclick={onClickOutside} onkeydown={onKey}>
-        <div transition:fly={{ y: "100%", duration: 300, easing: cubicInOut, opacity: 1 }}>
+    <div transition:backgroundFade={{duration: 250}} class="bottom-sheet" role="button" tabindex="0" onclick={onClickOutside} onkeydown={onKey}>
+        <div transition:fly={{ y: "100%", duration: 250, easing: cubicInOut, opacity: 1 }}>
             {@render children(data)}
         </div>
     </div>

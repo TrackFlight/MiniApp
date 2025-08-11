@@ -25,7 +25,7 @@
         visiblePagesTimeout = setTimeout(() => {
             visiblePages.delete(prevPage);
             visiblePages = new Set(visiblePages);
-        }, 300);
+        }, 250);
     }
 
     export function getCurrentPage(): number {
@@ -57,6 +57,6 @@
         position:absolute;
         width:100%;
         height:100%;
-        transition: transform 300ms cubic-bezier(0.65, 0, 0.35, 1);
+        transition: transform 250ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 </style>
