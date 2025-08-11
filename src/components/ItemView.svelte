@@ -215,6 +215,7 @@
         user-select: none;
         cursor: pointer;
         --delete-width: 45px;
+        z-index: 0;
     }
 
     .itemView > div {

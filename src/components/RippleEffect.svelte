@@ -115,6 +115,7 @@
         overflow: hidden;
         border-radius: inherit;
         pointer-events: none;
+        z-index: -1;
     }
 
     .ripple-wave {
@@ -125,7 +126,6 @@
         border-radius: 50%;
         background-color: var(--ripple-color);
         animation: ripple-animation 800ms;
-
     }
 
     .ripple-wave.hold {

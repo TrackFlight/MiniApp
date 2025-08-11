@@ -69,6 +69,7 @@
         padding-block: 12px;
         cursor: pointer;
         flex-shrink: 0;
+        z-index: 0;
     }
 
     .button:has(svg) {
