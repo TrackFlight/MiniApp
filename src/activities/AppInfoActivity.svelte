@@ -20,12 +20,13 @@
     import {getApplicationContext} from "../lib/navigation/ActivityManager";
     import AppInfoBottomSheet from "../components/AppInfoBottomSheet.svelte";
 
-    let {app} : { app: App } = $props();
+    let {app, allowEdit = false} : { app: App, allowEdit: boolean } = $props();
     let showMore = $state(true);
     let moreTextSize = $state(0);
     let linksList = $state<Link[]>(app.links);
     let description: HTMLParagraphElement | undefined = $state();
     let moreButton: HTMLParagraphElement | undefined = $state();
+    let localAppIndex = sessionStore.appList.findIndex(localApp => localApp.id === app.id);
 
     const {finishActivity} =  getApplicationContext();
 
@@ -127,14 +128,16 @@
         <!--suppress JSUnusedGlobalSymbols -->
         <VirtualList data={linksList}>
             {#snippet children(item: Link)}
+                {@const linkUrl = sessionStore.appList[localAppIndex]?.links.find(link => link.id === item.id)?.url || item.url}
                 <ItemView
-                    title={item.is_public ? item.url : item.url.replace(/\/(\w+)$/, '/<spoiler>$1</spoiler>')}
+                    title={item.is_public ? linkUrl : linkUrl.replace(/\/(\w+)$/, '/<spoiler>$1</spoiler>')}
                     icon={item.status ? 'link' : 'link_loading'}
                     desc={GetLinkDescription(item)}
                     highlight={item.status === 'available'}
                     on_click={() => telegram.showBottomSheet('link-info', item)}
                     on_delete={() => removeItem(item)}
                     small
+                    allowShowSpoilers={allowEdit || localAppIndex !== -1}
                 />
             {/snippet}
         </VirtualList>
