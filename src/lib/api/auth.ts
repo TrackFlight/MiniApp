@@ -4,6 +4,7 @@ import {internalRequest} from "./base";
 
 export const sessionStore = {
     appList: [] as App[],
+    trendingApps: [] as App[],
     currentJWT: '',
     langPack: {} as Record<string, string>,
     langCode: '',
@@ -31,6 +32,13 @@ export async function tryLogin() {
             return false;
         }
         sessionStore.appList = userResponse.response || [];
+        const trendingResponse = await internalRequest<App[], null>(
+            "apps/trending"
+        );
+        if (trendingResponse.error) {
+            return false;
+        }
+        sessionStore.trendingApps = trendingResponse.response || [];
         const langPackResponse = await internalRequest<{
             lang_code: string;
             strings: Record<string, string>;

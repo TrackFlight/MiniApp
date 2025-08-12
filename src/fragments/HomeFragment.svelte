@@ -111,12 +111,6 @@
             }
         );
     }
-
-    async function openItem(app: App) {
-        startActivity('appInfo', {
-            app: app,
-        });
-    }
 </script>
 
 <ScrollablePage>
@@ -136,7 +130,7 @@
         </svg>
     </StickerContainer>
     <Divider/>
-    <ListView header={T('APPS_HEADER')}>
+    <ListView header={T('FOLLOWING_APPS_HEADER')}>
         <ItemView icon="add" title={T('TRACK_LINK_BTN')} on_click={addLink}/>
         <!--suppress JSUnusedGlobalSymbols -->
         <VirtualList data={items}>
@@ -166,7 +160,10 @@
                     icon={item.icon_url ? item.icon_url : item.links[0].status ? '' : 'link_loading'}
                     id={item.links[0].id}
                     bind:deletable
-                    on_click={() => openItem(item)}
+                    on_click={() => startActivity('appInfo', {
+                        app: item,
+                        allowEdit: true,
+                    })}
                     on_delete={() => removeItem(item)}
                 />
             {/snippet}
