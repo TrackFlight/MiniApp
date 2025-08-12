@@ -1,6 +1,6 @@
 import {telegram} from "../telegram";
 import type {ResponseData} from "./types";
-import {sessionStore} from "./auth";
+import {retrieveToken, sessionStore} from "./auth";
 
 const appListChangeCallbacks: (() => void)[] = [];
 
@@ -44,6 +44,8 @@ export async function internalRequest<T, C>(path: string, method: string = "GET"
     } else if (rawResponse.status === 429) {
         const delay = response.error!.seconds! * 1000;
         await new Promise(resolve => setTimeout(resolve, delay));
+        return internalRequest(path, method, body);
+    } else if (rawResponse.status === 401 && await retrieveToken()) {
         return internalRequest(path, method, body);
     } else if (rawResponse.ok) {
         response.response = await rawResponse.json() as T;

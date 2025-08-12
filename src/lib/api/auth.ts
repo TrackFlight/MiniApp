@@ -14,17 +14,7 @@ export const sessionStore = {
 };
 
 export async function tryLogin() {
-    let response = await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ initData: telegram.initData }),
-    });
-    if (!response.ok) {
-        return false;
-    }
-    const data = await response.json();
-    if (data.token) {
-        sessionStore.currentJWT = data.token;
+    if (await retrieveToken()) {
         const userResponse = await internalRequest<App[], null>(
             "users/links"
         );
@@ -67,4 +57,20 @@ export async function tryLogin() {
         return true;
     }
     return false;
+}
+
+export async function retrieveToken() {
+    let response = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ initData: telegram.initData }),
+    });
+    if (!response.ok) {
+        return false;
+    }
+    const data = await response.json();
+    if (data.token) {
+        sessionStore.currentJWT = data.token;
+    }
+    return true;
 }
