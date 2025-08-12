@@ -37,6 +37,7 @@ export interface ActivityManagerContext<Props extends Record<string, any> = Reco
     startActivity: (name: string, props?: Props) => void;
     finishActivity: () => void;
     getComponentContext: (el: Element, subName?: string) => ComponentContext;
+    getFragmentContext: (fragmentName: string) => ComponentContext;
     getCaptureStateAPI: () => CaptureStateAPI;
 }
 
@@ -163,6 +164,14 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         onCaptureAPIRestoreCallbacks.get(activityName)?.push(fn);
     }
 
+    function getFragmentContext(fragmentName: string): ComponentContext {
+        let key = `${stack[stack.length - 1].name}:fragment:${fragmentName}`;
+        return {
+            onCapture: (fn: () => any) => internalOnCapture(key, fn),
+            onRestore: (fn: (state: any) => void) => internalOnRestore(key, fn)
+        }
+    }
+
     function getComponentContext(el: Element, subName?: string): ComponentContext {
         let key = `${stack[stack.length - 1].name}:${ScrollCache.getDomPath(el)}${`:${subName}` || ''}`;
         return {
@@ -191,6 +200,7 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         onCapture,
         onRestore,
         getComponentContext,
+        getFragmentContext,
         getCaptureStateAPI
     });
 
@@ -202,6 +212,7 @@ export function initActivityManager<Props extends Record<string, any> = Record<s
         onCapture,
         onRestore,
         getComponentContext,
+        getFragmentContext,
         getCaptureStateAPI
     };
 }
