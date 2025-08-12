@@ -9,7 +9,7 @@
     } : {hint: string, search?: boolean, text: string} = $props();
 
     let searchBar: HTMLDivElement;
-    let inputValue = $state('');
+    let inputValue = $state(text);
     let backgroundColor = $state('transparent');
 
     function findBackgroundColor(el: HTMLElement): string {
