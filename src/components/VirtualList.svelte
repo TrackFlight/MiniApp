@@ -77,6 +77,7 @@
         visibility: hidden;
         width: 100%;
         position: relative;
+        z-index: 1;
     }
 
     .virtual-list.ready {
