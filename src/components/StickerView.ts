@@ -25,7 +25,8 @@ async function getSticker(name: string): Promise<ArrayBuffer> {
 }
 
 async function downloadAndCacheSticker(name: string) {
-    const response = await fetch(`src/assets/stickers/${name}.lottie`);
+    const url = new URL(`../assets/stickers/${name}.lottie`, import.meta.url).href;
+    const response = await fetch(url);
     if (!response.ok) {
         throw new Error("Failed to download sticker");
     }
