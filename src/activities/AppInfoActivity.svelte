@@ -50,7 +50,7 @@
         if (app) {
             localApp = sessionStore.appList.find(a => a.id === app.id);
             if (localApp && localApp.links) {
-                linksList = retrieveLinksWithFollowingStatus(localApp!.links);
+                linksList = retrieveLinksWithFollowingStatus(app.links);
             }
         }
     }
