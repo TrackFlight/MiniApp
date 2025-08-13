@@ -168,7 +168,7 @@
                     bind:deletable
                     on_click={() => startActivity('appInfo', {
                         app: item,
-                        allowEdit: true,
+                        allowEdit: true
                     })}
                     on_delete={() => removeItem(item)}
                 />
