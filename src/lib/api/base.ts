@@ -60,3 +60,10 @@ export function notifyAppListChanged() {
 export function onAppListChanged(callback: () => void) {
     appListChangeCallbacks.push(callback);
 }
+
+export function removeAppListChangeListener(callback: () => void) {
+    const index = appListChangeCallbacks.indexOf(callback);
+    if (index !== -1) {
+        appListChangeCallbacks.splice(index, 1);
+    }
+}

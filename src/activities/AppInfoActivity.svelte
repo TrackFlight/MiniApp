@@ -2,10 +2,14 @@
     import {
         type App,
         type Link,
+        type LinkWithFollowingStatus,
         notifyAppListChanged,
         onAppListChanged,
+        removeAppListChangeListener,
         removeLink,
+        ServerErrorCode,
         sessionStore,
+        trackLink,
         withUIProgress
     } from "../lib/api";
     import {isiOS, telegram} from "../lib/telegram";
@@ -15,7 +19,7 @@
     import ListView from "../components/ListView.svelte";
     import VirtualList from "../components/VirtualList.svelte";
     import ItemView from "../components/ItemView.svelte";
-    import {onMount, tick} from "svelte";
+    import {onDestroy, onMount, tick} from "svelte";
     import Bulletin from "../components/Bulletin.svelte";
     import {getApplicationContext} from "../lib/navigation/ActivityManager";
     import AppInfoBottomSheet from "../components/AppInfoBottomSheet.svelte";
@@ -23,19 +27,12 @@
     let {app, allowEdit = false} : { app: App, allowEdit: boolean } = $props();
     let showMore = $state(true);
     let moreTextSize = $state(0);
-    let linksList = $state<Link[]>(app.links);
+    let localApp = sessionStore.appList.find(a => a.id === app.id);
+    let linksList = $state<LinkWithFollowingStatus[]>(retrieveLinksWithFollowingStatus(app.links));
     let description: HTMLParagraphElement | undefined = $state();
     let moreButton: HTMLParagraphElement | undefined = $state();
-    let localAppIndex = sessionStore.appList.findIndex(localApp => localApp.id === app.id);
 
     const {finishActivity} =  getApplicationContext();
-
-    onAppListChanged(() => {
-        const appInfo = sessionStore.appList.find(a => a.id === app.id);
-        if (appInfo) {
-            linksList = sessionStore.appList.find(a => a.id === app.id)!.links;
-        }
-    });
 
     onMount(async () => {
         await tick();
@@ -46,6 +43,31 @@
         moreTextSize = moreButton?.clientWidth || 0;
     });
 
+    onAppListChanged(handleAppListChanged);
+    onDestroy(() => removeAppListChangeListener(handleAppListChanged));
+
+    function handleAppListChanged() {
+        if (app) {
+            localApp = sessionStore.appList.find(a => a.id === app.id);
+            if (localApp && localApp.links) {
+                linksList = retrieveLinksWithFollowingStatus(localApp!.links);
+            }
+        }
+    }
+
+    function retrieveLinksWithFollowingStatus(links: Link[]): LinkWithFollowingStatus[] {
+        return links.map(link => {
+            const foundLink = localApp?.links.find(l => l.id === link.id);
+            return {
+                ...link,
+                following: !!foundLink,
+                url: foundLink?.url || link.url,
+                notify_available: foundLink?.notify_available || false,
+                notify_closed: foundLink?.notify_closed || false,
+            };
+        });
+    }
+
     function expandDescription() {
         showMore = false;
     }
@@ -54,6 +76,23 @@
         if ((e.key === "Enter" || e.key === " ")) {
             e.preventDefault();
             expandDescription();
+        }
+    }
+
+    async function addItem(link: Link) {
+        console.log(link.url, link.notify_available, link.notify_closed);
+        const res = await withUIProgress(trackLink(`https://${link.url}`, link.notify_available, link.notify_closed));
+        if (res === ServerErrorCode.LinkAlreadyFollowing) {
+            telegram.showBulletin("error", T('LINK_ALREADY_FOLLOWING'));
+        } else if (res == ServerErrorCode.BadRequest) {
+            telegram.showBulletin("error", T('INVALID_LINK_FORMAT'));
+        } else if (res === ServerErrorCode.LimitExceeded) {
+            telegram.showBulletin("forbidden", T('MAX_FOLLOWING_LINKS_LIMIT', {
+                Limit: sessionStore.maxFollowingLinks,
+            }));
+        } else {
+            telegram.showBulletin("link_added", T('LINK_ADDED'));
+            notifyAppListChanged();
         }
     }
 
@@ -84,7 +123,7 @@
                         text: T('UNDO_BTN'),
                         isUndo: true,
                         on_click: () => {
-                            linksList = app.links;
+                            linksList = retrieveLinksWithFollowingStatus(app.links);
                         }
                     },
                     async () => {
@@ -95,7 +134,16 @@
                         notifyAppListChanged();
                     },
                 );
-                linksList = linksList.filter(item => item.id !== link.id);
+                if (allowEdit) {
+                    linksList = linksList.filter(item => item.id !== link.id);
+                } else {
+                    linksList = linksList.map(item => {
+                        if (item.id === link.id) {
+                            return {...item, following: false};
+                        }
+                        return item;
+                    });
+                }
             },
         );
     }
@@ -127,24 +175,35 @@
     <ListView header={T('LINKS_HEADER')}>
         <!--suppress JSUnusedGlobalSymbols -->
         <VirtualList data={linksList}>
-            {#snippet children(item: Link)}
-                {@const linkUrl = sessionStore.appList[localAppIndex]?.links.find(link => link.id === item.id)?.url || item.url}
+            {#snippet children(item: LinkWithFollowingStatus)}
                 <ItemView
-                    title={item.is_public ? linkUrl : linkUrl.replace(/\/(\w+)$/, '/<spoiler>$1</spoiler>')}
-                    icon={item.status ? 'link' : 'link_loading'}
+                    title={item.is_public ? item.url : item.url.replace(/\/(\w+)$/, '/<spoiler>$1</spoiler>')}
+                    icon={item.status ? (allowEdit || !item.following ? 'link' : 'link_checked') : 'link_loading'}
                     desc={GetLinkDescription(item)}
                     highlight={item.status === 'available'}
-                    on_click={() => telegram.showBottomSheet('link-info', item)}
+                    on_click={async () => {
+                        if (item.is_public || allowEdit || item.following) {
+                            if (!item.following && sessionStore.appList.find(a => a.id === app.id)?.links.some(l => l.id === item.id)) {
+                               await telegram.closeBulletin();
+                            }
+                            telegram.showBottomSheet(
+                                'link-info',
+                                 item
+                            );
+                        } else {
+                            telegram.showBulletin("error", T('LINK_NOT_PUBLIC'));
+                        }
+                    }}
                     on_delete={() => removeItem(item)}
                     small
-                    allowShowSpoilers={allowEdit || localAppIndex !== -1}
+                    allowShowSpoilers={allowEdit || item.following}
                 />
             {/snippet}
         </VirtualList>
     </ListView>
 </div>
 <Bulletin/>
-<AppInfoBottomSheet on_remove={removeItem}/>
+<AppInfoBottomSheet on_remove={removeItem} on_add={addItem}/>
 
 <style>
     .content {

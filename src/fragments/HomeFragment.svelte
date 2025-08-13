@@ -13,6 +13,7 @@
         type App,
         onAppListChanged,
         removeApp,
+        removeAppListChangeListener,
         ServerErrorCode,
         sessionStore,
         trackLink,
@@ -20,18 +21,23 @@
     } from "../lib/api";
     import VirtualList from "../components/VirtualList.svelte";
     import ScrollablePage from "../components/ScrollablePage.svelte";
+    import {onDestroy} from "svelte";
 
     let deletable = $state(!isiOS);
     let items = $state(sessionStore.appList);
 
     const {startActivity} =  getApplicationContext();
 
-    onAppListChanged(() => {
+    onDestroy(() => removeAppListChangeListener(handleAppListChanged));
+    onAppListChanged(handleAppListChanged);
+
+    function handleAppListChanged() {
         items = sessionStore.appList;
+        console.log(sessionStore.appList);
         if (sessionStore.appList.length === 0 && isiOS) {
             deletable = false;
         }
-    });
+    }
 
     function removeItem(app: App) {
         const isUnknownApp = app.name == null;

@@ -1,6 +1,13 @@
 <script lang="ts">
     import BottomSheet from "./BottomSheet.svelte";
-    import {type Link, notifyAppListChanged, sessionStore, updateLinkPreferences, withUIProgress} from "../lib/api";
+    import {
+        type Link,
+        type LinkWithFollowingStatus,
+        notifyAppListChanged,
+        sessionStore,
+        updateLinkPreferences,
+        withUIProgress
+    } from "../lib/api";
     import {GetLinkDescription, T} from "../lib/translator";
     import {isiOS, telegram} from "../lib/telegram";
     import Divider from "./Divider.svelte";
@@ -9,25 +16,29 @@
 
     const {
         on_remove,
+        on_add,
     } : {
         on_remove: (link: Link) => void,
+        on_add: (link: Link) => void,
     } = $props();
 
     let applyTimeout: ReturnType<typeof setTimeout>;
 
-    async function onPreferenceChange(link: Link, preference: 'notify_available' | 'notify_closed', value: boolean) {
+    async function onPreferenceChange(link: LinkWithFollowingStatus, preference: 'notify_available' | 'notify_closed', value: boolean) {
         link[preference] = value;
-        clearTimeout(applyTimeout);
-        applyTimeout = setTimeout(async () => {
-            await withUIProgress(updateLinkPreferences(link));
-            notifyAppListChanged();
-        }, 250);
+        if (link.following) {
+            clearTimeout(applyTimeout);
+            applyTimeout = setTimeout(async () => {
+                await withUIProgress(updateLinkPreferences(link));
+                notifyAppListChanged();
+            }, 250);
+        }
     }
 </script>
 
 <!--suppress JSUnusedGlobalSymbols -->
 <BottomSheet id="link-info">
-    {#snippet children(data: Link)}
+    {#snippet children(data: LinkWithFollowingStatus)}
         {@const isAvailable = data.status === 'available'}
         {@const isLocked = sessionStore.appList.reduce(
             (acc, app) => acc + app.links.filter(
@@ -74,10 +85,17 @@
                 />
             </div>
             <div class="delete-section" class:isiOS>
-                <Button on_click={() => {
-                    on_remove(data);
-                    telegram.closeBottomSheet('link-info');
-                }} text={T('REMOVE_LINK_BTN')} accent="var(--tg-theme-destructive-text-color)" destructive/>
+                {#if data.following}
+                    <Button on_click={() => {
+                        on_remove(data);
+                        telegram.closeBottomSheet('link-info');
+                    }} text={T('REMOVE_LINK_BTN')} accent="var(--tg-theme-destructive-text-color)" destructive/>
+                {:else}
+                    <Button on_click={() => {
+                        on_add(data);
+                        telegram.closeBottomSheet('link-info');
+                    }} text={T('TRACK_LINK_BTN')} accent="var(--tg-theme-button-color)"/>
+                {/if}
             </div>
         </div>
     {/snippet}

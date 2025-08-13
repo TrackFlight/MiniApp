@@ -12,7 +12,6 @@
         flex-direction: column;
         height: 100%;
         overflow-y: auto;
-        padding-bottom: 10px;
     }
 
     .content::-webkit-scrollbar {

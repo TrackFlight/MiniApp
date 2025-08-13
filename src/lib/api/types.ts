@@ -18,6 +18,10 @@ export interface Link {
     last_update: number;
 }
 
+export interface LinkWithFollowingStatus extends Link {
+    following: boolean;
+}
+
 export type ResponseData<T> = {
     response?: T | null;
     error?: ErrorResponse;

@@ -15,6 +15,7 @@
     .listView {
         padding-inline: 14px;
         padding-top: 10px;
+        margin-bottom: 10px;
     }
 
     .listView:not(.isiOS) {
