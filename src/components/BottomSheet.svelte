@@ -79,5 +79,6 @@
         border-radius: 12px 12px 0 0;
         overflow: hidden;
         background-color: var(--tg-theme-secondary-bg-color);
+        padding-bottom: var(--tg-safe-area-inset-bottom);
     }
 </style>
