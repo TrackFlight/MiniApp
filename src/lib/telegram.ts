@@ -50,6 +50,7 @@ interface TelegramWebApp {
     BackButton: BackButton;
     themeParams: ThemeParams;
     ready(): void;
+    expand(): void;
     showAlert(message: string, callback?: () => void): void;
     showConfirm(message: string, callback?: (result: boolean) => void): void;
     showPopup(params: PopupParams, callback?: (result: string) => void): void;

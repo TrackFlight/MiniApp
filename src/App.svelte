@@ -8,6 +8,7 @@
     import AppInfoActivity from "./activities/AppInfoActivity.svelte";
 
     telegram?.ready();
+    telegram?.expand();
     telegram?.setHeaderColor("secondary_bg_color");
     telegram?.setBackgroundColor("secondary_bg_color");
     telegram.showLoadingProgress = (show: boolean) => loading = show;
