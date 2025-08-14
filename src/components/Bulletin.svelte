@@ -180,6 +180,7 @@
         padding-inline: 12px;
         bottom: 15px;
         background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-section-bg-color) 92%, var(--tg-theme-hint-color)) 95%, transparent);
+        z-index: 1;
     }
 
     .bulletin.isiOS {
