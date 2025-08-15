@@ -140,7 +140,7 @@
                         cy="50"
                         r="44"
                         fill="none"
-                        stroke="var(--tg-theme-text-color)"
+                        stroke="white"
                         stroke-width="12"
                         stroke-dasharray="282.6, 282.6"
                         stroke-dashoffset="{-282.6 * progress.current}"
@@ -179,7 +179,18 @@
         padding-block: 6px;
         padding-inline: 12px;
         bottom: 20px;
-        background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-section-bg-color) 92%, var(--tg-theme-hint-color)) 95%, transparent);
+        background: color-mix(in srgb,
+            color-mix(
+                in srgb,
+                color-mix(
+                    in srgb,
+                    oklch(from var(--tg-theme-section-bg-color) 25% c h) 90%,
+                    var(--tg-theme-section-bg-color)
+                ) 98%,
+                var(--tg-theme-hint-color)
+            ) 95%,
+            transparent
+        );
         z-index: 1;
     }
 
@@ -211,7 +222,7 @@
     }
 
     .container > p {
-        color: var(--tg-theme-text-color);
+        color: white;
         margin: 0;
     }
 
@@ -252,7 +263,7 @@
 
     .timerContainer > div > p {
         font-size: 12px;
-        color: var(--tg-theme-text-color);
+        color: white;
         margin: 0;
         font-weight: 500;
         position: absolute;
