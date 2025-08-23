@@ -62,7 +62,7 @@
         {/if}
     {/if}
     <input class:search autocomplete="off" spellcheck="false" maxlength="40" type="search" placeholder="{isiOS ? hint : ''}" bind:value={inputValue}/>
-    <p class:search>{hint}</p>
+    <div class="search-hint" class:search>{hint}</div>
 </div>
 <style>
     .search-bar {
@@ -141,12 +141,12 @@
         height: 16px;
     }
 
-    .search-bar.isiOS > p {
+    .search-bar.isiOS > .search-hint {
         display: none;
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS) > p {
+    .search-bar:not(.isiOS) > .search-hint {
         position: absolute;
         margin: 0;
         left: 18px;
@@ -161,18 +161,18 @@
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS) > p.search {
+    .search-bar:not(.isiOS) > .search-hint {
         left: 43px;
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS):has(input:focus) > p {
+    .search-bar:not(.isiOS):has(input:focus) > .search-hint {
         color: var(--tg-theme-accent-text-color);
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS):has(input:focus) > p,
-    .search-bar:not(.isiOS).has-input > p {
+    .search-bar:not(.isiOS):has(input:focus) > .search-hint,
+    .search-bar:not(.isiOS).has-input > .search-hint {
         top: 2%;
         left: 13px;
         font-size: 12px;
