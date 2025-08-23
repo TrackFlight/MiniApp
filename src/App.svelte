@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {telegram} from "./lib/telegram";
+    import {isDesktop, isiOS, telegram} from "./lib/telegram";
     import {fade} from 'svelte/transition';
     import {tryLogin} from "./lib/api";
     import LoadingDialog from "./components/LoadingDialog.svelte";
@@ -9,8 +9,8 @@
 
     telegram?.ready();
     telegram?.expand();
-    telegram?.setHeaderColor("secondary_bg_color");
-    telegram?.setBackgroundColor("secondary_bg_color");
+    telegram?.setHeaderColor(isDesktop && !isiOS ? "bg_color" : "secondary_bg_color");
+    telegram?.setBackgroundColor(isDesktop && !isiOS ? "bg_color" : "secondary_bg_color");
     telegram.showLoadingProgress = (show: boolean) => loading = show;
     telegram.showPrompt = (text: string, callback: (result: string | null) => void) => callback(prompt(text));
 
