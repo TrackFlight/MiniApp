@@ -157,7 +157,7 @@
             <NamedIcon name={app.name ? app.name : T('UNKNOWN_APP')} id={app.links[0].id} size="{isiOS ? 120:55}px"/>
         {/if}
         <div>
-            <h1>{app.name ? app.name : T('UNKNOWN_APP')}</h1>
+            <h1>{@html app.name ? app.name : T('UNKNOWN_APP')}</h1>
             <p>{T('APP_FOLLOWERS_AMOUNT', {Amount: app.followers}, app.followers)}</p>
         </div>
     </div>
@@ -261,6 +261,7 @@
     .app-header > div > h1 {
         color: var(--tg-theme-text-color);
         margin: 0;
+        text-align: center;
         font-size: 18px;
         font-weight: 500;
     }
