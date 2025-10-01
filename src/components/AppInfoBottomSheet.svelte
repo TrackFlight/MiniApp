@@ -40,11 +40,17 @@
 <BottomSheet id="link-info">
     {#snippet children(data: LinkWithFollowingStatus)}
         {@const isAvailable = data.status === 'available'}
-        {@const isLocked = sessionStore.appList.reduce(
-            (acc, app) => acc + app.links.filter(
-                link => link.id !== data.id && (link.notify_closed || link.notify_available)
-            ).length, 0
-        ) >= sessionStore.maxFreeLinks}
+        {@const isLocked = sessionStore.appList.some(
+            app => app.links
+                .filter(link => link.notify_closed || link.notify_available)
+                .sort((a, b) => a.added_at - b.added_at)
+                .findIndex(link => link.id === data.id) > sessionStore.maxFreeLinks
+        ) || !(sessionStore.appList.some(app => app.links.filter(link => link.id === data.id).some(link => link.notify_closed || link.notify_available))) &&
+            sessionStore.appList.reduce(
+                (acc, app) => acc + app.links.filter(link => link.notify_available || link.notify_closed).length,
+                0,
+            ) >= sessionStore.maxFreeLinks
+        }
         <div class="bottom-sheet-header" class:isiOS>
             <svg height="44px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 46">
                 <rect width="60" height="46" rx="23" ry="23" fill="var(--tg-theme-button-color)" />

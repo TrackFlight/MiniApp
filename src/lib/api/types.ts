@@ -14,6 +14,7 @@ export interface Link {
     is_public: boolean;
     notify_available: boolean;
     notify_closed: boolean;
+    added_at: number;
     last_availability: number;
     last_update: number;
 }
