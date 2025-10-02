@@ -109,6 +109,7 @@
     .sticker-view {
         position: relative;
         overflow: hidden;
+        flex-shrink: 0;
     }
 
     .sticker-view > canvas, .sticker-view > div > :global(svg) {
