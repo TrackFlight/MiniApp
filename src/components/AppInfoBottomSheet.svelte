@@ -34,6 +34,13 @@
             }, 250);
         }
     }
+
+    async function showPremiumInfo() {
+        telegram.closeBottomSheet('link-info');
+        telegram.showBulletin("forbidden", T('MAX_LINKS_NOTIFICATIONS_LIMIT_DESC'), 1800, T('MAX_LINKS_NOTIFICATIONS_LIMIT_TITLE', {
+            Limit: sessionStore.maxFreeLinks,
+        }));
+    }
 </script>
 
 <!--suppress JSUnusedGlobalSymbols -->
@@ -76,6 +83,7 @@
                     switchable
                     switchDefault={data.notify_available}
                     on_switch_change={(value) => onPreferenceChange(data, 'notify_available', value)}
+                    on_locked_click={showPremiumInfo}
                     switchLocked={isLocked}
                 />
                 <ItemView
@@ -87,6 +95,7 @@
                     switchable
                     switchDefault={data.notify_closed}
                     on_switch_change={(value) => onPreferenceChange(data, 'notify_closed', value)}
+                    on_locked_click={showPremiumInfo}
                     switchLocked={isLocked}
                 />
             </div>

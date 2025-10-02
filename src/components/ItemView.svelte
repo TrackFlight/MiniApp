@@ -15,6 +15,7 @@
         on_click,
         on_delete,
         on_switch_change,
+        on_locked_click,
         deletable = $bindable(),
         switchable = $bindable(),
         switchLocked = $bindable(),
@@ -32,6 +33,7 @@
         on_click?: () => void,
         on_delete?: () => void,
         on_switch_change?: (checked: boolean) => void,
+        on_locked_click?: () => void,
         deletable?: boolean,
         switchable?: boolean,
         switchLocked?: boolean,
@@ -60,6 +62,9 @@
             return;
         }
         if (switchable) {
+            if (switchLocked) {
+                on_locked_click?.();
+            }
             switchElement?.toggle();
         }else if (on_click && (!deletable || !isiOS)) {
             on_click();
