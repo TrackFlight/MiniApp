@@ -136,14 +136,15 @@
         </svg>
     </StickerContainer>
     <Divider/>
-    <ListView header={T('FOLLOWING_APPS_HEADER')}>
-        <ItemView icon="add" title={T('TRACK_LINK_BTN')} on_click={addLink}/>
-        <!--suppress JSUnusedGlobalSymbols -->
-        <VirtualList data={items}>
-            {#snippet children(item: App)}
-                <ItemView
-                    title={item.name ? item.name : T('UNKNOWN_APP')}
-                    desc={
+    <div class="content">
+        <ListView header={T('FOLLOWING_APPS_HEADER')}>
+            <ItemView icon="add" title={T('TRACK_LINK_BTN')} on_click={addLink}/>
+            <!--suppress JSUnusedGlobalSymbols -->
+            <VirtualList data={items}>
+                {#snippet children(item: App)}
+                    <ItemView
+                            title={item.name ? item.name : T('UNKNOWN_APP')}
+                            desc={
                         item.name ?
                         T(
                             'LINK_AMOUNT',
@@ -163,16 +164,23 @@
                             }
                         ) : item.links[0].url
                     }
-                    icon={item.icon_url ? item.icon_url : item.links[0].status ? '' : 'link_loading'}
-                    id={item.links[0].id}
-                    bind:deletable
-                    on_click={() => startActivity('appInfo', {
+                            icon={item.icon_url ? item.icon_url : item.links[0].status ? '' : 'link_loading'}
+                            id={item.links[0].id}
+                            bind:deletable
+                            on_click={() => startActivity('appInfo', {
                         app: item,
                         allowEdit: true
                     })}
-                    on_delete={() => removeItem(item)}
-                />
-            {/snippet}
-        </VirtualList>
-    </ListView>
+                            on_delete={() => removeItem(item)}
+                    />
+                {/snippet}
+            </VirtualList>
+        </ListView>
+    </div>
 </ScrollablePage>
+
+<style>
+    .content {
+        padding-bottom: var(--global-navbar-height);
+    }
+</style>

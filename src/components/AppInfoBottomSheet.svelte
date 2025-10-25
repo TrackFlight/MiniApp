@@ -99,7 +99,7 @@
                     switchLocked={isLocked}
                 />
             </div>
-            <div class="delete-section" class:isiOS>
+            <div class="delete-section {data.following ? 'available' : ''}" class:isiOS>
                 {#if data.following}
                     <Button on_click={() => {
                         on_remove(data);
@@ -167,7 +167,7 @@
     }
 
     .bottom-sheet-footer.isiOS > .list-view {
-        border-radius: 10px;
+        border-radius: 25px;
         overflow: hidden;
     }
 
@@ -193,7 +193,13 @@
 
     .bottom-sheet-footer.isiOS > .delete-section {
         margin-top: 20px;
-        border-radius: 10px;
+        border-radius: 50px;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    .bottom-sheet-footer.isiOS > .delete-section:not(.available) {
+        background: none;
+        border-radius: 0;
     }
 
     .bottom-sheet-footer:not(.isiOS) > .delete-section {

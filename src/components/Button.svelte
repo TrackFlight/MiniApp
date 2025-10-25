@@ -72,6 +72,18 @@
         z-index: 0;
     }
 
+    .button.isiOS:not(.secondary):not(.destructive)::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        border-radius: inherit;
+        box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.4), inset 0 0 3px rgba(255, 255, 255, 1);
+        opacity: 1;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+    }
+
     .button:has(svg) {
         padding-inline: 10px;
         padding-block: 6px;
@@ -98,16 +110,26 @@
         inset: 0;
         background: black;
         opacity: 0;
+        border-radius: inherit;
         transition: opacity 150ms ease-out;
+    }
+
+    .button:is(.isDesktop, .isiOS):not(.destructive):not(.secondary):before {
+        background: white;
+        mix-blend-mode: overlay;
     }
 
     .button.isDesktop:not(.isiOS).secondary:before {
         background: var(--accent-color);
     }
 
-    .button.isiOS:not(.secondary):active:before {
+    .button.isiOS:not(.secondary):active:not(.disabled):before {
         opacity: 0.2;
         z-index: 1;
+    }
+
+    .button.isiOS:not(.secondary):not(.destructive):not(.disabled):active:before {
+        opacity: 0.3;
     }
 
     .button.isDesktop:not(.isiOS):hover:before {
@@ -116,6 +138,7 @@
 
     .button.isiOS:not(.secondary) {
         padding-block: 14px;
+        border-radius: 50px;
     }
 
     .button:not(.isiOS) {

@@ -38,7 +38,7 @@
 </script>
 
 {#if logged}
-    <main transition:fade={{ duration: 450 }}>
+    <main transition:fade={{ duration: 350 }}>
         <ActivityManager {activities} initialActivity="main"/>
         {#if loading}
             <LoadingDialog/>

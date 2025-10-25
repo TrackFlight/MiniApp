@@ -95,7 +95,7 @@
 
     .search-bar.isiOS > input {
         border: none;
-        border-radius: 10px;
+        border-radius: 50px;
         padding-inline: 16px;
         padding-block: 10px;
         caret-color: var(--tg-theme-accent-text-color);

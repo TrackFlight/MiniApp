@@ -38,7 +38,7 @@
     .listView > div {
         background: var(--tg-theme-section-bg-color);
         width: 100%;
-        border-radius: 10px;
+        border-radius: 25px;
         overflow: hidden;
     }
 

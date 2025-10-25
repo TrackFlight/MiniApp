@@ -101,7 +101,7 @@
         width: calc(100% - 14px * 2);
         padding: 14px 16px;
         margin-inline: 14px;
-        border-radius: 10px;
+        border-radius: 50px;
         margin-bottom: 14px;
     }
 
@@ -130,7 +130,7 @@
     }
 
     .bottom-sheet-footer.isiOS > .list-view {
-        border-radius: 10px;
+        border-radius: 25px;
         overflow: hidden;
     }
 
@@ -156,7 +156,7 @@
 
     .bottom-sheet-footer.isiOS > .add-section {
         margin-top: 20px;
-        border-radius: 10px;
+        background: none;
     }
 
     .bottom-sheet-footer:not(.isiOS) > .add-section {

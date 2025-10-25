@@ -296,7 +296,7 @@
     .description-container.isiOS {
         width: calc(100% - 28px);
         padding-inline: 14px;
-        border-radius: 10px;
+        border-radius: 25px;
         margin-inline: 14px;
         margin-bottom: 14px;
     }

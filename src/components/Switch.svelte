@@ -1,5 +1,6 @@
 <script lang="ts">
     import {isiOS} from "../lib/telegram";
+    import {onMount} from "svelte";
 
     let {
         on_change,
@@ -22,9 +23,25 @@
         switchElement.checked = !switchElement.checked && !switchLocked;
         if (on_change && !switchLocked) on_change(switchElement.checked);
     }
+
+    let labelElement: HTMLLabelElement;
+    let isTouched = $state(false);
+    onMount(async () => {
+        labelElement.addEventListener('touchstart', () => {
+            isTouched = true;
+        });
+
+        labelElement.addEventListener('touchend', () => setTimeout(() => {
+            isTouched = false;
+        }, 150));
+
+        labelElement.addEventListener('touchcancel', () => setTimeout(() => {
+            isTouched = false;
+        }, 150));
+    })
 </script>
 
-<label class="switch button" class:isiOS>
+<label class="switch button" bind:this={labelElement} class:isiOS class:isTouched class:switchLocked>
     <input type="checkbox" bind:this={switchElement} onchange={on_switch_change} defaultChecked={defaultState && !switchLocked} disabled={switchLocked}/>
     {#if switchLocked}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26.5381 38.7451">
@@ -50,8 +67,8 @@
     }
 
     .switch.isiOS {
-        --switch-width: 52px;
-        --switch-height: 32px;
+        --switch-width: 62px;
+        --switch-height: 28px;
         padding: 2px;
         border-radius: 17px;
         background-color: color-mix(in srgb, var(--tg-theme-text-color) 15%, transparent);
@@ -61,7 +78,7 @@
         position: absolute;
         z-index: 1;
         width: 10px;
-        transform: translateX(9px);
+        transform: translateX(12px);
     }
 
     .switch:not(.isiOS) > svg {
@@ -79,7 +96,7 @@
     .switch:before {
         content: "";
         aspect-ratio: 1 / 1;
-        border-radius: 50%;
+        border-radius: 50px;
         transition: 225ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
@@ -91,10 +108,8 @@
 
     .switch.isiOS:before {
         height: 100%;
+        width: 60%;
         background-color: white;
-        filter: drop-shadow(0px 3px 1px rgba(0, 0, 0, 0.06))
-        drop-shadow(0px 3px 8px rgba(0, 0, 0, 0.15))
-        drop-shadow(0px 0px 0px rgba(0, 0, 0, 0.04));
     }
 
     .switch:after {
@@ -112,7 +127,7 @@
     }
 
     .switch.isiOS:has(input:checked) {
-        background-color: #42d450;
+        background-color: #6ccc60;
     }
 
     .switch:not(.isiOS):has(input:checked) {
@@ -124,7 +139,15 @@
     }
 
     .switch.isiOS:has(input:checked):before {
-        transform: translateX(calc(var(--switch-width) - var(--switch-height)));
+        transform: translateX(calc(calc(calc(calc(var(--switch-width) * 60) / 100) / 2) + 4px));
+    }
+
+    .switch.isiOS.isTouched:not(.switchLocked):before {
+        scale: 1.5;
+        background: transparent;
+        backdrop-filter: blur(2px);
+        /*noinspection CssNonIntegerLengthInPixels*/
+        box-shadow: 0.5px 0.5px 0 rgba(255, 255, 255, 0.2), -0.5px -0.5px 0 rgba(255, 255, 255, 0.2);
     }
 
     .switch:not(.isiOS):has(input:checked):before {

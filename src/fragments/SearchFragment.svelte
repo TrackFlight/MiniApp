@@ -183,11 +183,13 @@
     .search-content {
         width: 100%;
         position: absolute;
+        padding-bottom: var(--global-navbar-height);
     }
 
     .trending-content {
         position: absolute;
         width: 100%;
+        padding-bottom: var(--global-navbar-height);
     }
 
     .placeholderList {

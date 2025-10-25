@@ -17,6 +17,8 @@ body > div {
 
 :root {
     --global-backdrop-filter: saturate(180%) blur(20px);
+    /*noinspection CssUnresolvedCustomProperty*/
+    --global-navbar-height: calc(60px + var(--tg-safe-area-inset-bottom));
 }
 
 * {
