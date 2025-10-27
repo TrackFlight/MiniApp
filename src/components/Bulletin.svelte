@@ -17,6 +17,12 @@
     let closeTimeout: ReturnType<typeof setTimeout>;
     let shakeTimeout: ReturnType<typeof setTimeout>;
 
+    let {
+        bottom_margin = '0px',
+    }  : {
+        bottom_margin: string;
+    } = $props();
+
     let current: {
         title?: string,
         message: string,
@@ -130,6 +136,7 @@
          class:isiOS
          class:shakeBulletin
          transition:fly={{ y: "100%", duration: 250, easing: cubicInOut }}
+         style="--bottom-margin: {bottom_margin}"
          role="alert" aria-live="polite"
     >
         {#if current.icon === "timer" && progress}
@@ -175,10 +182,10 @@
         align-items: center;
         width: calc(100% - 20px);
         margin-inline: 10px;
-        border-radius: 10px;
+        border-radius: 12px;
         padding-block: 6px;
         padding-inline: 12px;
-        bottom: 20px;
+        bottom: calc(20px + var(--bottom-margin));
         background: color-mix(in srgb,
             color-mix(
                 in srgb,
@@ -191,7 +198,7 @@
             ) 95%,
             transparent
         );
-        z-index: 1;
+        z-index: 99;
     }
 
     .bulletin.isiOS {

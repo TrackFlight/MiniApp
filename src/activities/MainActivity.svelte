@@ -20,7 +20,7 @@
 
 <div class="content">
     <ViewPager fragments={fragments} bind:this={pager}/>
-    <Bulletin/>
+    <Bulletin bottom_margin="{isiOS ? '60px' : '50px'}"/>
 </div>
 <Navbar pager={pager} tabs={[T('HOME_TAB'), T('APPS_TAB')]}>
     {#snippet children(index: Number)}
