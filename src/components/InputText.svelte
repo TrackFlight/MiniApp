@@ -100,6 +100,8 @@
         padding-block: 10px;
         caret-color: var(--tg-theme-accent-text-color);
         background: var(--tg-theme-section-bg-color);
+        /*noinspection CssNonIntegerLengthInPixels*/
+        box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
     }
 
     .search-bar.isiOS > input.search {
