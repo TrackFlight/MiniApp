@@ -147,7 +147,7 @@
         background: transparent;
         backdrop-filter: blur(2px);
         /*noinspection CssNonIntegerLengthInPixels*/
-        box-shadow: 0.5px 0.5px 0 rgba(255, 255, 255, 0.2), -0.5px -0.5px 0 rgba(255, 255, 255, 0.2);
+        box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
     }
 
     .switch:not(.isiOS):has(input:checked):before {

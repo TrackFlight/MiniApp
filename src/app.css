@@ -15,10 +15,12 @@ body > div {
     height: 100%;
 }
 
+/*noinspection CssUnresolvedCustomProperty*/
 :root {
     --global-backdrop-filter: saturate(180%) blur(20px);
-    /*noinspection CssUnresolvedCustomProperty*/
     --global-navbar-height: calc(60px + var(--tg-safe-area-inset-bottom));
+    --tg-theme-liquid-glass-border: color-mix(in srgb, var(--tg-theme-section-separator-color) 60%, transparent);
+    --tg-theme-navbar-selected: color-mix(in srgb, var(--tg-theme-section-separator-color) 45%, transparent);
 }
 
 * {

@@ -16,8 +16,8 @@
     let isTouched = $state(false);
 </script>
 
-<div class="nav-container">
-    <nav class:isiOS class:isDesktop style="--navbar-page: {isTouched ? touchedIndex : pager?.getCurrentPage()}" class:isTouched>
+<div class="nav-container" style="--navbar-page: {isTouched ? touchedIndex : pager?.getCurrentPage()}; --page-count: {tabs.length}">
+    <nav class:isiOS class:isDesktop class:isTouched>
         <!--<div class="nav_sel"></div>-->
         {#each tabs as tab}
             {@const index = tabs.indexOf(tab)}
@@ -79,9 +79,9 @@
         width: 100%;
         height: 100%;
         border-radius: inherit;
-        background: color-mix(in srgb, var(--tg-theme-bottom-bar-bg-color) 85%, transparent 15%);
+        background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-bg-color) 91%, white) 85%, transparent);
         /*noinspection CssNonIntegerLengthInPixels*/
-        box-shadow: 0.5px 0.5px 0 rgba(255, 255, 255, 0.2), -0.5px -0.5px 0 rgba(255, 255, 255, 0.2);
+        box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
         transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
@@ -89,7 +89,7 @@
         content: '';
         position: absolute;
         border-radius: inherit;
-        background: rgba(255, 255, 255, 0.13);
+        background: var(--tg-theme-navbar-selected);
         left: 0;
         width: calc(var(--width-navitem) - 6px);
         margin-left: 3px;
@@ -104,7 +104,7 @@
         backdrop-filter: blur(2px) saturate(300%);
         background: transparent;
         /*noinspection CssNonIntegerLengthInPixels*/
-        box-shadow: 0.5px 0.5px 0 rgba(255, 255, 255, 0.2), -0.5px -0.5px 0 rgba(255, 255, 255, 0.2);
+        box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
     }
 
     nav.isiOS {
