@@ -18,7 +18,7 @@
 
 <div class="nav-container" style="--navbar-page: {isTouched ? touchedIndex : pager?.getCurrentPage()}; --page-count: {tabs.length}">
     <nav class:isiOS class:isDesktop class:isTouched>
-        <!--<div class="nav_sel"></div>-->
+        <div class="nav_glare" class:isiOS class:isTouched></div>
         {#each tabs as tab}
             {@const index = tabs.indexOf(tab)}
             {@const isActive = isTouched ? touchedIndex === index : pager?.getCurrentPage() === index}
@@ -54,7 +54,8 @@
 
 <style>
     .nav-container {
-        display: block;
+        display: flex;
+        justify-content: center;
         position: absolute;
         bottom: 0;
         width: 100%;
@@ -64,12 +65,42 @@
     nav {
         display: flex;
         position: relative;
-        margin-inline: auto;
         height: 50px;
         width: 100%;
         border-top: 1px solid var(--tg-theme-section-separator-color);
         padding-bottom: var(--tg-safe-area-inset-bottom);
         justify-content: space-evenly;
+    }
+
+    .nav_glare {
+        display: none;
+    }
+
+    .nav_glare.isiOS {
+        display: block;
+        position: absolute;
+        clip-path: inset(0 round 40px);
+        width: calc(var(--width-navitem) * var(--page-count));
+        height: 100%;
+        border-radius: inherit;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .nav_glare.isiOS:before {
+        content: '';
+        position: absolute;
+        transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
+        width: calc(var(--width-navitem) * calc(var(--page-count) + 2));
+        transform: translateX(calc(var(--width-navitem) * -1 * calc(calc(var(--page-count) - 1) - var(--navbar-page))));
+        opacity: 0;
+        height: 100%;
+        background: linear-gradient(to right, transparent, white 33%, white 33%, transparent);
+    }
+
+    .nav_glare.isiOS.isTouched:before {
+        opacity: 0.75;
     }
 
     nav.isiOS:before {
