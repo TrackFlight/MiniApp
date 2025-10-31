@@ -431,7 +431,7 @@
         color: var(--tg-theme-accent-text-color);
     }
 
-    .itemView > div > :global(label) {
+    .itemView > div > :global(.switch) {
         margin-left: auto;
         margin-right: 20px;
     }

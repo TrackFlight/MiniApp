@@ -18,27 +18,29 @@
 
 <div class="nav-container" style="--navbar-page: {isTouched ? touchedIndex : pager?.getCurrentPage()}; --page-count: {tabs.length}">
     <nav class:isiOS class:isDesktop class:isTouched>
-        <div class="nav_glare" class:isiOS class:isTouched></div>
-        <div class="nav_glare2" class:isiOS class:isTouched></div>
+        <div class="nav_glare" class:isiOS class:isDesktop class:isTouched></div>
+        <div class="nav_glare2" class:isiOS class:isDesktop class:isTouched></div>
         {#each tabs as tab}
             {@const index = tabs.indexOf(tab)}
             {@const isActive = isTouched ? touchedIndex === index : pager?.getCurrentPage() === index}
             <!--suppress HtmlUnknownAttribute -->
             <div role="button" class:isActive tabindex="0" ontouchstart={() => {
-                if (!isiOS) return;
+                if (!isiOS|| isDesktop) return;
                 isTouched = true
                 touchedIndex = index;
             }} ontouchend={() => {
-                if (!isiOS) return;
+                if (!isiOS || isDesktop) return;
                 setTimeout(() => {
                     isTouched = false;
                 }, 150)
                 pager?.setCurrentPage(index);
-            }} ontouchcancel={() => setTimeout(() => {
-                if (!isiOS) return;
-                isTouched = false;
-            }, 150)} onclick={() => {
-                if (isiOS) return;
+            }} ontouchcancel={() => {
+                if (!isiOS || isDesktop) return;
+                setTimeout(() => {
+                    isTouched = false;
+                }, 150)
+            }} onclick={() => {
+                if (isiOS && !isDesktop) return;
                 pager?.setCurrentPage(index);
             }} onkeydown={(e: KeyboardEvent) => {
                 if ((e.key === "Enter" || e.key === " ")) {
@@ -77,7 +79,7 @@
         display: none;
     }
 
-    .nav_glare.isiOS, .nav_glare2.isiOS {
+    .nav_glare.isiOS:not(.isDesktop), .nav_glare2.isiOS:not(.isDesktop) {
         display: block;
         position: absolute;
         clip-path: inset(0 round 40px);
@@ -87,16 +89,16 @@
         pointer-events: none;
     }
 
-    .nav_glare.isiOS {
+    .nav_glare.isiOS:not(.isDesktop) {
         mix-blend-mode: overlay;
         z-index: 2;
     }
 
-    .nav_glare2.isiOS {
+    .nav_glare2.isiOS:not(.isDesktop) {
         mix-blend-mode: hard-light;
     }
 
-    .nav_glare.isiOS:before {
+    .nav_glare.isiOS:not(.isDesktop):before {
         content: '';
         position: absolute;
         transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
@@ -107,7 +109,7 @@
         background: linear-gradient(to right, transparent, white 33%, white 33%, transparent);
     }
 
-    .nav_glare2.isiOS:before {
+    .nav_glare2.isiOS:not(.isDesktop):before {
         content: '';
         position: absolute;
         transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
@@ -118,15 +120,15 @@
         opacity: 0;
     }
 
-    .nav_glare2.isiOS.isTouched:before {
+    .nav_glare2.isiOS:not(.isDesktop).isTouched:before {
         opacity: 0.08;
     }
 
-    .nav_glare.isiOS.isTouched:before {
+    .nav_glare.isiOS:not(.isDesktop).isTouched:before {
         opacity: 0.75;
     }
 
-    nav.isiOS:before {
+    nav.isiOS:not(.isDesktop):before {
         content: '';
         backdrop-filter: blur(2px) saturate(300%);
         position: absolute;
@@ -139,7 +141,7 @@
         transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
-    nav.isiOS:after {
+    nav.isiOS:not(.isDesktop):after {
         content: '';
         position: absolute;
         border-radius: inherit;
@@ -153,7 +155,7 @@
         transform: translateX(calc(var(--width-navitem) * var(--navbar-page))) scale(1);
     }
 
-    nav.isiOS.isTouched:after {
+    nav.isiOS:not(.isDesktop).isTouched:after {
         transform: translateX(calc(var(--width-navitem) * var(--navbar-page))) scale(1.25);
         backdrop-filter: blur(2px) saturate(300%);
         background: transparent;
@@ -161,7 +163,7 @@
         box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
     }
 
-    nav.isiOS {
+    nav.isiOS:not(.isDesktop) {
         padding-bottom: 0;
         width: fit-content;
         height: 60px;
@@ -171,7 +173,11 @@
         border-radius: 100px;
     }
 
-    nav.isiOS.isTouched {
+    nav.isiOS.isDesktop {
+        height: 52px;
+    }
+
+    nav.isiOS:not(.isDesktop).isTouched {
         transform: scale(1.08);
     }
 
@@ -270,6 +276,10 @@
         height: 28px;
     }
 
+    nav.isiOS.isDesktop > div > div > :global(svg) {
+        fill: color-mix(in srgb, var(--tg-theme-text-color) 50%, transparent);
+    }
+
     nav.isiOS > div.isActive > div > :global(svg) {
         fill: var(--tg-theme-accent-text-color);
     }
@@ -286,7 +296,7 @@
         transition: color 150ms ease-in-out;
     }
 
-    nav.isiOS > div > div > :global(svg) {
+    nav.isiOS:not(.isDesktop) > div > div > :global(svg) {
         fill: var(--tg-theme-text-color);
     }
 
