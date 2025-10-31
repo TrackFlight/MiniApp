@@ -280,7 +280,7 @@
         fill: color-mix(in srgb, var(--tg-theme-text-color) 50%, transparent);
     }
 
-    nav.isiOS > div.isActive > div > :global(svg) {
+    nav.isiOS:not(.isDesktop) > div.isActive > div > :global(svg) {
         fill: var(--tg-theme-accent-text-color);
     }
 
