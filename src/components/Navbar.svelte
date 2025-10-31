@@ -19,6 +19,7 @@
 <div class="nav-container" style="--navbar-page: {isTouched ? touchedIndex : pager?.getCurrentPage()}; --page-count: {tabs.length}">
     <nav class:isiOS class:isDesktop class:isTouched>
         <div class="nav_glare" class:isiOS class:isTouched></div>
+        <div class="nav_glare2" class:isiOS class:isTouched></div>
         {#each tabs as tab}
             {@const index = tabs.indexOf(tab)}
             {@const isActive = isTouched ? touchedIndex === index : pager?.getCurrentPage() === index}
@@ -72,20 +73,27 @@
         justify-content: space-evenly;
     }
 
-    .nav_glare {
+    .nav_glare, .nav_glare2 {
         display: none;
     }
 
-    .nav_glare.isiOS {
+    .nav_glare.isiOS, .nav_glare2.isiOS {
         display: block;
         position: absolute;
         clip-path: inset(0 round 40px);
         width: calc(var(--width-navitem) * var(--page-count));
         height: 100%;
         border-radius: inherit;
-        mix-blend-mode: overlay;
         pointer-events: none;
+    }
+
+    .nav_glare.isiOS {
+        mix-blend-mode: overlay;
         z-index: 2;
+    }
+
+    .nav_glare2.isiOS {
+        mix-blend-mode: hard-light;
     }
 
     .nav_glare.isiOS:before {
@@ -93,10 +101,25 @@
         position: absolute;
         transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
         width: calc(var(--width-navitem) * calc(var(--page-count) + 2));
+        height: 100%;
         transform: translateX(calc(var(--width-navitem) * -1 * calc(calc(var(--page-count) - 1) - var(--navbar-page))));
         opacity: 0;
-        height: 100%;
         background: linear-gradient(to right, transparent, white 33%, white 33%, transparent);
+    }
+
+    .nav_glare2.isiOS:before {
+        content: '';
+        position: absolute;
+        transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
+        width: calc(var(--width-navitem) * calc(var(--page-count) + 2));
+        height: 100%;
+        transform: translateX(calc(var(--width-navitem) * -1 * calc(calc(var(--page-count) - 1) - var(--navbar-page))));
+        background: linear-gradient(to right, transparent, white 33%, transparent, transparent);
+        opacity: 0;
+    }
+
+    .nav_glare2.isiOS.isTouched:before {
+        opacity: 0.08;
     }
 
     .nav_glare.isiOS.isTouched:before {
@@ -127,7 +150,7 @@
         margin-top: 3px;
         height: calc(100% - 6px);
         transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
-        transform: translateX(calc(var(--width-navitem) * var(--navbar-page)));
+        transform: translateX(calc(var(--width-navitem) * var(--navbar-page))) scale(1);
     }
 
     nav.isiOS.isTouched:after {
