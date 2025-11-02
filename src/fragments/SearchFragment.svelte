@@ -48,7 +48,7 @@
         clearInterval(searchTimeout);
         searchTimeout = setTimeout(async () => {
             const trendingResponse = await internalRequest<App[], null>(
-                `apps/search?name=${encodeURIComponent(textInput)}`
+                `apps/search?name=${encodeURIComponent(textInput.trim())}`
             );
             if (trendingResponse.error) {
                 return;
