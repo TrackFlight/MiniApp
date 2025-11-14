@@ -87,15 +87,11 @@
         height: 100%;
         border-radius: inherit;
         pointer-events: none;
+        mix-blend-mode: overlay;
     }
 
     .nav_glare.isiOS:not(.isDesktop) {
-        mix-blend-mode: overlay;
         z-index: 2;
-    }
-
-    .nav_glare2.isiOS:not(.isDesktop) {
-        mix-blend-mode: hard-light;
     }
 
     .nav_glare.isiOS:not(.isDesktop):before {
@@ -121,7 +117,7 @@
     }
 
     .nav_glare2.isiOS:not(.isDesktop).isTouched:before {
-        opacity: 0.08;
+        opacity: 0.06;
     }
 
     .nav_glare.isiOS:not(.isDesktop).isTouched:before {
