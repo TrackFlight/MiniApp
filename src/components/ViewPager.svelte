@@ -12,7 +12,6 @@
 
     let currentPage: number = $state(0);
     let prevPage: number = $state(1);
-    let goingBack = $derived(prevPage > currentPage);
 
     let visiblePages = $state(new Set<number>([0]));
     let visiblePagesTimeout: ReturnType<typeof setTimeout>;
@@ -64,7 +63,7 @@
         <div
             class="fragment"
             class:disableAnimation
-            style="visibility: {visiblePages.has(index) ? 'visible':'hidden'};transform: translate3d({index === currentPage ? 0:(goingBack ? 100 : -100)}%, 0, 0);"
+            style="visibility: {visiblePages.has(index) ? 'visible':'hidden'};transform: translate3d({index === currentPage ? 0: 100 * (index-currentPage)}%, 0, 0);"
         >
             <Fragment/>
         </div>
