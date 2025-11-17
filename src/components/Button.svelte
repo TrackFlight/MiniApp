@@ -192,7 +192,7 @@
     }
 
     .button > svg {
-        min-width: 24px;
+        flex-shrink: 0;
         fill: var(--accent-color);
         transform: rotate(0deg) translateY(-1px);
     }

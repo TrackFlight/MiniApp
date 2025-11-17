@@ -70,7 +70,7 @@
         background-color: var(--unactive-color);
         align-items: center;
         width: var(--switch-width);
-        min-width: var(--switch-width);
+        flex-shrink: 0;
         transition: 225ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
