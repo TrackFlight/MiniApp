@@ -79,7 +79,7 @@
     }
 </script>
 
-<div class="itemView clickable" class:deletable class:switchable class:isiOS class:isDesktop role="button" tabindex="0" onclick={onClickButton} onkeydown={onKeyButton}>
+<div class="itemView clickable allow-divider" class:deletable class:switchable class:isiOS class:isDesktop role="button" tabindex="0" onclick={onClickButton} onkeydown={onKeyButton}>
     {#if !isiOS}
         <RippleEffect rippleColor="color-mix(in srgb, var(--tg-theme-text-color) 5%, transparent)"/>
     {/if}

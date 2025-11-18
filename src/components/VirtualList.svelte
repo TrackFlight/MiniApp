@@ -64,7 +64,7 @@
 
 <div class="virtual-list" bind:this={viewport} style="height: {totalHeight}px;" class:ready>
     {#each visible as item, index (item.__vid)}
-        <div style="top: {averageHeight * (start + index)}px;">
+        <div class="allow-divider" style="top: {averageHeight * (start + index)}px;">
             {@render children(item)}
         </div>
     {/each}
