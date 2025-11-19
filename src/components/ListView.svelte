@@ -59,6 +59,16 @@
     }
 
     /*noinspection CssUnusedSymbol*/
+    .listView :global(.allow-divider.isNoIcon:not(:last-child)::after) {
+        left: 48px;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    .listView :global(.allow-divider.isNoIcon.isiOS:not(:last-child)::after) {
+        left: 18px;
+    }
+
+    /*noinspection CssUnusedSymbol*/
     .listView > div > :global(div > div:not(:last-child) > .itemView:not(:has(.icon)).isiOS.deletable::after) {
         transform: translateX(var(--delete-width));
     }

@@ -79,7 +79,7 @@
     }
 </script>
 
-<div class="itemView clickable allow-divider" class:deletable class:switchable class:isiOS class:isDesktop role="button" tabindex="0" onclick={onClickButton} onkeydown={onKeyButton}>
+<div class="itemView clickable allow-divider" class:isNoIcon class:deletable class:switchable class:isiOS class:isDesktop role="button" tabindex="0" onclick={onClickButton} onkeydown={onKeyButton}>
     {#if !isiOS}
         <RippleEffect rippleColor="color-mix(in srgb, var(--tg-theme-text-color) 5%, transparent)"/>
     {/if}
@@ -435,6 +435,7 @@
         color: var(--tg-theme-accent-text-color);
     }
 
+    /*noinspection CssUnusedSymbol*/
     .itemView > div > :global(.switch) {
         margin-left: auto;
         margin-right: 20px;
