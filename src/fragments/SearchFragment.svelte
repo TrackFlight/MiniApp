@@ -67,7 +67,7 @@
     <div class="content">
         {#if searching && !noResults}
             <div class="search-content" class:hasItems={searchItems.length === 0} class:isiOS transition:fade={{duration: 200}}>
-                <ListView header='Search Results'>
+                <ListView header={T('SEARCH_RESULTS_HEADER')}>
                     {#if searchItems.length === 0}
                         <div class="placeholderList" transition:fade={{duration: 150}}>
                             <ItemPlaceholder/>
