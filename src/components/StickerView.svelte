@@ -11,14 +11,16 @@
         loop = false,
         autoplay = false,
         on_load,
-        children
+        children,
+        time_ratio = $bindable(),
     } : {
         size: string
-        sticker?: string,
+        sticker?: string | ArrayBuffer | Record<string, unknown>,
         loop?: boolean,
         autoplay?: boolean,
         on_load?: () => void,
-        children?: any
+        children?: any,
+        time_ratio?: number,
     } = $props();
 
     let dotLottie: DotLottie;
@@ -30,30 +32,32 @@
     const {getComponentContext} =  getApplicationContext();
 
     onMount(async () => {
-        const {onCapture, onRestore} = getComponentContext(currentElement, sticker);
+        if (typeof sticker === "string") {
+            const {onCapture, onRestore} = getComponentContext(currentElement, sticker);
 
-        onCapture(() => {
-            return {
-                currentFrame: dotLottie.currentFrame,
-                totalFrames: dotLottie.totalFrames,
-                duration: dotLottie.duration,
-                pausedAt: Date.now(),
-                isPlaying: dotLottie.isPlaying
-            }
-        });
+            onCapture(() => {
+                return {
+                    currentFrame: dotLottie.currentFrame,
+                    totalFrames: dotLottie.totalFrames,
+                    duration: dotLottie.duration,
+                    pausedAt: Date.now(),
+                    isPlaying: dotLottie.isPlaying
+                }
+            });
 
-        onRestore((state: { currentFrame: number, pausedAt: number, totalFrames: number, duration: number, isPlaying: boolean }) => {
-            if (state.isPlaying) {
-                const frameDuration = (state.duration / state.totalFrames) * 1000;
-                const elapsedFrames = Math.floor((Date.now() - state.pausedAt) / frameDuration);
-                startFrame = Math.min(state.currentFrame + elapsedFrames, state.totalFrames - 1);
-            } else {
-                startFrame = state.currentFrame;
-            }
-            if (startFrame == state.totalFrames - 1 && !loop) {
-                autoplay = false;
-            }
-        });
+            onRestore((state: { currentFrame: number, pausedAt: number, totalFrames: number, duration: number, isPlaying: boolean }) => {
+                if (state.isPlaying) {
+                    const frameDuration = (state.duration / state.totalFrames) * 1000;
+                    const elapsedFrames = Math.floor((Date.now() - state.pausedAt) / frameDuration);
+                    startFrame = Math.min(state.currentFrame + elapsedFrames, state.totalFrames - 1);
+                } else {
+                    startFrame = state.currentFrame;
+                }
+                if (startFrame == state.totalFrames - 1 && !loop) {
+                    autoplay = false;
+                }
+            });
+        }
 
         dotLottie = new DotLottie({
             canvas:  lottieEl,
@@ -62,10 +66,35 @@
         dotLottie.addEventListener("ready", loadSticker);
         dotLottie.addEventListener("load", () => {
             loaded = true;
-            if (startFrame > 0) {
-                dotLottie.setFrame(startFrame);
+            if (time_ratio != undefined) {
+                dotLottie.setFrame(Math.floor(dotLottie.totalFrames * time_ratio) - 1);
+            } else {
+                if (startFrame > 0) {
+                    dotLottie.setFrame(startFrame);
+                }
             }
             if (on_load) on_load();
+        });
+
+        function animateToRatio(ratio: number) {
+            dotLottie.stop();
+            const targetFrame = Math.floor(dotLottie.totalFrames * ratio);
+            const startFrame = dotLottie.currentFrame;
+
+            if (targetFrame === startFrame) return;
+
+            if (targetFrame == 0) {
+                dotLottie.setFrame(0);
+                return;
+            }
+            dotLottie.play();
+        }
+
+        $effect(() => {
+            if (!loaded) return;
+            if (time_ratio !== undefined) {
+                animateToRatio(time_ratio);
+            }
         });
 
         $effect(loadSticker);

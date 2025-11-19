@@ -2,7 +2,7 @@ import {LRUCache} from "../lib/lru-cache";
 
 const stickersLRUCache = new LRUCache<string, ArrayBuffer>(10);
 export const stickersInstance = {
-    getSticker: (name: string) => {
+    getSticker: (name: string | ArrayBuffer | Record<string, unknown>) => {
         return getSticker(name);
     },
     preloadSticker: (name: string) => {
@@ -17,7 +17,10 @@ async function preloadSticker(name: string) {
     await downloadAndCacheSticker(name);
 }
 
-async function getSticker(name: string): Promise<ArrayBuffer> {
+async function getSticker(name: string | ArrayBuffer | Record<string, unknown>): Promise<ArrayBuffer | Record<string, unknown>> {
+    if (typeof name !== "string") {
+        return name;
+    }
     if (stickersLRUCache.has(name)) {
         return stickersLRUCache.get(name)!;
     }
