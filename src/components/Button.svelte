@@ -193,6 +193,7 @@
 
     .button > svg {
         flex-shrink: 0;
+        width: 24px;
         fill: var(--accent-color);
         transform: rotate(0deg) translateY(-1px);
     }

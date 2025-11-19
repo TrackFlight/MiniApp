@@ -20,7 +20,7 @@
     let {
         bottom_margin = '0px',
     }  : {
-        bottom_margin: string;
+        bottom_margin?: string;
     } = $props();
 
     let current: {
