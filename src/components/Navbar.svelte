@@ -126,7 +126,7 @@
 
     nav.isiOS:not(.isDesktop):before {
         content: '';
-        backdrop-filter: blur(2px) saturate(300%);
+        backdrop-filter: blur(2px) saturate(100%);
         position: absolute;
         width: 100%;
         height: 100%;
@@ -153,7 +153,7 @@
 
     nav.isiOS:not(.isDesktop).isTouched:after {
         transform: translateX(calc(var(--width-navitem) * var(--navbar-page))) scale(1.25);
-        backdrop-filter: blur(2px) saturate(300%);
+        backdrop-filter: blur(2px) saturate(100%);
         background: transparent;
         /*noinspection CssNonIntegerLengthInPixels*/
         box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
