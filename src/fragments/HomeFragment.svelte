@@ -120,7 +120,6 @@
 
 <ScrollablePage>
     <Header>
-        <UserIcon user={currentUser} />
         {#if isiOS && items.length > 0}
             <Button text={deletable ? T('DONE_BTN') : T('EDIT_BTN')} on_click={() => deletable = !deletable} destructive secondary />
         {/if}

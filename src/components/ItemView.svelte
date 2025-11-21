@@ -1,10 +1,11 @@
 <script lang="ts">
-    import {isDesktop, isiOS} from "../lib/telegram";
+    import {isDesktop, isiOS, telegram} from "../lib/telegram";
     import NamedIcon from "./NamedIcon.svelte";
     import {parseTextWithSpoilers} from "./SimpleSpoiler";
     import SimpleSpoiler from "./SimpleSpoiler.svelte";
     import Switch from "./Switch.svelte";
     import RippleEffect from "./RippleEffect.svelte";
+    import StickerView from "./StickerView.svelte";
 
     let {
         icon,
@@ -19,6 +20,9 @@
         deletable = $bindable(),
         switchable = $bindable(),
         switchLocked = $bindable(),
+        status = $bindable(),
+        radio = $bindable(),
+        radioChecked = $bindable(),
         highlight = false,
         small = false,
         no_ellipsis = false,
@@ -37,6 +41,9 @@
         deletable?: boolean,
         switchable?: boolean,
         switchLocked?: boolean,
+        status?: string,
+        radio?: boolean,
+        radioChecked?: boolean,
         highlight?: boolean,
         small?: boolean,
         noBoldTitle?: boolean,
@@ -47,7 +54,54 @@
 
     let switchElement: Switch | undefined = $state();
     let titleWithSpoilers = $derived(parseTextWithSpoilers(title))
+    const with_status = $derived(status !== undefined && status !== null && status.length > 0);
+    const isNoIcon = $derived(icon === "no_icon");
     let currentSpoilersStatus = $state(true);
+
+    const checkIcon = !isiOS ?
+        JSON.parse('{"v":"5.9.4","fr":60,"ip":0,"op":30,"w":20,"h":20,"nm":"Radio","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":4,"nm":"Radio","sr":1,"ks":{"o":{"a":0,"k":100,"ix":11},"r":{"a":0,"k":0,"ix":10},"p":{"a":0,"k":[10,10,0],"ix":2,"l":2},"a":{"a":0,"k":[0,0,0],"ix":1,"l":2},"s":{"a":1,"k":[{"i":{"x":[0,0,0.667],"y":[1,1,1]},"o":{"x":[0.333,0.333,0.333],"y":[0,0,0]},"t":0,"s":[100,100,100]},{"i":{"x":[0,0,0.667],"y":[1,1,1]},"o":{"x":[0.333,0.333,0.333],"y":[0,0,0]},"t":15,"s":[95,95,100]},{"t":30,"s":[100,100,100]}],"ix":6,"l":2}},"ao":0,"shapes":[{"ty":"gr","it":[{"ty":"gr","it":[{"d":1,"ty":"el","s":{"a":1,"k":[{"i":{"x":[0,0],"y":[1,1]},"o":{"x":[0.333,0.333],"y":[0,0]},"t":0,"s":[20,20]},{"t":30,"s":[10,10]}],"ix":2},"p":{"a":0,"k":[0,0],"ix":3},"nm":"Контур эллипса 1","mn":"ADBE Vector Shape - Ellipse","hd":false},{"d":3,"ty":"el","s":{"a":1,"k":[{"i":{"x":[0,0],"y":[1,1]},"o":{"x":[0.333,0.333],"y":[0,0]},"t":0,"s":[16,16]},{"t":30,"s":[0,0]}],"ix":2},"p":{"a":0,"k":[0,0],"ix":3},"nm":"Контур эллипса 2","mn":"ADBE Vector Shape - Ellipse","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Преобразовать"}],"nm":"Dot","np":2,"cix":2,"bm":0,"ix":1,"mn":"ADBE Vector Group","hd":false},{"ty":"gr","it":[{"d":1,"ty":"el","s":{"a":0,"k":[20,20],"ix":2},"p":{"a":0,"k":[0,0],"ix":3},"nm":"Контур эллипса 1","mn":"ADBE Vector Shape - Ellipse","hd":false},{"d":3,"ty":"el","s":{"a":0,"k":[16,16],"ix":2},"p":{"a":0,"k":[0,0],"ix":3},"nm":"Контур эллипса 2","mn":"ADBE Vector Shape - Ellipse","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Преобразовать"}],"nm":"Border","np":2,"cix":2,"bm":0,"ix":2,"mn":"ADBE Vector Group","hd":false},{"ty":"fl","c":{"a":1,"k":[{"i":{"x":[0],"y":[1]},"o":{"x":[0.333],"y":[0]},"t":0,"s":[0.51372551918,0.525490224361,0.541176497936,1]},{"t":30,"s":[0.352941185236,0.654901981354,0.917647063732,1]}],"ix":4},"o":{"a":1,"k":[{"i":{"x":[0],"y":[1]},"o":{"x":[0.333],"y":[0]},"t":0,"s":[50]},{"t":30,"s":[100]}],"ix":5},"r":1,"bm":0,"nm":"color_checked","mn":"ADBE Vector Graphic - Fill","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Преобразовать"}],"nm":"Radio","np":3,"cix":2,"bm":0,"ix":1,"mn":"ADBE Vector Group","hd":false}],"ip":0,"op":30,"st":0,"ct":1,"bm":0}],"markers":[]}') :
+        JSON.parse('{"v":"5.9.4","fr":60,"ip":0,"op":30,"w":90,"h":90,"nm":"Checkbox 4","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":4,"nm":"Path 3","sr":1,"ks":{"o":{"a":0,"k":100,"ix":11},"r":{"a":0,"k":0,"ix":10},"p":{"a":0,"k":[44.25,44.25,0],"ix":2,"l":2},"a":{"a":0,"k":[0,0,0],"ix":1,"l":2},"s":{"a":0,"k":[100,100,100],"ix":6,"l":2}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"v":[[6.25,-6.25],[-1.75,6.25],[-6.25,0.75]],"c":false},"ix":2},"nm":"Контур 1","mn":"ADBE Vector Shape - Group","hd":false},{"ty":"tm","s":{"a":1,"k":[{"i":{"x":[0],"y":[1]},"o":{"x":[0.333],"y":[0]},"t":0,"s":[100]},{"t":30,"s":[0]}],"ix":1},"e":{"a":0,"k":100,"ix":2},"o":{"a":0,"k":0,"ix":3},"m":1,"ix":2,"nm":"Обрезать контуры 1","mn":"ADBE Vector Filter - Trim","hd":false},{"ty":"st","c":{"a":0,"k":[0,0.478431373835,1,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":2.33,"ix":5},"lc":2,"lj":2,"bm":0,"nm":"Обводка 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[300,300],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Преобразовать"}],"nm":"Path 3","np":3,"cix":2,"bm":0,"ix":1,"mn":"ADBE Vector Group","hd":false}],"ip":0,"op":30,"st":0,"ct":1,"bm":0}],"markers":[]}');
+
+    if (radio) {
+        const newColor = hexToLottieRgba(telegram!.themeParams.button_color);
+
+        function hexToLottieRgba(hex: string): [number, number, number, number] {
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(c => c + c).join('');
+            }
+            const r = parseInt(hex.substring(0, 2), 16) / 255;
+            const g = parseInt(hex.substring(2, 4), 16) / 255;
+            const b = parseInt(hex.substring(4, 6), 16) / 255;
+            return [r, g, b, 1];
+        }
+
+        function replaceFillAndStroke(shapes: any[], color: [number, number, number, number], allowedTimestamps: number[]) {
+            if (!shapes) return;
+
+            for (const shape of shapes) {
+                if (shape.ty === 'gr' && shape.it) {
+                    replaceFillAndStroke(shape.it, color, allowedTimestamps);
+                }
+
+                if ((shape.ty === 'fl' || shape.ty === 'st') && shape.c) {
+                    if (shape.c.a === 1 && Array.isArray(shape.c.k)) {
+                        for (const kf of shape.c.k) {
+                            if (allowedTimestamps.includes(kf.t) && kf.s) {
+                                kf.s = color;
+                            }
+                        }
+                    } else if (Array.isArray(shape.c.k) && shape.c.k.length === 4) {
+                        shape.c.k = color;
+                    }
+                }
+            }
+        }
+
+        for (const layer of checkIcon.layers) {
+            if (layer.shapes) replaceFillAndStroke(layer.shapes, newColor, [30]);
+        }
+    }
 
     function onKeyDelete(e: KeyboardEvent) {
         if ((e.key === "Enter" || e.key === " ") && on_delete) {
@@ -79,7 +133,7 @@
     }
 </script>
 
-<div class="itemView clickable allow-divider" class:isNoIcon class:deletable class:switchable class:isiOS class:isDesktop role="button" tabindex="0" onclick={onClickButton} onkeydown={onKeyButton}>
+<div class="itemView clickable allow-divider" class:isNoIcon class:deletable class:switchable class:with_status class:isiOS class:isDesktop role="button" tabindex="0" onclick={onClickButton} onkeydown={onKeyButton}>
     {#if !isiOS}
         <RippleEffect rippleColor="color-mix(in srgb, var(--tg-theme-text-color) 5%, transparent)"/>
     {/if}
@@ -179,14 +233,28 @@
                         <path d="M65.4297 38.8428C65.4297 44.2139 60.9131 48.6816 55.5664 48.6816C50.1709 48.6816 45.7275 44.2627 45.7275 38.8428C45.7275 33.4473 50.1709 29.0039 55.5664 29.0039C60.9863 29.0039 65.4297 33.4473 65.4297 38.8428ZM50.7324 37.5732C50.0244 37.5732 49.4629 38.1836 49.4629 38.8428C49.4629 39.502 50.0244 40.1123 50.7324 40.1123L60.4248 40.1123C61.1328 40.1123 61.6943 39.502 61.6943 38.8428C61.6943 38.1836 61.1328 37.5732 60.4248 37.5732Z" fill="var(--tg-theme-subtitle-text-color)"/>
                     </g>
                 </svg>
+            {:else if icon.startsWith("icon:")}
+                {@const iconName = icon.split(':')[1]}
+                <svg style="margin-inline: 16px;margin-block: 13px;flex-shrink: 0;" width="36px" height="36px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" preserveAspectRatio="xMidYMid meet">
+                    <rect x="2" y="2" width="26" height="26" rx="10" ry="10" fill={icon.split(':')[2]}/>
+                    <g transform="translate(3,3) scale(0.8)">
+                        {#if iconName === "bulb"}
+                            <path fill="#fff" fill-rule="evenodd" d="M16.67 20.699c-.19.051-.506.051-1.138.051h-1.065c-.631 0-.947 0-1.138-.051-.133-.036-.195-.051-.25-.077-.057-.026-.108-.063-.222-.143-.161-.113-.534-.556-1.28-1.443a19 19 0 0 0-.963-1.03C9.375 16.746 8 15.346 8 13c0-4 1.5-7.75 7-7.75S22 9 22 13c0 2.345-1.375 3.745-2.614 5.006-.342.348-.674.686-.963 1.03-.746.887-1.119 1.33-1.28 1.443-.114.08-.165.117-.221.143s-.118.041-.251.077zM12.5 22.75a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1 2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2" clip-rule="evenodd"></path>
+                        {:else if iconName === "newsletter"}
+                            <path fill="#fff" fill-rule="evenodd" d="M8.887 18.01q-1.658 0-2.522-.841-.865-.84-.865-2.433v-1.18q0-1.593.865-2.433.864-.84 2.522-.84h1.737v7.726zm2.845.007v-7.735a25 25 0 0 0 2.328-.38q1.293-.267 2.602-.679a17 17 0 0 0 2.441-.961v11.767a17 17 0 0 0-2.384-.945 25 25 0 0 0-2.563-.679 25 25 0 0 0-2.424-.388m10.12 3.985a1.7 1.7 0 0 1-.858-.21 1.46 1.46 0 0 1-.582-.574 1.8 1.8 0 0 1-.202-.857V7.881q0-.484.202-.856a1.44 1.44 0 0 1 .582-.582q.372-.21.857-.21.493 0 .865.21.373.202.574.582.21.372.21.857v12.48q0 .484-.21.856-.202.372-.574.574-.372.21-.865.21m-9.748 1.48q-.704 0-1.124-.373-.413-.372-.72-1.034l-1.357-2.967q.194 0 .372.008.177.009.282.009 1.536.04 2.32.097.792.056 1.253.137l.453 2.174q.128.623-.04 1.059a1.28 1.28 0 0 1-.558.663q-.38.225-.881.226" clip-rule="evenodd"></path>
+                        {/if}
+                    </g>
+                </svg>
             {:else if icon !== "no_icon" && icon.length > 0}
                 <img src="{icon}" alt="ItemIcon" loading="lazy">
             {:else if icon !== "no_icon"}
                 <NamedIcon name={title ? title:''} id={id ? id : 0} size="40px"/>
             {/if}
-            {@const isNoIcon = icon === "no_icon"}
             {@const isNoDesc = !desc || desc.length === 0}
-            <div class="textContainer" class:isNoIcon class:isNoDesc>
+            {#if radio && !isiOS}
+                <StickerView size="20px" sticker={checkIcon} time_ratio={radioChecked ? 1 : 0}/>
+            {/if}
+            <div class="textContainer" class:isNoIcon class:isNoDesc class:radio>
                 <div>
                     <p class="itemTitle" class:small class:switchable>
                         {#each titleWithSpoilers as part}
@@ -215,6 +283,17 @@
             {/if}
             {#if switchable && !deletable}
                 <Switch bind:this={switchElement} switchLocked={switchLocked} on_change={on_switch_change} defaultState={switchDefault}/>
+            {:else if with_status && !switchable && !deletable}
+                <div class="status">
+                    <p>{status}</p>
+                    {#if isiOS}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="7" height="12" viewBox="0 0 7 12" preserveAspectRatio="xMidYMid meet">
+                            <path opacity="0.3" stroke="var(--tg-theme-text-color)" fill="transparent" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 5 5-5 5"></path>
+                        </svg>
+                    {/if}
+                </div>
+            {:else if radio && isiOS}
+                <StickerView size="30px" sticker={checkIcon} time_ratio={radioChecked ? 1 : 0}/>
             {/if}
         {/if}
     </div>
@@ -359,9 +438,21 @@
         margin-block: 13px;
     }
 
+    /*noinspection CssUnusedSymbol*/
+    .itemView:not(.isiOS) > div > :global(.sticker-view) {
+        margin-left: 15px;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    .itemView.isiOS > div > :global(.sticker-view) {
+        margin-left: auto;
+        margin-right: 20px;
+    }
+
     .textContainer {
         overflow: hidden;
         padding-right: 20px;
+        padding-block: 6px;
     }
 
     .textContainer.isNoIcon {
@@ -371,6 +462,10 @@
 
     .textContainer.isNoDesc {
         padding-block: 14px;
+    }
+
+    .textContainer.radio {
+        padding-block: 16px;
     }
 
     .textContainer > div {
@@ -391,6 +486,10 @@
 
     .itemTitle.small {
         font-size: 16px;
+    }
+
+    .textContainer.radio > div > .itemTitle {
+        font-weight: normal;
     }
 
     .itemTitle.switchable {
@@ -439,5 +538,26 @@
     .itemView > div > :global(.switch) {
         margin-left: auto;
         margin-right: 20px;
+    }
+
+    .itemView > div > .status {
+        margin-left: auto;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .itemView:not(.isiOS) > div > .status {
+        margin-right: 20px;
+    }
+
+    .itemView > div > .status > p {
+        color: var(--tg-theme-subtitle-text-color);
+        font-size: 16px;
+    }
+
+    .itemView:not(.isiOS) > div > .status > p {
+        color: var(--tg-theme-accent-text-color);
     }
 </style>

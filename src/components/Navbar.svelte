@@ -272,6 +272,13 @@
         height: 28px;
     }
 
+    /*noinspection CssUnusedSymbol*/
+    nav.isiOS > div > div > :global(.user-icon) {
+        width: 24px;
+        height: 24px;
+        margin: 2px 0;
+    }
+
     nav.isiOS.isDesktop > div > div > :global(svg) {
         fill: color-mix(in srgb, var(--tg-theme-text-color) 50%, transparent);
     }

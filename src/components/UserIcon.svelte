@@ -1,29 +1,24 @@
 <!--suppress CssUnusedSymbol -->
 <script lang="ts">
     import type {WebAppUser} from "../lib/telegram";
-    import {isiOS} from "../lib/telegram";
 
     const { user } : {user: WebAppUser} = $props();
 </script>
 
-<div class="user-icon" class:isiOS>
+<div class="user-icon">
     <img src="{user.photo_url}" alt="User" loading="lazy"/>
 </div>
 
 <style>
     .user-icon {
-        width: 36px;
-        height: 36px;
+        width: 26px;
+        height: 26px;
         border-radius: 50%;
         overflow: hidden;
         display: flex;
         justify-content: center;
         align-items: center;
         transition: opacity 120ms ease-out;
-    }
-
-    .user-icon.isiOS:active {
-        opacity: 0.4;
     }
 
     .user-icon > img {

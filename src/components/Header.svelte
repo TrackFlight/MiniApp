@@ -12,7 +12,7 @@
         width: 100%;
         display: flex;
         align-items: center;
-        flex-direction: row-reverse;
+        flex-direction: row;
         justify-content: space-between;
     }
 

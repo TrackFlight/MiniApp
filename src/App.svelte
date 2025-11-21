@@ -6,6 +6,7 @@
     import MainActivity from "./activities/MainActivity.svelte";
     import ActivityManager from "./lib/navigation/ActivityManager.svelte";
     import AppInfoActivity from "./activities/AppInfoActivity.svelte";
+    import NotificationSettingsActivity from "./activities/NotificationSettingsActivity.svelte";
 
     telegram?.ready();
     telegram?.expand();
@@ -34,6 +35,7 @@
     const activities = {
         main: MainActivity,
         appInfo: AppInfoActivity,
+        notificationSettings: NotificationSettingsActivity,
     };
 </script>
 

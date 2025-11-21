@@ -5,6 +5,7 @@ import {internalRequest} from "./base";
 export const sessionStore = {
     appList: [] as App[],
     trendingApps: [] as App[],
+    preferences: {} as Record<string, boolean>,
     currentJWT: '',
     langPack: {} as Record<string, string>,
     langCode: '',
@@ -54,6 +55,14 @@ export async function tryLogin() {
         sessionStore.maxFreeLinks = getConfigResponse.response?.limit_free!;
         sessionStore.maxPremiumLinks = getConfigResponse.response?.limit_premium!;
         sessionStore.maxFollowingLinks = getConfigResponse.response?.max_following_links!;
+
+        const getPreferencesResponse = await internalRequest<Record<string, boolean>, null>(
+            `users/preferences`
+        )
+        if (getPreferencesResponse.error) {
+            return false;
+        }
+        sessionStore.preferences = getPreferencesResponse.response!;
         return true;
     }
     return false;

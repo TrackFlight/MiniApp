@@ -34,6 +34,7 @@ interface WebAppInitData {
 
 interface ThemeParams {
     text_color: string;
+    button_color: string;
 }
 
 export type BulletinButton = {

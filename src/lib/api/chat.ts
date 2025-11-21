@@ -95,3 +95,11 @@ export async function removeLink(link: Link) {
         }))
         .filter(app => app.links.length > 0);
 }
+
+export async function updatePreferences() {
+    await internalRequest(
+        `users/preferences`,
+        "PATCH",
+        sessionStore.preferences,
+    );
+}
