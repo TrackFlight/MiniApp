@@ -80,7 +80,6 @@
     }
 
     async function addItem(link: Link) {
-        console.log(link.url, link.notify_available, link.notify_closed);
         const res = await withUIProgress(trackLink(`https://${link.url}`, link.notify_available, link.notify_closed));
         if (res === ServerErrorCode.LinkAlreadyFollowing) {
             telegram.showBulletin("error", T('LINK_ALREADY_FOLLOWING'));

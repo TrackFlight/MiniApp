@@ -33,7 +33,6 @@
 
     function handleAppListChanged() {
         items = sessionStore.appList;
-        console.log(sessionStore.appList);
         if (sessionStore.appList.length === 0 && isiOS) {
             deletable = false;
         }
