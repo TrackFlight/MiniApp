@@ -141,8 +141,8 @@
             <VirtualList data={items}>
                 {#snippet children(item: App)}
                     <ItemView
-                            title={item.name ? item.name : T('UNKNOWN_APP')}
-                            desc={
+                        title={item.name ? item.name : T('UNKNOWN_APP')}
+                        desc={
                         item.name ?
                         T(
                             'LINK_AMOUNT',
