@@ -47,7 +47,7 @@
     }
 
     /*noinspection CssUnusedSymbol*/
-    .listView :global(.allow-divider:not(:last-child)::after) {
+    .listView :global(:has(.virtual-list :nth-child(2), .itemView:nth-child(2)) .allow-divider:not(:last-child)::after) {
         content: "";
         position: absolute;
         bottom: 0;
@@ -69,7 +69,7 @@
     }
 
     /*noinspection CssUnusedSymbol*/
-    .listView > div > :global(div > div:not(:last-child) > .itemView:not(:has(.icon)).isiOS.deletable::after) {
-        transform: translateX(var(--delete-width));
+    .listView.isiOS :global(.allow-divider:not(:last-child):has(.deletable)::after) {
+        transform: translateX(var(--delete-ios-width));
     }
 </style>

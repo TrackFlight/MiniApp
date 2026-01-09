@@ -306,7 +306,6 @@
         width: 100%;
         user-select: none;
         cursor: pointer;
-        --delete-width: 45px;
         z-index: 0;
     }
 
@@ -380,7 +379,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: var(--delete-width);
+        height: var(--delete-ios-width);
         position: relative;
         transition: width 250ms ease;
         flex-shrink: 0;
@@ -388,7 +387,7 @@
 
     .deleteBtn.isiOS:before,
     .deleteBtn.isiOS:after {
-        transform: translateX(calc(-14px - var(--delete-width)));
+        transform: translateX(calc(-14px - var(--delete-ios-width)));
         transition: transform 210ms ease-in-out 0ms;
     }
 
@@ -420,7 +419,7 @@
     }
 
     .deleteBtn.isiOS.deletable {
-        width: var(--delete-width);
+        width: var(--delete-ios-width);
     }
 
     /** Icons and Description **/
