@@ -1,10 +1,10 @@
 <script lang="ts">
-    import {isiOS} from "../lib/telegram";
+    import {isiOS, isDesktop} from "../lib/telegram";
 
     const { header, children } : {header: string, children: any} = $props();
 </script>
 
-<div class="listView" class:isiOS>
+<div class="listView" class:isiOS class:isDesktop>
     <p>{!isiOS ? header : header.toUpperCase()}</p>
     <div>
         {@render children?.()}
@@ -16,6 +16,12 @@
         padding-inline: 14px;
         padding-top: 10px;
         margin-bottom: 10px;
+        overflow: hidden;
+    }
+
+    .listView:not(.isiOS):not(.isDesktop) {
+        margin-inline: 12px;
+        border-radius: 15px;
     }
 
     .listView:not(.isiOS) {

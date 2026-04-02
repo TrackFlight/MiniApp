@@ -94,6 +94,11 @@
         background: var(--accent-color);
     }
 
+    .button:not(.isiOS):not(.isDesktop) {
+        border-radius: 200px;
+        padding-block: 14px;
+    }
+
     .button.secondary.isiOS {
         padding-block: 10px;
     }

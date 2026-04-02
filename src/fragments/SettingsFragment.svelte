@@ -2,7 +2,7 @@
     import ScrollablePage from "../components/ScrollablePage.svelte";
     import {T} from "../lib/translator.js";
     import ListView from "../components/ListView.svelte";
-    import {isiOS} from "../lib/telegram";
+    import {isiOS, isDesktop} from "../lib/telegram";
     import ItemView from "../components/ItemView.svelte";
     import ItemDescription from "../components/ItemDescription.svelte";
     import {sessionStore} from "../lib/api";
@@ -24,7 +24,7 @@
 </script>
 
 <ScrollablePage>
-    <div class="settings-content">
+    <div class="settings-content" class:isiOS class:isDesktop>
         <ListView header={T('NOTIFICATIONS_HEADER')}>
             <ItemView
                 title={T('NOTIFICATION_UPDATES_TITLE')}
@@ -61,5 +61,9 @@
     .settings-content {
         width: 100%;
         padding-bottom: var(--global-navbar-height);
+    }
+
+    .settings-content:not(.isiOS):not(.isDesktop) {
+        margin-block-start: 10px;
     }
 </style>

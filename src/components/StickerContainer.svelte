@@ -1,11 +1,11 @@
 <script lang="ts">
-    import {isiOS} from "../lib/telegram";
+    import {isiOS, isDesktop} from "../lib/telegram";
     import StickerView from "./StickerView.svelte";
 
     const { title, desc, sticker, children } : {title: string, desc: string, sticker:string, children: any} = $props();
 </script>
 
-<div class="sticker-container" class:isiOS>
+<div class="sticker-container" class:isiOS class:isDesktop>
     <StickerView size="140px" sticker={sticker} autoplay={true}>
         {@render children?.()}
     </StickerView>
@@ -21,6 +21,13 @@
         padding-block: 20px;
         padding-inline: 30px;
         align-items: center;
+    }
+
+    .sticker-container:not(.isiOS):not(.isDesktop) {
+        margin-inline: 12px;
+        margin-block-start: 10px;
+        width: calc(100% - 24px);
+        border-radius: 15px;
     }
 
     .sticker-container:not(.isiOS) {

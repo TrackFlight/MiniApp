@@ -1,12 +1,10 @@
 <script lang="ts">
     import {T} from "../lib/translator";
     import ListView from "../components/ListView.svelte";
-    import {isiOS, telegram} from "../lib/telegram";
+    import {isiOS, isDesktop} from "../lib/telegram";
     import ItemView from "../components/ItemView.svelte";
     import {
-        notifyAppListChanged,
         sessionStore,
-        updateLinkPreferences,
         updatePreferences,
         withUIProgress
     } from "../lib/api";
@@ -37,7 +35,7 @@
     }
 </script>
 
-<div class="content">
+<div class="content" class:isDesktop class:isiOS>
     <ListView header={title}>
         <ItemView
             title={T('STATUS_ON')}
@@ -58,3 +56,9 @@
     </ListView>
     <ItemDescription description={description} />
 </div>
+
+<style>
+    .content:not(.isiOS):not(.isDesktop) {
+        margin-block-start: 10px;
+    }
+</style>

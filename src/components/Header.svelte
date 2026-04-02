@@ -17,6 +17,6 @@
     }
 
     .header:not(.isiOS) {
-        background: var(--tg-theme-section-bg-color);
+        display: none;
     }
 </style>

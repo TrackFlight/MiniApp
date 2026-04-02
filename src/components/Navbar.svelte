@@ -14,17 +14,90 @@
 
     let touchedIndex = $state(0);
     let isTouched = $state(false);
+    let feImageEl: SVGFEImageElement;
+    let navbarElement: HTMLElement;
+
+    function generatePillNormalMap(width: number, height: number): string {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+        const r = height / 2;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, width, height, r);
+        ctx.clip();
+        const vGrad = ctx.createLinearGradient(0, 0, 0, height);
+        vGrad.addColorStop(0,    'rgb(218, 254, 218)');
+        vGrad.addColorStop(0.10, 'rgb(122, 222,  74)');
+        vGrad.addColorStop(0.20, 'rgb(113, 193,  16)');
+        vGrad.addColorStop(0.40, 'rgb(131, 163,   2)');
+        vGrad.addColorStop(0.50, 'rgb(144, 146,   0)');
+        vGrad.addColorStop(0.70, 'rgb(172, 120,   2)');
+        vGrad.addColorStop(0.80, 'rgb(178,  99,   4)');
+        vGrad.addColorStop(0.90, 'rgb(163,  56,  12)');
+        vGrad.addColorStop(1.0,  'rgb(133,  94,  95)');
+        ctx.fillStyle = vGrad;
+        ctx.fillRect(0, 0, width, height);
+        ctx.shadowColor = 'rgba(255, 255, 255, 1)';
+        ctx.shadowBlur  = height * 0.26;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.lineWidth   = 2;
+        ctx.beginPath();
+        ctx.roundRect(1, 1, width - 2, height - 2, r - 1);
+        ctx.stroke();
+
+        return canvas.toDataURL('image/png');
+    }
+
+    function updateNormalMap() {
+        if (!feImageEl || !navbarElement) return;
+
+        const rect = navbarElement.getBoundingClientRect();
+        const width = Math.ceil(rect.width);
+        const height = Math.ceil(rect.height);
+
+        if (width <= 0 || height <= 0) return;
+
+        feImageEl.setAttribute('href', generatePillNormalMap(width, height));
+    }
+
+    $effect(() => {
+        if (!navbarElement || !feImageEl) return;
+        updateNormalMap();
+        const resizeObserver = new ResizeObserver(() => {
+            updateNormalMap();
+        });
+        resizeObserver.observe(navbarElement);
+        return () => {
+            resizeObserver.disconnect();
+        };
+    });
 </script>
 
 <div class="nav-container" style="--navbar-page: {isTouched ? touchedIndex : pager?.getCurrentPage()}; --page-count: {tabs.length}">
-    <nav class:isiOS class:isDesktop class:isTouched>
+    <nav class:isiOS class:isDesktop class:isTouched bind:this={navbarElement}>
+        <div class="glass-filter">
+            <svg>
+                <filter id="apple-glass" primitiveUnits="objectBoundingBox">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="0.05" result="blurred_source"></feGaussianBlur>
+                    <feImage bind:this={feImageEl} result="map"
+                             width="100%" height="100%" x="0" y="0" href="" />
+                    <feDisplacementMap in="blurred_source" in2="displacement_map" scale="0.2" xChannelSelector="R" yChannelSelector="G" result="displaced"></feDisplacementMap>
+                    <feColorMatrix in="displaced" type="saturate" result="displaced_saturated" values="6"></feColorMatrix>
+                    <feComposite in="displaced_saturated" in2="specular_layer" operator="in" result="specular_saturated"></feComposite>
+                    <feComponentTransfer in="specular_layer" result="specular_faded"><feFuncA type="linear" slope="0.4"></feFuncA></feComponentTransfer>
+                    <feBlend in="specular_saturated" in2="displaced" mode="normal" result="withSaturation"></feBlend>
+                    <feBlend in="specular_faded" in2="withSaturation" mode="normal"></feBlend>
+                </filter>
+            </svg>
+        </div>
         <div class="nav_glare" class:isiOS class:isDesktop class:isTouched></div>
         <div class="nav_glare2" class:isiOS class:isDesktop class:isTouched></div>
         {#each tabs as tab}
             {@const index = tabs.indexOf(tab)}
             {@const isActive = isTouched ? touchedIndex === index : pager?.getCurrentPage() === index}
             <!--suppress HtmlUnknownAttribute -->
-            <div role="button" class:isActive tabindex="0" ontouchstart={() => {
+            <div class="button_container" role="button" class:isiOS class:isDesktop class:isActive tabindex="0" ontouchstart={() => {
                 if (!isiOS|| isDesktop) return;
                 isTouched = true
                 touchedIndex = index;
@@ -73,6 +146,10 @@
         border-top: 1px solid var(--tg-theme-section-separator-color);
         padding-bottom: var(--tg-safe-area-inset-bottom);
         justify-content: space-evenly;
+    }
+
+    nav:not(.isiOS):not(.isDesktop) {
+        margin-bottom: 4px;
     }
 
     .nav_glare, .nav_glare2 {
@@ -124,17 +201,23 @@
         opacity: 0.75;
     }
 
-    nav.isiOS:not(.isDesktop):before {
+    nav:not(.isDesktop):before {
         content: '';
-        backdrop-filter: blur(2px) saturate(100%);
         position: absolute;
         width: 100%;
         height: 100%;
         border-radius: inherit;
-        background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-bg-color) 91%, white) 85%, transparent);
+        background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-section-bg-color) 97%, white) 85%, transparent);
+        backdrop-filter: url(#apple-glass);
+
         /*noinspection CssNonIntegerLengthInPixels*/
         box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
         transition: 200ms cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    nav.isiOS:not(.isDesktop):before {
+        backdrop-filter: blur(2px) saturate(100%);
+        background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-bg-color) 91%, white) 85%, transparent);
     }
 
     nav.isiOS:not(.isDesktop):after {
@@ -159,7 +242,7 @@
         box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
     }
 
-    nav.isiOS:not(.isDesktop) {
+    nav:not(.isDesktop) {
         padding-bottom: 0;
         width: fit-content;
         height: 60px;
@@ -177,13 +260,9 @@
         transform: scale(1.08);
     }
 
-    nav:not(.isiOS) {
-        background: var(--tg-theme-section-bg-color);
-        height: 62px;
-    }
-
     nav.isDesktop {
         background: var(--tg-theme-section-bg-color);
+        height: 62px;
     }
 
     nav > div {
@@ -219,7 +298,7 @@
         transition: width 150ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
-    nav:not(.isiOS) > div > div:after {
+    nav:not(.isiOS).isDesktop > div > div:after {
         content: "";
         position: absolute;
         width: 70%;
@@ -229,6 +308,29 @@
         z-index: -1;
         background: var(--tg-theme-text-color);
         transition: opacity 150ms cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .button_container:not(.isiOS):not(.isDesktop) {
+        position: relative;
+    }
+
+    .button_container:not(.isiOS):not(.isDesktop):after {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border-radius: 30px;
+        opacity: 0;
+        background: var(--tg-theme-button-color);
+        transform: scale(0.5);
+        transform-origin: center center;
+        transition:
+                transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .button_container:not(.isiOS):not(.isDesktop).isActive:after {
+        transform: scale(1);
+        opacity: 0.15;
     }
 
     /*noinspection CssUnusedSymbol*/
@@ -249,13 +351,13 @@
         }
     }
 
-    nav:not(.isiOS) > div.isActive > div:before {
+    nav:not(.isiOS).isDesktop > div.isActive > div:before {
         width: 70%;
         opacity: 0.1;
         animation: pulseBg 300ms ease-in-out;
     }
 
-    nav.isiOS > div > div {
+    nav:not(.isDesktop) > div > div {
         margin-bottom: 0;
     }
 
@@ -273,7 +375,7 @@
     }
 
     /*noinspection CssUnusedSymbol*/
-    nav.isiOS > div > div > :global(.user-icon) {
+    nav:not(.isDesktop) > div > div > :global(.user-icon) {
         width: 24px;
         height: 24px;
         margin: 2px 0;
@@ -283,11 +385,15 @@
         fill: color-mix(in srgb, var(--tg-theme-text-color) 50%, transparent);
     }
 
-    nav.isiOS:not(.isDesktop) > div.isActive > div > :global(svg) {
+    nav:not(.isDesktop) > div.isActive > div > :global(svg) {
         fill: var(--tg-theme-accent-text-color);
     }
 
-    nav:not(.isiOS) > div.isActive > div > :global(svg) {
+    nav:not(.isDesktop):not(.isiOS) > div.isActive > div > :global(svg) {
+        fill: var(--tg-theme-button-color);
+    }
+
+    nav.isDesktop > div.isActive > div > :global(svg) {
         fill: var(--tg-theme-text-color);
     }
 
@@ -299,11 +405,11 @@
         transition: color 150ms ease-in-out;
     }
 
-    nav.isiOS:not(.isDesktop) > div > div > :global(svg) {
+    nav:not(.isDesktop) > div > div > :global(svg) {
         fill: var(--tg-theme-text-color);
     }
 
-    nav.isiOS > div > p {
+    nav:not(.isDesktop) > div > p {
         color: var(--tg-theme-text-color);
     }
 
@@ -314,14 +420,28 @@
     nav.isiOS > div > p {
         font-size: 10px;
         font-weight: 500;
+    }
+
+    nav:not(.isDesktop) > div > p {
         z-index: 1;
     }
 
-    nav.isiOS > div.isActive > p {
+    nav:not(.isDesktop) > div.isActive > p {
         color: var(--tg-theme-accent-text-color);
     }
 
-    nav:not(.isiOS) > div.isActive > p {
+    nav:not(.isDesktop):not(.isActive) > div.isActive > p {
+        color: var(--tg-theme-button-color);
+    }
+
+    nav.isDesktop > div.isActive > p {
         color: var(--tg-theme-text-color);
+    }
+
+    .glass-filter {
+        position: absolute;
+        width: 0;
+        height: 0;
+        z-index: -1;
     }
 </style>

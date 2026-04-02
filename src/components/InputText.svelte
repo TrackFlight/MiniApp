@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {isiOS} from "../lib/telegram";
+    import {isiOS, isDesktop} from "../lib/telegram";
     import {onDestroy, onMount} from "svelte";
 
     let {
@@ -49,7 +49,7 @@
     });
 </script>
 
-<div class="search-bar" class:isiOS class:has-input={inputValue.length > 0} bind:this={searchBar} style="--background-parent: {backgroundColor}">
+<div class="search-bar" class:isiOS class:isDesktop class:has-input={inputValue.length > 0} bind:this={searchBar} style="--background-parent: {backgroundColor}">
     {#if search}
         {#if isiOS}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38.0371 38.0615">
@@ -61,7 +61,7 @@
             </svg>
         {/if}
     {/if}
-    <input class:search autocomplete="off" spellcheck="false" maxlength="40" type="search" placeholder="{isiOS ? hint : ''}" bind:value={inputValue}/>
+    <input class:isiOS class:isDesktop class:search autocomplete="off" spellcheck="false" maxlength="40" type="search" placeholder="{isiOS || !isDesktop ? hint : ''}" bind:value={inputValue}/>
     <div class="search-hint" class:search>{hint}</div>
 </div>
 <style>
@@ -93,19 +93,27 @@
         appearance: none;
     }
 
-    .search-bar.isiOS > input {
+    .search-bar:not(.isDesktop) > input {
         border: none;
         border-radius: 50px;
         padding-inline: 16px;
         padding-block: 10px;
         caret-color: var(--tg-theme-accent-text-color);
-        background: var(--tg-theme-section-bg-color);
+        background: color-mix(in srgb, var(--tg-theme-subtitle-text-color) 15%, transparent);
+    }
+
+    .search-bar.isiOS > input {
         /*noinspection CssNonIntegerLengthInPixels*/
         box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);
+        background: var(--tg-theme-section-bg-color);
     }
 
     .search-bar.isiOS > input.search {
         padding-inline: 42px 16px;
+    }
+
+    .search-bar:not(.isiOS):not(.isDesktop) > input.search {
+        padding-inline: 45px 16px;
     }
 
     input::placeholder {
@@ -113,17 +121,22 @@
         color: color-mix(in srgb, var(--tg-theme-subtitle-text-color) 75%, transparent);
     }
 
+    input:not(.isDesktop):not(.isiOS)::placeholder {
+        font-size: 15px;
+        color: color-mix(in srgb, var(--tg-theme-subtitle-text-color) 85%, var(--tg-theme-text-color));
+    }
+
     input:focus {
         border-color: var(--tg-theme-accent-text-color);
         outline: var(--tg-theme-accent-text-color);
     }
 
-    .search-bar.isiOS > input:focus {
+    .search-bar:not(.isDesktop) > input:focus {
         outline: none;
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS):has(input:focus) > svg {
+    .search-bar.isDesktop:has(input:focus) > svg {
         fill: var(--tg-theme-accent-text-color);
     }
 
@@ -143,12 +156,18 @@
         height: 16px;
     }
 
-    .search-bar.isiOS > .search-hint {
+    .search-bar:not(.isDesktop):not(.isiOS) > svg {
+        width: 19px;
+        height: 19px;
+        fill: color-mix(in srgb, var(--tg-theme-subtitle-text-color) 85%, var(--tg-theme-text-color));
+    }
+
+    .search-bar:not(.isDesktop) > .search-hint {
         display: none;
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS) > .search-hint {
+    .search-bar.isDesktop > .search-hint {
         position: absolute;
         margin: 0;
         left: 18px;
@@ -163,18 +182,18 @@
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS) > .search-hint {
+    .search-bar.isDesktop > .search-hint {
         left: 43px;
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS):has(input:focus) > .search-hint {
+    .search-bar.isDesktop:has(input:focus) > .search-hint {
         color: var(--tg-theme-accent-text-color);
     }
 
     /*noinspection CssUnusedSymbol*/
-    .search-bar:not(.isiOS):has(input:focus) > .search-hint,
-    .search-bar:not(.isiOS).has-input > .search-hint {
+    .search-bar.isDesktop:has(input:focus) > .search-hint,
+    .search-bar.isDesktop.has-input > .search-hint {
         top: 2%;
         left: 13px;
         font-size: 12px;

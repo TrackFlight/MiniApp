@@ -12,7 +12,7 @@
         trackLink,
         withUIProgress
     } from "../lib/api";
-    import {isiOS, telegram} from "../lib/telegram";
+    import {isiOS, isDesktop, telegram} from "../lib/telegram";
     import {GetLinkDescription, T} from "../lib/translator";
     import NamedIcon from "../components/NamedIcon.svelte";
     import Divider from "../components/Divider.svelte";
@@ -151,7 +151,7 @@
 </script>
 
 <div class="content">
-    <div class="app-header" class:isiOS>
+    <div class="app-header" class:isiOS class:isDesktop>
         {#if app.icon_url}
             <img src={app.icon_url} alt="App Icon"/>
         {:else}
@@ -164,7 +164,7 @@
     </div>
     <Divider/>
     {#if app.description}
-        <div class="description-container" class:isiOS role="button" tabindex="0" class:showMore onclick={expandDescription} onkeydown={onKey}>
+        <div class="description-container" class:isiOS class:isDesktop role="button" tabindex="0" class:showMore onclick={expandDescription} onkeydown={onKey}>
             <h4>{isiOS ? T('APP_DESCRIPTION_HEADER').toLowerCase() : T('APP_DESCRIPTION_HEADER')}</h4>
             <p class="more-button" bind:this={moreButton}>
                 {T('DESCRIPTION_MORE_BUTTON')}
@@ -288,6 +288,16 @@
         width: 100%;
         position: relative;
         background: var(--tg-theme-section-bg-color);
+    }
+
+    .description-container:not(.isiOS):not(.isDesktop), .app-header:not(.isiOS):not(.isDesktop) {
+        margin-inline: 12px;
+        border-radius: 15px;
+        width: calc(100% - 24px);
+    }
+
+    .app-header:not(.isiOS):not(.isDesktop) {
+        margin-block-start: 10px;
     }
 
     .description-container:not(.isiOS) {
