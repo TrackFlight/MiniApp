@@ -115,7 +115,6 @@
         overflow: hidden;
         border-radius: inherit;
         pointer-events: none;
-        z-index: -1;
     }
 
     .ripple-wave {
