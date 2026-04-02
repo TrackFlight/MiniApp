@@ -1,7 +1,7 @@
 {
   "name": "tft-bot-miniapp",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,14 +10,14 @@
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^6.2.1",
-    "@tsconfig/svelte": "^5.0.6",
-    "svelte": "^5.43.14",
-    "svelte-check": "^4.3.4",
+    "@sveltejs/vite-plugin-svelte": "^6.2.4",
+    "@tsconfig/svelte": "^5.0.8",
+    "svelte": "^5.55.1",
+    "svelte-check": "^4.4.6",
     "typescript": "~5.9.3",
-    "vite": "^7.2.4"
+    "vite": "^7.3.1"
   },
   "dependencies": {
-    "@lottiefiles/dotlottie-web": "^0.56.0"
+    "@lottiefiles/dotlottie-web": "^0.69.0"
   }
 }
