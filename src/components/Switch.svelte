@@ -1,6 +1,5 @@
 <script lang="ts">
     import {isDesktop, isiOS} from "../lib/telegram";
-    import {onMount} from "svelte";
 
     let {
         on_change,
@@ -19,6 +18,7 @@
         on_change((event.target as HTMLInputElement).checked);
     }
 
+    // noinspection JSUnusedGlobalSymbols
     export function toggle() {
         switchElement.checked = !switchElement.checked && !switchLocked;
         if (on_change && !switchLocked) on_change(switchElement.checked);

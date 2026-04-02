@@ -1,6 +1,5 @@
 <script lang="ts">
-    import {currentUser, isiOS, telegram} from "../lib/telegram";
-    import UserIcon from '../components/UserIcon.svelte'
+    import {isiOS, telegram} from "../lib/telegram";
     import Header from "../components/Header.svelte";
     import StickerContainer from "../components/StickerContainer.svelte";
     import ListView from "../components/ListView.svelte";

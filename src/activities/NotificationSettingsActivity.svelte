@@ -22,7 +22,7 @@
         description: string
     } = $props();
 
-    let checked = $state(sessionStore.preferences[kind]);
+    let checked = $derived(sessionStore.preferences[kind]);
     let applyTimeout: ReturnType<typeof setTimeout>;
 
     function togglePreferences(toggle: boolean) {
