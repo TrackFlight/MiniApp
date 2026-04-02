@@ -28,9 +28,10 @@
     let showMore = $state(true);
     let moreTextSize = $state(0);
     let localApp = sessionStore.appList.find(a => a.id === app.id);
-    let linksList = $state<LinkWithFollowingStatus[]>(retrieveLinksWithFollowingStatus(app.links));
+    let linksList = $derived<LinkWithFollowingStatus[]>(retrieveLinksWithFollowingStatus(app.links));
     let description: HTMLParagraphElement | undefined = $state();
     let moreButton: HTMLParagraphElement | undefined = $state();
+    const appName = $derived(app.name ? app.name : T('UNKNOWN_APP'));
 
     const {finishActivity} =  getApplicationContext();
 
@@ -56,13 +57,14 @@
     }
 
     function retrieveLinksWithFollowingStatus(links: Link[]): LinkWithFollowingStatus[] {
-        return links.map(link => {
+        return links.map((link): LinkWithFollowingStatus => {
             const foundLink = localApp?.links.find(l => l.id === link.id);
             return {
                 ...link,
                 following: !!foundLink,
                 url: foundLink?.url || link.url,
                 notify_available: foundLink?.notify_available || false,
+                app_name: appName,
                 notify_closed: foundLink?.notify_closed || false,
             };
         });
@@ -153,10 +155,10 @@
         {#if app.icon_url}
             <img src={app.icon_url} alt="App Icon"/>
         {:else}
-            <NamedIcon name={app.name ? app.name : T('UNKNOWN_APP')} id={app.links[0].id} size="{isiOS ? 120:55}px"/>
+            <NamedIcon name={appName} id={app.links[0].id} size="{isiOS ? 120:55}px"/>
         {/if}
         <div>
-            <h1>{@html app.name ? app.name : T('UNKNOWN_APP')}</h1>
+            <h1>{@html appName}</h1>
             <p>{T('APP_FOLLOWERS_AMOUNT', {Amount: app.followers}, app.followers)}</p>
         </div>
     </div>

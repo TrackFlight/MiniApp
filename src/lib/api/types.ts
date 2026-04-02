@@ -21,6 +21,7 @@ export interface Link {
 
 export interface LinkWithFollowingStatus extends Link {
     following: boolean;
+    app_name: string | null;
 }
 
 export type ResponseData<T> = {

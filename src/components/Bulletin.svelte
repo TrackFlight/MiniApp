@@ -36,6 +36,11 @@
     telegram.showBulletin = async (icon: string, message: string, duration?: number, title?: string, button?: BulletinButton, on_close?: () => void) => {
         const isSame = current && current.icon === icon && current.message === message && current.title === title && current?.icon !== 'timer';
         const isVisible = document.getElementsByClassName('bulletin').length > 0;
+        switch(icon) {
+            case 'copy':
+                icon = 'link_added';
+                break;
+        }
         const newData = {
             title: title,
             message: message,
