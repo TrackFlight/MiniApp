@@ -153,12 +153,12 @@
                     <Button on_click={() => {
                         on_remove(data);
                         telegram.closeBottomSheet('link-info');
-                    }} text={T('REMOVE_LINK_BTN')} accent="var(--tg-theme-destructive-text-color)" destructive/>
+                    }} text={T('REMOVE_LINK_BTN')} accent="var(--tg-theme-destructive-text-color)" android_rounded destructive/>
                 {:else}
                     <Button on_click={() => {
                         on_add(data);
                         telegram.closeBottomSheet('link-info');
-                    }} text={T('TRACK_LINK_BTN')} accent="var(--tg-theme-button-color)"/>
+                    }} text={T('TRACK_LINK_BTN')} accent="var(--tg-theme-button-color)" android_rounded/>
                 {/if}
             </div>
         </div>

@@ -64,7 +64,7 @@
                 <Button on_click={() => {
                     callable(inputValue, notifyAvailable, notifyClosed);
                     telegram.closeBottomSheet('add-link');
-                }} text={T('TRACK_LINK_BTN')} accent="var(--tg-theme-button-color)" disabled={!isValidLink}/>
+                }} text={T('TRACK_LINK_BTN')} accent="var(--tg-theme-button-color)" disabled={!isValidLink} android_rounded/>
             </div>
         </div>
     {/snippet}

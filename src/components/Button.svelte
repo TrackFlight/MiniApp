@@ -11,6 +11,7 @@
         accent = 'var(--tg-theme-accent-text-color)',
         destructive = false,
         disabled = false,
+        android_rounded = false,
     } : {
         text?: string,
         on_click?: () => void,
@@ -19,6 +20,7 @@
         accent?: string,
         destructive?: boolean,
         disabled?: boolean,
+        android_rounded?: boolean,
     } = $props();
 
     const displayText = $derived(!isiOS && text && secondary ? text.toUpperCase() : text);
@@ -38,7 +40,7 @@
     }
 </script>
 
-<div style="--accent-color: {accent}" class="button clickable" class:isDesktop class:isiOS class:disabled class:destructive class:secondary role="button" tabindex="0" onclick={handleClick} onkeydown={onKey}>
+<div style="--accent-color: {accent}" class="button clickable" class:isDesktop class:isiOS class:android_rounded class:disabled class:destructive class:secondary role="button" tabindex="0" onclick={handleClick} onkeydown={onKey}>
     {#if !isiOS}
         <RippleEffect rippleColor="color-mix(in srgb, {secondary ? 'var(--accent-color)' : 'black'} {secondary ? '8':'15'}%, transparent)"/>
     {/if}
@@ -94,7 +96,7 @@
         background: var(--accent-color);
     }
 
-    .button:not(.isiOS):not(.isDesktop) {
+    .button.android_rounded:not(.isiOS):not(.isDesktop) {
         border-radius: 200px;
         padding-block: 14px;
     }
