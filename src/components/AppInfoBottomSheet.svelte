@@ -9,7 +9,7 @@
         withUIProgress
     } from "../lib/api";
     import {GetLinkDescription, T} from "../lib/translator";
-    import {isDesktop, isDarkTheme, isiOS, telegram} from "../lib/telegram";
+    import {isDesktop, isDarkTheme, isAndroid, isiOS, isSamsungDevice, telegram} from "../lib/telegram";
     import Divider from "./Divider.svelte";
     import ItemView from "./ItemView.svelte";
     import Button from "./Button.svelte";
@@ -65,7 +65,7 @@
 
     function copyLink(data: LinkWithFollowingStatus) {
         telegram.closeBottomSheet('link-info');
-        if (isiOS || isDesktop) {
+        if (isiOS || isDesktop || (isAndroid && !isSamsungDevice())) {
             telegram.showBulletin("copy", T('COPIED_LINK'), 1800);
         }
         navigator.clipboard.writeText(data.url);
@@ -288,6 +288,9 @@
 
     .link-container > p {
         margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .copy-btn {
