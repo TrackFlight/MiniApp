@@ -98,5 +98,7 @@
         display: flex;
         flex-direction: column;
         background: var(--tg-theme-secondary-bg-color);
+        will-change: transform;
+        contain: layout paint;
     }
 </style>

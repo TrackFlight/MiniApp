@@ -41,16 +41,21 @@
         if (page < 0 || page >= fragments.length) return;
         if (currentPage === page) return;
         prevPage = currentPage;
-        currentPage = page;
-
+        
         visiblePages.add(page);
         visiblePages.add(prevPage);
         visiblePages = new Set(visiblePages);
-        clearInterval(visiblePagesTimeout);
-        visiblePagesTimeout = setTimeout(() => {
-            visiblePages.delete(prevPage);
-            visiblePages = new Set(visiblePages);
-        }, 250);
+
+        clearTimeout(visiblePagesTimeout);
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                currentPage = page;
+                visiblePagesTimeout = setTimeout(() => {
+                    visiblePages.delete(prevPage);
+                    visiblePages = new Set(visiblePages);
+                }, 250);
+            });
+        });
     }
 
     export function getCurrentPage(): number {

@@ -146,6 +146,7 @@
         border-top: 1px solid var(--tg-theme-section-separator-color);
         padding-bottom: var(--tg-safe-area-inset-bottom);
         justify-content: space-evenly;
+        isolation: isolate;
     }
 
     nav:not(.isiOS):not(.isDesktop) {
@@ -209,6 +210,11 @@
         border-radius: inherit;
         background: color-mix(in srgb, color-mix(in srgb, var(--tg-theme-section-bg-color) 97%, white) 85%, transparent);
         backdrop-filter: url(#apple-glass);
+        -webkit-backdrop-filter: url(#apple-glass);
+
+        will-change: backdrop-filter;
+        transform: translateZ(0);
+        contain: paint;
 
         /*noinspection CssNonIntegerLengthInPixels*/
         box-shadow: 0.5px 0.5px 0 var(--tg-theme-liquid-glass-border), -0.5px -0.5px 0 var(--tg-theme-liquid-glass-border);

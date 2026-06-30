@@ -31,7 +31,7 @@
 
     const {getComponentContext} =  getApplicationContext();
 
-    onMount(async () => {
+    onMount(() => {
         if (typeof sticker === "string") {
             const {onCapture, onRestore} = getComponentContext(currentElement, sticker);
 
@@ -59,23 +59,6 @@
             });
         }
 
-        dotLottie = new DotLottie({
-            canvas:  lottieEl,
-        });
-
-        dotLottie.addEventListener("ready", loadSticker);
-        dotLottie.addEventListener("load", () => {
-            loaded = true;
-            if (time_ratio != undefined) {
-                dotLottie.setFrame(Math.floor(dotLottie.totalFrames * time_ratio) - 1);
-            } else {
-                if (startFrame > 0) {
-                    dotLottie.setFrame(startFrame);
-                }
-            }
-            if (on_load) on_load();
-        });
-
         function animateToRatio(ratio: number) {
             dotLottie.stop();
             const targetFrame = Math.floor(dotLottie.totalFrames * ratio);
@@ -98,9 +81,46 @@
         });
 
         $effect(loadSticker);
+
+        let cancelled = false;
+        const initPlayer = () => {
+            if (cancelled || !lottieEl) return;
+            dotLottie = new DotLottie({
+                canvas: lottieEl,
+            });
+
+            dotLottie.addEventListener("ready", loadSticker);
+            dotLottie.addEventListener("load", () => {
+                loaded = true;
+                if (time_ratio != undefined) {
+                    dotLottie.setFrame(Math.floor(dotLottie.totalFrames * time_ratio) - 1);
+                } else {
+                    if (startFrame > 0) {
+                        dotLottie.setFrame(startFrame);
+                    }
+                }
+                if (on_load) on_load();
+            });
+
+            loadSticker();
+        };
+
+        const ric = (window as any).requestIdleCallback as
+            | ((cb: () => void, opts?: { timeout: number }) => number)
+            | undefined;
+        const handle = ric ? ric(initPlayer, { timeout: 500 }) : setTimeout(initPlayer, 300);
+
+        return () => {
+            cancelled = true;
+            const cancelRic = (window as any).cancelIdleCallback as ((h: number) => void) | undefined;
+            if (ric && cancelRic) cancelRic(handle as number);
+            else clearTimeout(handle as ReturnType<typeof setTimeout>);
+            dotLottie?.destroy?.();
+        };
     });
 
     function loadSticker() {
+        if (!dotLottie) return;
         if (sticker) {
             const options = {
                 loop: loop,
@@ -121,7 +141,7 @@
     }
 
     export function play() {
-        dotLottie.play();
+        dotLottie?.play();
     }
 </script>
 

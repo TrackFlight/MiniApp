@@ -57,14 +57,20 @@
         }
     });
 
+    let scrollScheduled = false;
     function onScroll() {
-        currentTop = viewport.getBoundingClientRect().top;
+        if (scrollScheduled) return;
+        scrollScheduled = true;
+        requestAnimationFrame(() => {
+            currentTop = viewport.getBoundingClientRect().top;
+            scrollScheduled = false;
+        });
     }
 </script>
 
 <div class="virtual-list" bind:this={viewport} style="height: {totalHeight}px;" class:ready>
     {#each visible as item, index (item.__vid)}
-        <div class="allow-divider" style="top: {averageHeight * (start + index)}px;">
+        <div class="allow-divider" style="transform: translateY({averageHeight * (start + index)}px);">
             {@render children(item)}
         </div>
     {/each}
@@ -85,12 +91,15 @@
     }
 
     .virtual-list.ready > div {
-        transition: top 250ms cubic-bezier(0.65, 0, 0.35, 1);
+        transition: transform 250ms cubic-bezier(0.65, 0, 0.35, 1);
     }
 
     .virtual-list > div {
         position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         visibility: visible;
+        will-change: transform;
     }
 </style>
